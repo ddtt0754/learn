@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>智学中心</title>
+<style>
+:root{
+  --bg:#f5f7fa;
+  --text:#1e293b;
+  --text2:#64748b;
+  --grad:linear-gradient(135deg,#35d29a,#2f9df0);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:32px 22px;
+}
+.wrap{width:100%;max-width:560px;text-align:center;}
+
+/* 标题 */
+.title{
+  font-size:3.4rem;font-weight:900;letter-spacing:.18em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  margin-bottom:10px;
+}
+.subtitle{font-size:1.15rem;color:var(--text2);margin-bottom:42px;font-weight:500;}
+
+/* 学科选择 */
+.section-label{font-size:1.1rem;color:var(--text2);margin-bottom:18px;font-weight:600;}
+.subjects{display:flex;gap:18px;justify-content:center;margin-bottom:46px;}
+.subject{
+  flex:1;max-width:220px;cursor:pointer;
+  background:#fff;border:3px solid #e2e8f0;border-radius:20px;
+  padding:30px 14px;transition:transform .15s,border-color .2s,box-shadow .2s;
+  user-select:none;
+}
+.subject:active{transform:scale(.97);}
+.subject .ico{font-size:3.4rem;line-height:1;margin-bottom:14px;}
+.subject .name{font-size:1.8rem;font-weight:800;color:var(--text);}
+.subject.active{
+  border-color:transparent;
+  background:var(--grad);
+  box-shadow:0 12px 30px rgba(47,157,240,.25);
+}
+.subject.active .name{color:#fff;}
+.subject.active .ico{filter:brightness(0) invert(1);}
+
+/* 进入按钮 */
+.enter-btn{
+  width:100%;max-width:420px;
+  padding:22px 0;font-size:1.9rem;font-weight:900;letter-spacing:.1em;
+  color:#fff;border:none;border-radius:18px;cursor:pointer;
+  background:var(--grad);
+  box-shadow:0 14px 32px rgba(53,210,154,.30);
+  transition:transform .15s,box-shadow .2s;
+}
+.enter-btn:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(47,157,240,.35);}
+.enter-btn:active{transform:scale(.98);}
+
+.tip{margin-top:26px;font-size:.95rem;color:#94a3b8;}
+
+@media(max-width:520px){
+  .title{font-size:2.8rem;}
+  .subjects{gap:12px;}
+  .subject{padding:24px 10px;border-radius:16px;}
+  .subject .ico{font-size:2.8rem;}
+  .subject .name{font-size:1.5rem;}
+  .enter-btn{font-size:1.6rem;padding:20px 0;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">智学中心</h1>
+  <p class="subtitle">选择学科，开启专注学习</p>
+
+  <div class="section-label">请选择学科</div>
+  <div class="subjects">
+    <div class="subject active" data-sub="math" onclick="selectSubject('math')">
+      <div class="ico">📐</div>
+      <div class="name">数学</div>
+    </div>
+    <div class="subject" data-sub="english" onclick="selectSubject('english')">
+      <div class="ico">🔤</div>
+      <div class="name">英语</div>
+    </div>
+  </div>
+
+  <button class="enter-btn" onclick="enter()">进入</button>
+
+  <p class="tip">当前默认：数学</p>
+</div>
+
+<script>
+// ===== 目标网址（暂用 # 占位，后续替换）=====
+var TARGET_URL = {
+  math:    'learn-maths/index.html',   // 数学网址
+  english: 'learn-english/index.html'    // 英语网址
+};
+// ===========================================
+
+var current = 'math';
+
+function selectSubject(sub){
+  current = sub;
+  var nodes = document.querySelectorAll('.subject');
+  nodes.forEach(function(n){
+    n.classList.toggle('active', n.getAttribute('data-sub') === sub);
+  });
+  var tip = document.querySelector('.tip');
+  if (tip) tip.textContent = '当前默认：' + (sub === 'math' ? '数学' : '英语');
+}
+
+function enter(){
+  var url = TARGET_URL[current] || '#';
+  location.href = url;
+}
+</script>
+</body>
+</html>
