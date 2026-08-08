@@ -1,2 +1,0 @@
-# learn
-Wise Learning Hub
