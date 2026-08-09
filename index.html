@@ -94,14 +94,14 @@ body{
 
   <button class="enter-btn" onclick="enter()">进入</button>
 
-  <p class="tip">当前默认：数学</p>
+  <p class="tip">当前选择：数学</p>
 </div>
 
 <script>
 // ===== 目标网址（暂用 # 占位，后续替换）=====
 var TARGET_URL = {
-  math:    'https://ddtt0754.github.io/learn-maths/index.html',   // 数学网址
-  english: 'https://ddtt0754.github.io/learn-english/index.html'    // 英语网址
+  math:    'learn-maths/index.html',   // 数学网址
+  english: 'learn-english/index.html'    // 英语网址
 };
 // ===========================================
 
@@ -114,7 +114,7 @@ function selectSubject(sub){
     n.classList.toggle('active', n.getAttribute('data-sub') === sub);
   });
   var tip = document.querySelector('.tip');
-  if (tip) tip.textContent = '当前默认：' + (sub === 'math' ? '数学' : '英语');
+  if (tip) tip.textContent = '当前选择：' + (sub === 'math' ? '数学' : '英语');
 }
 
 function enter(){
