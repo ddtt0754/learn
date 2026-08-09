@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>HTML学习 - 学AI</title>
+<style>
+:root{
+  --bg:#f5f7fa;
+  --text:#1e293b;
+  --text2:#64748b;
+  --grad:linear-gradient(135deg,#35d29a,#2f9df0);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;
+  padding:28px 20px 48px;
+}
+.wrap{width:100%;max-width:640px;}
+
+/* 顶部返回 */
+.back-bar{width:100%;max-width:640px;margin-bottom:18px;}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 18px;border:none;border-radius:12px;
+  background:#fff;color:var(--text2);font-size:.95rem;cursor:pointer;
+  box-shadow:0 4px 12px rgba(15,23,42,.06);
+  transition:transform .15s;
+  touch-action:manipulation;
+}
+.back-btn:active{transform:scale(.95);}
+
+/* 标题 */
+.head{text-align:center;margin-bottom:30px;}
+.title{
+  font-size:2.8rem;font-weight:900;letter-spacing:.14em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.subtitle{font-size:1.02rem;color:var(--text2);margin-top:10px;font-weight:500;}
+.subtitle b{margin:0 4px;color:var(--text);}
+
+/* 分组 */
+.group{margin-bottom:28px;}
+.group-title{
+  display:flex;align-items:center;gap:6px;
+  font-size:1.05rem;font-weight:700;color:var(--text);
+  margin-bottom:12px;
+}
+.group-title::before{
+  content:"";width:5px;height:18px;border-radius:3px;
+  background:var(--grad);margin-right:2px;
+}
+.group-note{font-size:.82rem;color:var(--text2);margin:-6px 0 12px;}
+
+/* 网址大卡片（1 列，含优缺点说明） */
+.cards{display:grid;grid-template-columns:1fr;gap:12px;}
+.card{
+  background:#fff;border-radius:16px;padding:18px 16px 16px;
+  text-decoration:none;color:var(--text);
+  box-shadow:0 6px 16px rgba(15,23,42,.05);
+  border:2px solid #eef2f7;
+  display:block;
+  transition:transform .15s,border-color .2s,box-shadow .2s;
+  user-select:none;
+  touch-action:manipulation;
+}
+.card:active{transform:scale(.98);}
+.card .top{display:flex;align-items:center;gap:10px;}
+.card .ico{font-size:1.7rem;line-height:1;}
+.card .name{font-size:1.08rem;font-weight:700;flex:1;word-break:break-word;}
+.card .go{
+  flex-shrink:0;
+  padding:5px 13px;border-radius:999px;
+  background:var(--grad);color:#fff;font-size:.75rem;font-weight:700;
+}
+.card .grade{
+  display:inline-block;margin-top:12px;
+  background:#eef7f1;color:#1fa873;font-size:.78rem;font-weight:600;
+  padding:3px 11px;border-radius:999px;
+}
+.card .line{margin-top:9px;font-size:.85rem;color:var(--text2);line-height:1.65;}
+.card .line b{color:var(--text);font-weight:600;}
+.card .line.warn{background:#fff8ec;border-radius:8px;padding:7px 10px;}
+
+/* 小贴士 */
+.plan{
+  background:#fff;border-radius:16px;padding:18px;
+  box-shadow:0 6px 16px rgba(15,23,42,.05);
+  border:2px solid #eef2f7;
+  margin-bottom:28px;
+}
+.plan h3{font-size:1.02rem;font-weight:700;}
+.plan .warn{
+  margin-top:10px;background:#fff7e8;border-radius:10px;
+  padding:12px 14px;font-size:.85rem;color:#8a6d3b;line-height:1.7;
+}
+.plan .warn b{color:#7a5c22;}
+
+/* 底部说明 */
+.tip{margin-top:26px;text-align:center;font-size:.9rem;color:#94a3b8;}
+
+@media(max-width:480px){
+  .title{font-size:2.1rem;}
+  .card .name{font-size:1rem;}
+}
+</style>
+</head>
+<body>
+<a class="back-bar" href="learn_ai.html">
+  <button class="back-btn" type="button">← 返回学AI 导航</button>
+</a>
+<div class="wrap">
+  <div class="head">
+    <h1 class="title">HTML学习</h1>
+    <p class="subtitle">适合小学生的 <b>免费 · 趣味</b> 网页制作网站 · 全部免安装直接打开</p>
+  </div>
+
+  <div id="groups"></div>
+
+  <div class="plan">
+    <h3>💡 学习小贴士</h3>
+    <div class="warn">
+      <b>建议路线：</b>先用中文教程打基础（认识标签、结构），再到 CodePen 里动手改代码、做个人小主页，最后用免费模板改成自己的作品。<br>
+      <b>家长注意：</b>所有网站浏览器直接打开即可，无需安装任何软件；HTML 是网页的"骨架"，搭配 CSS（样式）和 JavaScript（动效）就能做出自己的网页。
+    </div>
+  </div>
+
+  <p class="tip">点击卡片即可前往学习 · 持续更新 · © 2026 两英豆豆教练</p>
+</div>
+
+<script>
+/* =====================================================================
+ * ★ 网址数据区 —— 后期添加 / 修改，只需改动这里 ★
+ *   ico:   图标 | name: 名称 | url: 网址 | grade: 适合年级
+ *   good:  亮点/优点 | bad: 注意/缺点（可为空字符串）
+ * ===================================================================== */
+var GROUPS = [
+  {
+    title: '中文教程（免费零基础）', ico: '📖',
+    note: '从认识标签到做出完整网页，循序渐进',
+    sites: [
+      { ico:'📘', name:'菜鸟教程 · HTML', url:'https://www.runoob.com/html/html-tutorial.html',
+        grade:'适合全年龄段小学生',
+        good:'完全免费中文教程，从最基础的标签讲到完整网页制作；每个知识点都带实例，可直接复制运行，零基础友好。',
+        bad:'偏教科书风格，趣味性弱，适合搭配动手创作一起用。' },
+      { ico:'📚', name:'W3School · HTML 中文', url:'https://www.w3schools.cn/html/',
+        grade:'适合小学 4 年级 +',
+        good:'免费中文教程，网页内直接运行示例代码；知识点由浅入深，语法速查方便，是很好的"字典"。',
+        bad:'偏教程风格，游戏性弱。' }
+    ]
+  },
+  {
+    title: '在线创作 · 实时预览（免安装）', ico: '🎨',
+    note: '写代码立即看到网页效果，最有成就感',
+    sites: [
+      { ico:'🖥️', name:'CodePen', url:'https://codepen.io/pen/',
+        grade:'适合小学高年级 +',
+        good:'在线写 HTML / CSS / JavaScript，右侧实时预览效果，无需安装任何软件；可以搜索别人的作品学习改造，做个人主页、小游戏都很方便。',
+        bad:'英文界面，无配套中文课程。' },
+      { ico:'🧪', name:'JSFiddle', url:'https://jsfiddle.net/',
+        grade:'适合小学高年级 +',
+        good:'在线测试网页代码，一键运行和分享；界面简洁，适合验证自己的想法。',
+        bad:'英文界面，偏工具型，趣味性一般。' }
+    ]
+  },
+  {
+    title: '模板素材 · 动手改造', ico: '🧩',
+    note: '拿现成模板改成自己的作品',
+    sites: [
+      { ico:'📄', name:'HTML5 UP', url:'https://html5up.net/',
+        grade:'适合小学高年级 +',
+        good:'大量免费响应式网页模板，下载即用；可以下载后用记事本或 CodePen 改文字、改颜色，快速做出个人主页。',
+        bad:'英文界面，模板较成品化，需要动手改造才有学习效果。' }
+    ]
+  }
+];
+/* ===================================================================== */
+
+var groupsEl = document.getElementById('groups');
+GROUPS.forEach(function(g){
+  var sec = document.createElement('section');
+  sec.className = 'group';
+
+  var h = document.createElement('div');
+  h.className = 'group-title';
+  h.innerHTML = g.ico + ' ' + g.title;
+  sec.appendChild(h);
+  if(g.note){
+    var n = document.createElement('div');
+    n.className = 'group-note';
+    n.textContent = g.note;
+    sec.appendChild(n);
+  }
+
+  var c = document.createElement('div');
+  c.className = 'cards';
+  g.sites.forEach(function(s){
+    var a = document.createElement('a');
+    a.className = 'card';
+    a.href = s.url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    var html =
+      '<div class="top">' +
+        '<span class="ico">' + s.ico + '</span>' +
+        '<span class="name">' + s.name + '</span>' +
+        '<span class="go">访问 ↗</span>' +
+      '</div>' +
+      '<div class="grade">🎓 ' + s.grade + '</div>' +
+      '<div class="line"><b>✅ 亮点：</b>' + s.good + '</div>';
+    if(s.bad){
+      html += '<div class="line warn"><b>⚠️ 注意：</b>' + s.bad + '</div>';
+    }
+    a.innerHTML = html;
+    c.appendChild(a);
+  });
+  sec.appendChild(c);
+  groupsEl.appendChild(sec);
+});
+</script>
+</body>
+</html>

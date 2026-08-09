@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>AI学 · 网址导航 - 豆豆智学中心</title>
+<style>
+:root{
+  --bg:#f5f7fa;
+  --text:#1e293b;
+  --text2:#64748b;
+  --grad:linear-gradient(135deg,#35d29a,#2f9df0);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;
+  padding:28px 20px 48px;
+}
+.wrap{width:100%;max-width:600px;}
+
+/* 顶部返回 */
+.back-bar{width:100%;max-width:600px;margin-bottom:18px;}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 18px;border:none;border-radius:12px;
+  background:#fff;color:var(--text2);font-size:.95rem;cursor:pointer;
+  box-shadow:0 4px 12px rgba(15,23,42,.06);
+  transition:transform .15s;
+  touch-action:manipulation;
+}
+.back-btn:active{transform:scale(.95);}
+
+/* 标题 */
+.head{text-align:center;margin-bottom:34px;}
+.title{
+  font-size:3rem;font-weight:900;letter-spacing:.16em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.subtitle{font-size:1.05rem;color:var(--text2);margin-top:10px;font-weight:500;}
+.subtitle b{margin:0 4px;color:var(--text);}
+
+/* 网址卡片 */
+.section-label{font-size:1.05rem;color:var(--text2);margin-bottom:16px;font-weight:600;text-align:center;}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.card{
+  background:#fff;border-radius:18px;padding:26px 16px 22px;
+  text-align:center;cursor:pointer;text-decoration:none;color:var(--text);
+  box-shadow:0 6px 16px rgba(15,23,42,.05);
+  border:2px solid #eef2f7;
+  transition:transform .15s,border-color .2s,box-shadow .2s;
+  user-select:none;
+  touch-action:manipulation;
+}
+.card:active{transform:scale(.95);}
+.card .ico{font-size:2.6rem;line-height:1;margin-bottom:12px;}
+.card .name{font-size:1.15rem;font-weight:700;word-break:break-word;}
+.card .desc{font-size:.82rem;color:var(--text2);margin-top:6px;line-height:1.5;}
+.card .tag{
+  display:inline-block;margin-top:10px;padding:3px 12px;border-radius:999px;
+  background:#e8f7f0;color:#1fa873;font-size:.72rem;font-weight:600;
+}
+.card .tag.live{
+  background:var(--grad);color:#fff;
+}
+
+/* 底部说明 */
+.tip{margin-top:30px;text-align:center;font-size:.9rem;color:#94a3b8;}
+
+@media(max-width:480px){
+  .title{font-size:2.4rem;}
+  .cards{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .card{padding:20px 10px 16px;border-radius:14px;}
+  .card .ico{font-size:2.1rem;}
+  .card .name{font-size:1rem;}
+}
+</style>
+</head>
+<body>
+<a class="back-bar" href="index.html">
+  <button class="back-btn" type="button">← 返回主页</button>
+</a>
+<div class="wrap">
+  <div class="head">
+    <h1 class="title">AI学</h1>
+    <p class="subtitle">AI 网址导航 <b>·</b> 好用的 AI 学习站</p>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <p class="tip">点击卡片即可前往学习 · 持续更新 · © 2026 两英豆豆教练</p>
+</div>
+
+<script>
+/* =====================================================================
+ * ★ 网址数据区 —— 后期添加 / 修改网站，只需改动这里 ★
+ *   ico:  卡片图标（emoji）
+ *   name: 网站名称
+ *   desc: 一句话简介
+ *   url:  网站地址（live 为 true 时点击新窗口打开）
+ *   live: true=已上线可访问；false=建设中占位
+ * ===================================================================== */
+var SITES = [
+  { ico:'🌐', name:'OpenMAIC · 互动课堂', desc:'清华开源·一键生成沉浸式 AI 课堂', url:'https://openmaic.io/zh/',            live:true },
+  { ico:'💡', name:'Code.org · Hour of AI', desc:'编程一小时：AI 互动入门', url:'https://code.org/zh-Hant/hour-of-ai', live:true },
+  { ico:'🧑‍🏫', name:'AI 智能辅导', desc:'不懂就问，AI 随时答疑讲解',  url:'#', live:false },
+  { ico:'🗣️', name:'AI 口语陪练', desc:'开口练习，AI 陪你对话纠音',  url:'#', live:false },
+  { ico:'✍️', name:'AI 作文批改', desc:'提交作文，秒出点评与修改建议', url:'#', live:false },
+  { ico:'🎧', name:'AI 听读训练', desc:'听短文、读课文，磨耳朵练语感', url:'#', live:false }
+];
+/* ===================================================================== */
+
+var cards = document.getElementById('cards');
+SITES.forEach(function(s){
+  var a = document.createElement('a');
+  a.className = 'card';
+  a.href = s.url;
+  if(s.live){
+    a.target = '_blank';
+    a.rel = 'noopener';
+  } else {
+    a.addEventListener('click', function(e){ e.preventDefault(); });
+  }
+  a.innerHTML =
+    '<div class="ico">' + s.ico + '</div>' +
+    '<div class="name">' + s.name + '</div>' +
+    '<div class="desc">' + s.desc + '</div>' +
+    '<span class="tag' + (s.live ? ' live' : '') + '">' + (s.live ? '访问 ↗' : '建设中') + '</span>';
+  cards.appendChild(a);
+});
+</script>
+</body>
+</html>

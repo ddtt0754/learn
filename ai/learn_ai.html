@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>学AI · 网址导航 - 豆豆智学中心</title>
+<style>
+:root{
+  --bg:#f5f7fa;
+  --text:#1e293b;
+  --text2:#64748b;
+  --grad:linear-gradient(135deg,#35d29a,#2f9df0);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;
+  padding:28px 20px 48px;
+}
+.wrap{width:100%;max-width:620px;}
+
+/* 顶部返回 */
+.back-bar{width:100%;max-width:620px;margin-bottom:18px;}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 18px;border:none;border-radius:12px;
+  background:#fff;color:var(--text2);font-size:.95rem;cursor:pointer;
+  box-shadow:0 4px 12px rgba(15,23,42,.06);
+  transition:transform .15s;
+  touch-action:manipulation;
+}
+.back-btn:active{transform:scale(.95);}
+
+/* 标题 */
+.head{text-align:center;margin-bottom:30px;}
+.title{
+  font-size:3rem;font-weight:900;letter-spacing:.16em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.subtitle{font-size:1.05rem;color:var(--text2);margin-top:10px;font-weight:500;}
+.subtitle b{margin:0 4px;color:var(--text);}
+
+/* 分组 */
+.group{margin-bottom:28px;}
+.group-title{
+  display:flex;align-items:center;gap:6px;
+  font-size:1.05rem;font-weight:700;color:var(--text);
+  margin-bottom:12px;
+}
+.group-title::before{
+  content:"";width:5px;height:18px;border-radius:3px;
+  background:var(--grad);margin-right:2px;
+}
+
+/* 网址卡片 */
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.card{
+  background:#fff;border-radius:16px;padding:20px 12px 16px;
+  text-align:center;cursor:pointer;text-decoration:none;color:var(--text);
+  box-shadow:0 6px 16px rgba(15,23,42,.05);
+  border:2px solid #eef2f7;
+  transition:transform .15s,border-color .2s,box-shadow .2s;
+  user-select:none;
+  touch-action:manipulation;
+}
+.card:active{transform:scale(.95);}
+.card .ico{font-size:2.3rem;line-height:1;margin-bottom:10px;}
+.card .name{font-size:1.05rem;font-weight:700;word-break:break-word;}
+.card .desc{font-size:.78rem;color:var(--text2);margin-top:5px;line-height:1.5;}
+.card .tag{
+  display:inline-block;margin-top:10px;padding:3px 12px;border-radius:999px;
+  background:var(--grad);color:#fff;font-size:.72rem;font-weight:600;
+}
+
+/* 底部说明 */
+.tip{margin-top:30px;text-align:center;font-size:.9rem;color:#94a3b8;}
+
+@media(max-width:480px){
+  .title{font-size:2.4rem;}
+  .cards{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .card{padding:18px 8px 14px;border-radius:14px;}
+  .card .ico{font-size:2rem;}
+  .card .name{font-size:.98rem;}
+}
+</style>
+</head>
+<body>
+<a class="back-bar" href="index.html">
+  <button class="back-btn" type="button">← 返回主页</button>
+</a>
+<div class="wrap">
+  <div class="head">
+    <h1 class="title">学AI</h1>
+    <p class="subtitle">AI 网址导航 <b>·</b> 常用 AI 工具</p>
+  </div>
+
+  <div id="groups"></div>
+
+  <p class="tip">点击卡片即可前往 · 持续更新 · © 2026 两英豆豆教练</p>
+</div>
+
+<script>
+/* =====================================================================
+ * ★ 网址数据区 —— 后期添加 / 修改 / 调整分类，只需改动这里 ★
+ *   ico:  卡片图标（emoji）
+ *   name: 工具名称
+ *   desc: 一句话简介
+ *   url:  网址（点击新窗口打开）
+ * 按功能分组：GROUPS = [ { title:'组名', ico:'组图标', sites:[...] } ]
+ * ===================================================================== */
+var GROUPS = [
+  {
+    title: 'AI 对话助手', ico: '💬',
+    sites: [
+      { ico:'🥤', name:'豆包',       desc:'字节 AI 助手：问答、写作、翻译', url:'https://www.doubao.com/chat/' },
+      { ico:'🐋', name:'DeepSeek',   desc:'深度求索：免费对话与深度推理',   url:'https://chat.deepseek.com/' }
+    ]
+  },
+  {
+    title: '编程语言学习', ico: '📘',
+    sites: [
+      { ico:'🐍', name:'Python 学习', desc:'小学生免费趣味 Python 网站合集', url:'python.html', local:true },
+      { ico:'🌐', name:'HTML 学习', desc:'小学生免费趣味网页制作网站合集', url:'html.html', local:true }
+    ]
+  },
+  {
+    title: 'AI 编程 · 开发', ico: '💻',
+    sites: [
+      { ico:'🤝', name:'WorkBuddy',  desc:'腾讯 AI Agent：一句话让 AI 替你办公', url:'https://www.workbuddy.cn/' },
+      { ico:'💻', name:'CodeBuddy',  desc:'腾讯 AI 编程助手：对话式编程全流程',  url:'https://www.codebuddy.cn/' },
+      { ico:'🧩', name:'Coze 扣子',  desc:'字节 AI 智能体 / Bot 搭建平台',      url:'https://www.coze.cn/' },
+      { ico:'🚀', name:'Trae',       desc:'字节 AI IDE：超级 AI 开发工程师',    url:'https://www.trae.cn/' }
+    ]
+  },
+  {
+    title: 'AI 绘画 · 生图', ico: '🎨',
+    sites: [
+      { ico:'🖌️', name:'哩布哩布',    desc:'AI 绘画模型社区与在线生图',     url:'https://www.liblib.art/viphome?referralCode=C2mNSdrA' },
+      { ico:'🎨', name:'MX 绘画',     desc:'AI 绘画创作平台',               url:'https://www.mxai.cn/' },
+      { ico:'🖼️', name:'MX 绘画中文站', desc:'AI 绘画中文版（邀请）',        url:'https://41023289.share.mxai.cn/home/?from=invite&invite_id=41023289' },
+      { ico:'✨', name:'星流',        desc:'AI 绘画与图像创作工具',          url:'https://www.xingliu.art/' }
+    ]
+  },
+  {
+    title: 'AI 视频创作', ico: '🎬',
+    sites: [
+      { ico:'🌈', name:'即梦',        desc:'剪映旗下 AI 创作：图/视频/音乐', url:'https://jimeng.jianying.com/ai' },
+      { ico:'🐦', name:'小云雀',      desc:'剪映旗下 AI 创作工具',          url:'https://xyq.jianying.com' },
+      { ico:'🎥', name:'可灵 Kling',  desc:'快手 AI 视频生成',              url:'https://app.klingai.com/' },
+      { ico:'🎞️', name:'Vidu',       desc:'AI 视频生成平台',               url:'https://www.vidu.cn/' },
+      { ico:'🧬', name:'Morph',       desc:'AI 视频创作（Morph Studio）',   url:'https://www.morphstudio.com/' },
+      { ico:'🐚', name:'海螺 AI',     desc:'MiniMax 视频与语音创作',         url:'https://hailuoai.com/' },
+      { ico:'📺', name:'Neowow',      desc:'AI 视频创作平台',               url:'https://neowow.cn/neo-tv' },
+      { ico:'📽️', name:'LiBTV',      desc:'Liblib 视频创作平台',           url:'https://www.liblib.tv/' }
+    ]
+  },
+  {
+    title: 'AI 数字人', ico: '🧑‍🎤',
+    sites: [
+      { ico:'🪞', name:'蝉镜 AI',     desc:'AI 数字人视频创作',             url:'https://www.chanjing.cc/' },
+      { ico:'💡', name:'灵光 AI',     desc:'AI 数字人与视频创作',           url:'https://www.lingguang.com/' },
+      { ico:'🦋', name:'飞影数字人',  desc:'AI 数字人口播视频创作',         url:'https://www.feiyingai.com' },
+      { ico:'🎙️', name:'腾讯智影',   desc:'腾讯智能创作：数字人视频平台',  url:'https://zenvideo.qq.com' }
+    ]
+  },
+  {
+    title: 'AI 音乐', ico: '🎵',
+    sites: [
+      { ico:'🎶', name:'苏谱之音',    desc:'Suno AI 音乐生成（中文站）',     url:'https://41023289.share.suno.cn/home/#/?from=invite&invite_id=41023289' },
+      { ico:'🎼', name:'天工 SkyMusic', desc:'昆仑万维天工：AI 音乐生成',   url:'https://www.tiangong.cn/music' }
+    ]
+  },
+  {
+    title: 'AI 工作流平台', ico: '⚙️',
+    sites: [
+      { ico:'🔄', name:'OKflow',      desc:'AI 视频工作流平台',             url:'https://okflow.cn/auth/login?code=NXPGN9E4' },
+      { ico:'⚙️', name:'RunningHub',  desc:'AI 工作流 / 自动化平台',        url:'https://www.runninghub.ai/?inviteCode=o52o3ndu' }
+    ]
+  },
+  {
+    title: 'AI 综合 · 聚合', ico: '🌐',
+    sites: [
+      { ico:'🧠', name:'MiniMax',     desc:'海螺母公司 AI 综合平台',         url:'https://www.minimaxi.com/' },
+      { ico:'🗼', name:'灯塔 AI 聚合', desc:'多模型 AI 工具聚合站',           url:'http://dengta.lk888.ai' }
+    ]
+  },
+  {
+    title: '创作 · 变现', ico: '📣',
+    sites: [
+      { ico:'🍅', name:'番茄达人中心', desc:'番茄内容创作与达人变现',        url:'https://kol.fanqieopen.com/' },
+      { ico:'📱', name:'抖音创作服务', desc:'抖音创作者中心：视频创作与变现', url:'https://creator.douyin.com/' }
+    ]
+  }
+];
+/* ===================================================================== */
+
+var groupsEl = document.getElementById('groups');
+GROUPS.forEach(function(g){
+  var sec = document.createElement('section');
+  sec.className = 'group';
+
+  var h = document.createElement('div');
+  h.className = 'group-title';
+  h.innerHTML = g.ico + ' ' + g.title;
+  sec.appendChild(h);
+
+  var c = document.createElement('div');
+  c.className = 'cards';
+  g.sites.forEach(function(s){
+    var a = document.createElement('a');
+    a.className = 'card';
+    a.href = s.url;
+    if(!s.local){
+      a.target = '_blank';
+      a.rel = 'noopener';
+    }
+    a.innerHTML =
+      '<div class="ico">' + s.ico + '</div>' +
+      '<div class="name">' + s.name + '</div>' +
+      '<div class="desc">' + s.desc + '</div>' +
+      '<span class="tag">' + (s.local ? '进入 →' : '访问 ↗') + '</span>';
+    c.appendChild(a);
+  });
+  sec.appendChild(c);
+  groupsEl.appendChild(sec);
+});
+</script>
+</body>
+</html>

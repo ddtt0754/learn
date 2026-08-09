@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Python 学习 - 学AI</title>
+<style>
+:root{
+  --bg:#f5f7fa;
+  --text:#1e293b;
+  --text2:#64748b;
+  --grad:linear-gradient(135deg,#35d29a,#2f9df0);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;
+  padding:28px 20px 48px;
+}
+.wrap{width:100%;max-width:640px;}
+
+/* 顶部返回 */
+.back-bar{width:100%;max-width:640px;margin-bottom:18px;}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 18px;border:none;border-radius:12px;
+  background:#fff;color:var(--text2);font-size:.95rem;cursor:pointer;
+  box-shadow:0 4px 12px rgba(15,23,42,.06);
+  transition:transform .15s;
+  touch-action:manipulation;
+}
+.back-btn:active{transform:scale(.95);}
+
+/* 标题 */
+.head{text-align:center;margin-bottom:30px;}
+.title{
+  font-size:2.8rem;font-weight:900;letter-spacing:.14em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.subtitle{font-size:1.02rem;color:var(--text2);margin-top:10px;font-weight:500;}
+.subtitle b{margin:0 4px;color:var(--text);}
+
+/* 分组 */
+.group{margin-bottom:28px;}
+.group-title{
+  display:flex;align-items:center;gap:6px;
+  font-size:1.05rem;font-weight:700;color:var(--text);
+  margin-bottom:12px;
+}
+.group-title::before{
+  content:"";width:5px;height:18px;border-radius:3px;
+  background:var(--grad);margin-right:2px;
+}
+.group-note{font-size:.82rem;color:var(--text2);margin:-6px 0 12px;}
+
+/* 网址大卡片（1 列，含优缺点说明） */
+.cards{display:grid;grid-template-columns:1fr;gap:12px;}
+.card{
+  background:#fff;border-radius:16px;padding:18px 16px 16px;
+  text-decoration:none;color:var(--text);
+  box-shadow:0 6px 16px rgba(15,23,42,.05);
+  border:2px solid #eef2f7;
+  display:block;
+  transition:transform .15s,border-color .2s,box-shadow .2s;
+  user-select:none;
+  touch-action:manipulation;
+}
+.card:active{transform:scale(.98);}
+.card .top{display:flex;align-items:center;gap:10px;}
+.card .ico{font-size:1.7rem;line-height:1;}
+.card .name{font-size:1.08rem;font-weight:700;flex:1;word-break:break-word;}
+.card .go{
+  flex-shrink:0;
+  padding:5px 13px;border-radius:999px;
+  background:var(--grad);color:#fff;font-size:.75rem;font-weight:700;
+}
+.card .grade{
+  display:inline-block;margin-top:12px;
+  background:#eef7f1;color:#1fa873;font-size:.78rem;font-weight:600;
+  padding:3px 11px;border-radius:999px;
+}
+.card .line{margin-top:9px;font-size:.85rem;color:var(--text2);line-height:1.65;}
+.card .line b{color:var(--text);font-weight:600;}
+.card .line.warn{background:#fff8ec;border-radius:8px;padding:7px 10px;}
+
+/* 学习搭配方案 */
+.plan{
+  background:#fff;border-radius:16px;padding:20px 18px;
+  box-shadow:0 6px 16px rgba(15,23,42,.05);
+  border:2px solid #eef2f7;
+  margin-bottom:28px;
+}
+.plan h3{font-size:1.05rem;font-weight:700;}
+.plan ul{margin:12px 0 0 2px;list-style:none;}
+.plan li{
+  margin-top:8px;font-size:.9rem;color:var(--text2);line-height:1.6;
+  padding:8px 12px;background:var(--bg);border-radius:10px;
+}
+.plan li b{color:var(--text);}
+.plan .warn{
+  margin-top:14px;background:#fff7e8;border-radius:10px;
+  padding:12px 14px;font-size:.85rem;color:#8a6d3b;line-height:1.7;
+}
+.plan .warn b{color:#7a5c22;}
+
+/* 底部说明 */
+.tip{margin-top:26px;text-align:center;font-size:.9rem;color:#94a3b8;}
+
+@media(max-width:480px){
+  .title{font-size:2.1rem;}
+  .card .name{font-size:1rem;}
+}
+</style>
+</head>
+<body>
+<a class="back-bar" href="learn_ai.html">
+  <button class="back-btn" type="button">← 返回学AI 导航</button>
+</a>
+<div class="wrap">
+  <div class="head">
+    <h1 class="title">Python 学习</h1>
+    <p class="subtitle">适合小学生的 <b>免费 · 趣味</b> Python 网站 · 全部免安装直接打开</p>
+  </div>
+
+  <div id="groups"></div>
+
+  <div class="plan">
+    <h3>📋 学习搭配方案（直接照抄安排）</h3>
+    <ul>
+      <li><b>1-3 年级：</b>Code.org → 熟悉逻辑</li>
+      <li><b>3-5 年级：</b>极客战记（主）+ Trinket 海龟画图（辅）</li>
+      <li><b>5-6 年级：</b>极客战记 + W3Schools 系统学习 + CheckiO 解谜练习</li>
+    </ul>
+    <div class="warn">
+      <b>💡 小提醒</b><br>
+      1. 小学生学 Python 优先兴趣＞进度，不要一开始就死记语法；<br>
+      2. 优先使用中文网站，降低阅读门槛；<br>
+      3. 所有网站浏览器直接打开，不需要下载安装 Python 软件，避免环境报错。
+    </div>
+  </div>
+
+  <p class="tip">点击卡片即可前往学习 · 持续更新 · © 2026 两英豆豆教练</p>
+</div>
+
+<script>
+/* =====================================================================
+ * ★ 网址数据区 —— 后期添加 / 修改，只需改动这里 ★
+ *   ico:   图标 | name: 名称 | url: 网址 | grade: 适合年级
+ *   good:  亮点/优点 | bad: 注意/缺点（可为空字符串）
+ * ===================================================================== */
+var GROUPS = [
+  {
+    title: '游戏闯关类（首选！激发兴趣）', ico: '🎮',
+    note: '角色扮演 + 写代码闯关，最适合激发兴趣',
+    sites: [
+      { ico:'⚔️', name:'极客战记 CodeCombat', url:'https://codecombat.cn',
+        grade:'适合 4~9 年级（小学 3 年级以上最佳）',
+        good:'角色扮演游戏，直接写标准 Python 代码操控英雄打怪、寻宝、解谜；中文界面，剧情丰富；基础主线关卡永久免费。学习内容：循环、条件判断、函数、变量，完全贴合少儿 Python 入门知识点。',
+        bad:'高阶副本、皮肤付费；基础学习足够用。' },
+      { ico:'🧩', name:'CheckiO', url:'https://checkio.org',
+        grade:'适合小学 4 年级以上，喜欢解谜的孩子',
+        good:'星球探险模式，Python 趣味谜题闯关；写完代码即时验证，能看别人不同解题思路；基础关卡全部免费。',
+        bad:'纯解谜，没有动画角色；英文界面（代码指令是英文，适合适应英文编程）。' }
+    ]
+  },
+  {
+    title: '在线创作平台（自由写代码、画图、做小项目）', ico: '🎨',
+    note: '打开就能写代码，可视化反馈强',
+    sites: [
+      { ico:'🐢', name:'Trinket', url:'https://trinket.io',
+        grade:'适合全年龄段小学生',
+        good:'内置 Python 海龟绘图 (turtle)！可以画画、画图案、做简单动画，非常适合小学生入门；在线编辑器，一键运行；大量免费示例代码。优势：老师教学最常用，非常适合零基础练习可视化代码。',
+        bad:'免费版有少量项目数量限制，日常练习够用。' },
+      { ico:'🚀', name:'Replit', url:'https://replit.com',
+        grade:'适合小学高年级',
+        good:'全能在线代码编辑器，完整 Python 环境，可以写小游戏、计算器；海量免费 Python 项目模板；支持保存代码。',
+        bad:'没有配套课程，适合已经懂基础语法自由创作；零基础需要家长带着找教程。' }
+    ]
+  },
+  {
+    title: '中文系统教程网站（循序渐进学习）', ico: '📖',
+    note: '由浅入深，适合系统学语法',
+    sites: [
+      { ico:'📚', name:'W3Schools Python（中文）', url:'https://www.w3schools.cn/python/',
+        grade:'适合小学 4 年级 +',
+        good:'完全免费、中文、零基础教程；每段代码都可以网页内直接运行；知识点由浅入深，语法查询神器。',
+        bad:'偏教科书风格，游戏性弱，适合搭配上面游戏网站一起使用。' },
+      { ico:'💯', name:'PythonTip', url:'https://www.pythontip.com/coding',
+        grade:'适合小学高年级，刷题练逻辑',
+        good:'国内中文 Python 题库，难度分级（简单/中等），大量基础练习题，免费；可以看参考思路。',
+        bad:'纯习题，没有图文课程。' }
+    ]
+  },
+  {
+    title: '过渡备选（先练逻辑，再转 Python）', ico: '🧩',
+    note: '1-3 年级打字偏弱，建议先图形化编程建立思维',
+    sites: [
+      { ico:'🌍', name:'Code.org', url:'https://code.org/zh-hans',
+        grade:'适合 1~3 年级',
+        good:'免费，积木编程，建立逻辑思维，后期可过渡到 Python。',
+        bad:'' },
+      { ico:'🐱', name:'Scratch', url:'https://scratch.mit.edu',
+        grade:'适合 1~3 年级',
+        good:'图形化编程，逻辑启蒙首选，全球最大少儿编程社区。',
+        bad:'' }
+    ]
+  },
+  {
+    title: '免费视频课程（系统入门）', ico: '📺',
+    note: '视频讲解 + 交互练习',
+    sites: [
+      { ico:'🎓', name:'可汗学院 · Python 入门', url:'https://www.khanacademy.org/computing/intro-to-python-fundamentals',
+        grade:'适合小学高年级及以上',
+        good:'可汗学院官方免费 Python 基础课程，视频讲解 + 交互式练习循序渐进，网页直接学习，无需安装。',
+        bad:'英文界面，适合有一定英语基础或家长陪同。' }
+    ]
+  }
+];
+/* ===================================================================== */
+
+var groupsEl = document.getElementById('groups');
+GROUPS.forEach(function(g){
+  var sec = document.createElement('section');
+  sec.className = 'group';
+
+  var h = document.createElement('div');
+  h.className = 'group-title';
+  h.innerHTML = g.ico + ' ' + g.title;
+  sec.appendChild(h);
+  if(g.note){
+    var n = document.createElement('div');
+    n.className = 'group-note';
+    n.textContent = g.note;
+    sec.appendChild(n);
+  }
+
+  var c = document.createElement('div');
+  c.className = 'cards';
+  g.sites.forEach(function(s){
+    var a = document.createElement('a');
+    a.className = 'card';
+    a.href = s.url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    var html =
+      '<div class="top">' +
+        '<span class="ico">' + s.ico + '</span>' +
+        '<span class="name">' + s.name + '</span>' +
+        '<span class="go">访问 ↗</span>' +
+      '</div>' +
+      '<div class="grade">🎓 ' + s.grade + '</div>' +
+      '<div class="line"><b>✅ 亮点：</b>' + s.good + '</div>';
+    if(s.bad){
+      html += '<div class="line warn"><b>⚠️ 注意：</b>' + s.bad + '</div>';
+    }
+    a.innerHTML = html;
+    c.appendChild(a);
+  });
+  sec.appendChild(c);
+  groupsEl.appendChild(sec);
+});
+</script>
+</body>
+</html>
