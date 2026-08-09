@@ -65,6 +65,20 @@ body{
 
 .tip{margin-top:26px;font-size:.95rem;color:#94a3b8;}
 
+/* 右上角 Ai 入口 */
+.ai-entry{
+  position:fixed;top:calc(12px + env(safe-area-inset-top));right:14px;z-index:99;
+  padding:5px 13px;border-radius:999px;
+  font-size:13px;font-weight:700;letter-spacing:.5px;
+  color:#fff;text-decoration:none;
+  background:var(--grad);
+  box-shadow:0 6px 16px rgba(47,157,240,.28);
+  transition:transform .15s,box-shadow .2s;
+  touch-action:manipulation;
+  user-select:none;-webkit-user-select:none;
+}
+.ai-entry:active{transform:scale(.92);}
+
 @media(max-width:520px){
   .title{font-size:2.8rem;}
   .subjects{gap:12px;}
@@ -76,6 +90,7 @@ body{
 </style>
 </head>
 <body>
+<a class="ai-entry" href="ai/index.html">Ai</a>
 <div class="wrap">
   <h1 class="title">智学中心</h1>
   <p class="subtitle">选择学科，开启专注学习</p>
