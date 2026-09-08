@@ -1,1 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="Z9TkZAmhrDQHeZ8G4eA85W">
+<head data-page-node-id="q3MzmLAgzhoMhSY0iFJ1No">
+<meta charset="UTF-8" data-page-node-id="8qftsfi0m14VSGQyqUmEjq">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="H1S0H9i2yqWq8MwYZqw3se">
+<title>红包墙幸运大抽奖</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: radial-gradient(circle at 50% 0%, #b31217 0%, #7a0b10 45%, #4a060a 100%);
+    color: #fff;
+    overflow-x: hidden;
+    padding-bottom: 30px;
+  }
+  .container { max-width: 480px; margin: 0 auto; padding: 0 14px; position: relative; z-index: 2; }
 
+  /* ============ 顶部 ============ */
+  .header { text-align: center; padding: 26px 0 8px; }
+  .title-wrap {
+    display: inline-block;
+    background: linear-gradient(180deg, #ff5f4e, #d42a1e);
+    border: 2px solid #ffd98a;
+    border-radius: 20px;
+    padding: 14px 30px 16px;
+    box-shadow: 0 6px 0 rgba(0,0,0,.25), inset 0 2px 6px rgba(255,255,255,.25);
+    transform: rotate(-2deg);
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100% { transform: rotate(-2deg) translateY(0); } 50% { transform: rotate(-2deg) translateY(-6px); } }
+  .title {
+    font-size: 30px; font-weight: 900; letter-spacing: 4px;
+    background: linear-gradient(180deg, #fff8d6, #ffd257);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 2px 4px rgba(0,0,0,.15);
+  }
+  .subtitle { margin-top: 6px; font-size: 13px; color: #ffe3b0; letter-spacing: 6px; }
+
+  /* ============ 信息栏 ============ */
+  .info-bar { display: flex; gap: 10px; margin: 16px 0; }
+  .info-card {
+    flex: 1; background: rgba(0,0,0,.28); border: 1px solid rgba(255,214,130,.4);
+    border-radius: 12px; padding: 10px 8px; text-align: center;
+  }
+  .info-num { font-size: 24px; font-weight: 800; color: #ffd257; }
+  .info-label { font-size: 11px; color: #f7cfa0; margin-top: 2px; }
+  .info-card.clickable { cursor: pointer; position: relative; transition: transform .12s, border-color .2s; }
+  .info-card.clickable:active { transform: scale(.96); }
+  .info-card.clickable .edit-gear {
+    position: absolute; top: 5px; right: 7px; font-size: 11px; opacity: .75;
+  }
+  .info-card.clickable .set-hint {
+    display: block; font-size: 9px; color: rgba(255,255,255,.55); margin-top: 2px;
+  }
+
+  /* ============ 次数设置弹窗 ============ */
+  .set-row { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 18px 0 6px; }
+  .set-btn {
+    width: 44px; height: 44px; border-radius: 50%; border: 2px solid #ffd98a;
+    background: rgba(0,0,0,.25); color: #ffd257; font-size: 24px; font-weight: 800;
+    cursor: pointer; line-height: 1;
+  }
+  .set-btn:active { transform: scale(.9); }
+  .set-num {
+    width: 90px; text-align: center; outline: none;
+    background: rgba(0,0,0,.3); border-radius: 12px; padding: 10px 0;
+    color: #ffd257; font-size: 28px; font-weight: 900;
+    border: 2px solid rgba(255,214,130,.5);
+    -moz-appearance: textfield;
+  }
+  .set-num::-webkit-inner-spin-button, .set-num::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .set-num:focus { border-color: #ffd257; }
+  .quick-row { display: flex; gap: 8px; justify-content: center; margin: 12px 0 4px; }
+  .quick-chip {
+    padding: 6px 14px; border-radius: 16px; border: 1px solid rgba(255,214,130,.55);
+    background: rgba(0,0,0,.22); color: #ffe3b0; font-size: 12px; cursor: pointer;
+  }
+  .quick-chip.active { background: #f0b429; color: #7a0b10; font-weight: 800; border-color: #ffe9a8; }
+  .set-note { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 10px; }
+
+  /* ============ 抽奖按钮 ============ */
+  .draw-btn-zone { text-align: center; margin: 6px 0 18px; }
+  .draw-btn {
+    width: 130px; height: 130px; border-radius: 50%;
+    border: 6px solid #ffd98a;
+    background: radial-gradient(circle at 35% 30%, #ff7a5c, #e03423 60%, #b01f12);
+    color: #fff; font-size: 22px; font-weight: 900; letter-spacing: 3px;
+    cursor: pointer; outline: none;
+    box-shadow: 0 8px 0 #8f150b, 0 14px 24px rgba(0,0,0,.45), inset 0 3px 8px rgba(255,255,255,.35);
+    transition: transform .12s;
+  }
+  .draw-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #8f150b, 0 6px 12px rgba(0,0,0,.4); }
+  .draw-btn:disabled { filter: grayscale(.6); cursor: not-allowed; }
+  .draw-btn .small { display: block; font-size: 11px; font-weight: 500; letter-spacing: 1px; color: #ffe3b0; margin-top: 4px; }
+
+  /* ============ 红包墙 ============ */
+  .wall-title { text-align: center; font-size: 15px; color: #ffd257; letter-spacing: 3px; margin-bottom: 12px; }
+  .wall-title::before { content: "—— "; opacity: .5; }
+  .wall-title::after { content: " ——"; opacity: .5; }
+  .wall {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .packet {
+    position: relative; aspect-ratio: 3 / 4.1; border: none; cursor: pointer;
+    border-radius: 10px; overflow: hidden;
+    background: linear-gradient(160deg, #f5402e, #c31f10 70%);
+    box-shadow: 0 4px 10px rgba(0,0,0,.35), inset 0 1px 3px rgba(255,255,255,.3);
+    animation: pop .35s ease backwards;
+    transition: transform .15s;
+  }
+  .packet:hover { transform: scale(1.05); }
+  .packet:active { transform: scale(.95); }
+  .packet::after {
+    content: ""; position: absolute; left: 0; right: 0; top: 55%; height: 45%;
+    background: linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.28));
+  }
+  .packet .seal {
+    position: absolute; z-index: 2; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 34px; height: 34px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffe9a8, #f0b429);
+    color: #a01005; font-weight: 900; font-size: 16px; line-height: 34px; text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,.35);
+  }
+  .packet .fu {
+    position: absolute; z-index: 2; top: 8px; left: 50%; transform: translateX(-50%);
+    font-size: 20px; font-weight: 900; color: #ffd257;
+    text-shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+  .packet.shake { animation: packetShake .5s ease; }
+  @keyframes packetShake {
+    0%,100% { transform: rotate(0); } 20% { transform: rotate(-8deg) scale(1.08); }
+    40% { transform: rotate(8deg) scale(1.08); } 60% { transform: rotate(-6deg) scale(1.08); }
+    80% { transform: rotate(6deg) scale(1.08); }
+  }
+  @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .packet.opened { filter: grayscale(.85) brightness(.75); pointer-events: none; }
+
+  /* ============ 中奖记录 ============ */
+  .records { margin-top: 20px; }
+  .records h3 { text-align: center; font-size: 14px; color: #f7cfa0; letter-spacing: 3px; margin-bottom: 10px; }
+  .record-list { list-style: none; }
+  .record-list li {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(0,0,0,.25); border-radius: 10px; padding: 9px 14px;
+    margin-bottom: 8px; font-size: 13px; border: 1px solid rgba(255,214,130,.2);
+  }
+  .record-list .r-name { color: #ffe3b0; }
+  .record-list .r-prize { color: #ffd257; font-weight: 700; }
+  .record-list .r-time { color: rgba(255,255,255,.5); font-size: 11px; }
+  .empty-tip { text-align: center; color: rgba(255,255,255,.45); font-size: 12px; padding: 10px 0; }
+
+  .foot-note { text-align: center; font-size: 11px; color: rgba(255,255,255,.4); margin-top: 22px; line-height: 1.8; }
+
+  /* ============ 弹窗 ============ */
+  .mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 50;
+    display: none; align-items: center; justify-content: center; padding: 24px;
+  }
+  .mask.show { display: flex; }
+  .modal {
+    width: 100%; max-width: 330px; border-radius: 22px; text-align: center;
+    background: linear-gradient(180deg, #e6392a, #b31d10 80%);
+    border: 3px solid #ffd98a; padding: 30px 24px 26px; position: relative;
+    animation: modalIn .45s cubic-bezier(.2,1.4,.4,1);
+  }
+  @keyframes modalIn { from { transform: scale(.4) translateY(60px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+  .modal .close-x {
+    position: absolute; top: 10px; right: 14px; width: 28px; height: 28px;
+    border-radius: 50%; border: none; background: rgba(0,0,0,.3); color: #ffd98a;
+    font-size: 15px; cursor: pointer;
+  }
+  .modal .coin { font-size: 52px; animation: coinSpin 2.4s ease-in-out infinite; display: inline-block; }
+  @keyframes coinSpin { 0%,100% { transform: rotateY(0) scale(1); } 50% { transform: rotateY(180deg) scale(1.1); } }
+  .modal .m-title { font-size: 22px; font-weight: 900; color: #ffd257; margin-top: 8px; letter-spacing: 2px; }
+  .modal .m-prize { font-size: 30px; font-weight: 900; color: #fff; margin: 12px 0 4px; text-shadow: 0 2px 6px rgba(0,0,0,.3); }
+  .modal .m-sub { font-size: 12px; color: #ffe3b0; }
+  .modal .m-btn {
+    margin-top: 20px; width: 100%; padding: 12px 0; border: none; border-radius: 24px;
+    background: linear-gradient(180deg, #ffe9a8, #f0b429); color: #a01005;
+    font-size: 16px; font-weight: 800; cursor: pointer; letter-spacing: 4px;
+    box-shadow: 0 4px 0 #c2870f;
+  }
+  .modal .m-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #c2870f; }
+
+  /* ============ 彩带 ============ */
+  canvas#confetti { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
+
+  /* 浮动的金元宝装饰 */
+  .deco { position: fixed; z-index: 1; opacity: .5; font-size: 26px; animation: drift 9s linear infinite; pointer-events: none; }
+  @keyframes drift { from { transform: translateY(105vh) rotate(0); } to { transform: translateY(-15vh) rotate(360deg); } }
+</style>
+</head>
+<body data-page-node-id="b9rfa65yEHkxoXhIaRfath">
+
+<div class="deco" style="left:6%; animation-duration:11s;" data-page-node-id="uXD9LcIGVsUrHPNMjMtULe">🧧</div>
+<div class="deco" style="left:88%; animation-duration:13s; animation-delay:2s;" data-page-node-id="OJGTB0MNmxhym24CZqSaqe">💰</div>
+<div class="deco" style="left:14%; animation-duration:15s; animation-delay:5s;" data-page-node-id="DqiLLVSB4bHg2HuJMJ5wjy">🧧</div>
+<div class="deco" style="left:78%; animation-duration:10s; animation-delay:7s;" data-page-node-id="DHDpHThR8vCPmSDgntjVse">🪙</div>
+
+<div class="container" data-page-node-id="VEkGOOHftTAZ6nqB2oJrsv">
+  <div class="header" data-page-node-id="QPOkwV56wf2gwDizGEuObS">
+    <div class="title-wrap" data-page-node-id="Y2Hgs3vrFIVFcRqFOBKB31">
+      <div class="title" data-page-node-id="w2gbD4wE8r72TdWEncXfzy">红包墙</div>
+      <div class="subtitle" data-page-node-id="I9hyrnDwp2JzyvtahnEM67">幸运大抽奖</div>
+    </div>
+  </div>
+
+  <div class="info-bar" data-page-node-id="HJYiYxHvUP0W5caX0PYnLB">
+    <div class="info-card" data-page-node-id="qikCURoCNPRZFdZlcrEDOk"><div class="info-num" id="remainCount" data-page-node-id="PWZPBpGX1uduAUUta3EKKR">40</div><div class="info-label" data-page-node-id="wAI3DNou2sTXLDdJkEfPcB">剩余红包</div></div>
+    <div class="info-card clickable" id="drawCard" onclick="openSettings()" data-page-node-id="c6h75ZDID8FyXrAHNizPWp">
+      <span class="edit-gear" data-page-node-id="I81uIYiZgp7iqijUaYVL2N">⚙</span>
+      <div class="info-num" id="drawCount" data-page-node-id="2f87kksc0aB0udyiYyVdhY">1</div>
+      <div class="info-label" data-page-node-id="PECE7qktKFYINqQoYfKaHz">抽奖机会</div>
+      <span class="set-hint" data-page-node-id="CJkgDzIiYjY43BnU06PLir">点击设置</span>
+    </div>
+    <div class="info-card" data-page-node-id="fHv6T2qpgDuPempUsv4ljS"><div class="info-num" id="winCount" data-page-node-id="xyAg3qXN3GHX7weYsxpNoX">0</div><div class="info-label" data-page-node-id="b4qRAzA6HKgZobiDPljGGJ">已中奖</div></div>
+  </div>
+
+  <div class="draw-btn-zone" data-page-node-id="YioRt5A9AbQEmFDrGK7BDA">
+    <button class="draw-btn" id="drawBtn" data-page-node-id="5WWBAzzStKVBwCTc9TIJRh">抽奖<span class="small" data-page-node-id="7isfTYvi8a7wFJFs8SBRlE">点击开始</span></button>
+  </div>
+
+  <div class="wall-title" data-page-node-id="j2NX5tx1AqMPxSHdu2VfLB">点击红包也可以直接拆</div>
+  <div class="wall" id="wall" data-page-node-id="ABuUkfmG5BF9ziJSqEVzqn"></div>
+
+  <div class="records" data-page-node-id="1XHPIgQcYO7P0dT2AZDReF">
+    <h3 data-page-node-id="BsRelYEusiiVGuxmQz1A4i">中奖记录</h3>
+    <ul class="record-list" id="recordList" data-page-node-id="S5h9IyoFPG9oA2c7Rle0qg"></ul>
+    <div class="empty-tip" id="emptyTip" data-page-node-id="DKduBRGJzCX1PPxeLMSTWg">还没有中奖记录，快去试试手气吧～</div>
+  </div>
+
+  <div class="foot-note" data-page-node-id="MqHpN4lQi0Rbz7FOI1QhZV">
+    活动时间：2026年9月8日 - 9月30日<br data-page-node-id="V4gMuSjNqx7VZSVTEtNzbo">
+    奖品数量有限，抽完即止 · 本页面为演示效果
+  </div>
+</div>
+
+<div class="mask" id="setMask" data-page-node-id="QlqhEhVl3uDVsaAEDcrfbd">
+  <div class="modal" data-page-node-id="kOL8PSnuS02Hpedp0KIbuy">
+    <button class="close-x" onclick="closeSettings()" data-page-node-id="1vZOCioWeTKB9DnWCRVAXj">✕</button>
+    <div class="m-title" style="margin-top:0;" data-page-node-id="nlqQe1Vvqbz6mVAmfvKQay">设置抽奖次数</div>
+    <div class="set-row" data-page-node-id="2MIwynsrJk1CQbLbnfkWw9">
+      <button class="set-btn" onclick="stepSetting(-1)" data-page-node-id="dydShp0PqqBVtChXUXxJDe">−</button>
+      <input class="set-num" id="setNum" type="number" min="1" max="99" value="1" data-page-node-id="GoT9eOE0Keo6sSqsai6tWA">
+      <button class="set-btn" onclick="stepSetting(1)" data-page-node-id="uAQ4AHVDdgY1ILxp1pNmXO">＋</button>
+    </div>
+    <div class="quick-row" data-page-node-id="u4OflqLELrmeZJ3GW5UwIx">
+      <button class="quick-chip" onclick="quickSet(1)" data-page-node-id="rvAn9qdJgImtIyrHIfwrGV">1次</button>
+      <button class="quick-chip" onclick="quickSet(2)" data-page-node-id="76ha1klf21jrJHYAFmewFr">2次</button>
+      <button class="quick-chip" onclick="quickSet(3)" data-page-node-id="hNyiq6XMx1Ats5naa3OrK6">3次</button>
+    </div>
+    <div class="set-note" data-page-node-id="5y2YPUC7j1BnON7nGHs2Fq">范围 1 ~ 99 次，设置后立即生效</div>
+    <button class="m-btn" onclick="applySettings()" data-page-node-id="R0tiJvCy09g8YoWXjjxhEt">确认设置</button>
+  </div>
+</div>
+
+<div class="mask" id="mask" data-page-node-id="uZj1gjYdJ7ZzDO00ioB50S">
+  <div class="modal" data-page-node-id="rl40kQQWL4HUZzTjDlB4Jq">
+    <button class="close-x" onclick="closeModal()" data-page-node-id="IGNsTQuWq0NGY38lPiLpaz">✕</button>
+    <div class="coin" id="mCoin" data-page-node-id="amQ9m4R2Br5AIXQiI00em7">🧧</div>
+    <div class="m-title" id="mTitle" data-page-node-id="i943wcvgvYV5eP9YmVRHKM">恭喜中奖</div>
+    <div class="m-prize" id="mPrize" data-page-node-id="QfQN8hOOSvDThWwcjCKSyO">10元红包</div>
+    <div class="m-sub" id="mSub" data-page-node-id="w5slpyLLVCevnGpo1LL8AE">奖品已放入您的账户</div>
+    <button class="m-btn" onclick="closeModal()" data-page-node-id="sonNLAC6u6XOgnF0aZZiPZ">开心收下</button>
+  </div>
+</div>
+
+<canvas id="confetti" data-page-node-id="K0WD00QBGEcot9KmiD4pQF"></canvas>
+
+<script>
+// ===== 奖品配置（数量与红包一一对应，共 40 个）=====
+var PRIZE_POOL = [
+  { name: "10元现金红包", count: 2,  icon: "🧧" },
+  { name: "5元现金红包",  count: 4,  icon: "🧧" },
+  { name: "3元现金红包",  count: 12, icon: "🧧" },
+  { name: "2元现金红包",  count: 14, icon: "🧧" },
+  { name: "再来一次",     count: 8,  icon: "🍂" }
+];
+var INIT_DRAW = 1;      // 初始抽奖机会次数（真实上限 99 由 clampSetting 控制）
+var PACKET_NUM = 40;    // 红包墙数量（4列 × 10行）
+
+var remain = PACKET_NUM, draws = INIT_DRAW, wins = 0;
+var records = [];
+
+var wall = document.getElementById("wall");
+var drawBtn = document.getElementById("drawBtn");
+var mask = document.getElementById("mask");
+
+// 生成打乱后的奖品池，与红包一一对应（保证各奖品数量精确）
+var prizeDeck = [];
+PRIZE_POOL.forEach(function(p) {
+  for (var i = 0; i < p.count; i++) prizeDeck.push(p);
+});
+for (var j = prizeDeck.length - 1; j > 0; j--) {
+  var k = Math.floor(Math.random() * (j + 1));
+  var tmp = prizeDeck[j]; prizeDeck[j] = prizeDeck[k]; prizeDeck[k] = tmp;
+}
+
+// 初始化红包墙
+for (var i = 0; i < PACKET_NUM; i++) {
+  (function(idx) {
+    var b = document.createElement("button");
+    b.className = "packet";
+    b.style.animationDelay = (idx * 0.03) + "s";
+    b.dataset.idx = idx;
+    b.innerHTML = '<span class="fu">奖</span><span class="seal">拆</span>';
+    b.onclick = function() { openPacket(b); };
+    wall.appendChild(b);
+  })(i);
+}
+
+function updateInfo() {
+  document.getElementById("remainCount").textContent = remain;
+  document.getElementById("drawCount").textContent = draws;
+  document.getElementById("winCount").textContent = wins;
+  drawBtn.disabled = draws <= 0 || remain <= 0;
+  drawBtn.innerHTML = draws <= 0 ? "抽奖<span class='small'>机会已用完</span>"
+                    : "抽奖<span class='small'>剩余 " + draws + " 次</span>";
+}
+
+function openPacket(el) {
+  if (el.classList.contains("opened")) return;
+  if (draws <= 0) { showToastModal("抽取机会已用完", "🍂", "下次再来"); return; }
+  el.classList.add("shake");
+  drawBtn.disabled = true;
+  setTimeout(function() {
+    el.classList.remove("shake");
+    var prize = prizeDeck[+el.dataset.idx];
+    el.classList.add("opened");
+    remain--; draws--;
+    settleResult(prize);
+  }, 600);
+}
+
+// 大按钮抽奖：随机高亮几个红包再开
+drawBtn.onclick = function() {
+  if (draws <= 0 || remain <= 0) return;
+  drawBtn.disabled = true;
+  var packets = Array.prototype.slice.call(wall.children).filter(function(p) { return !p.classList.contains("opened"); });
+  var timer = null, round = 0, maxRound = 14;
+  function highlight() {
+    packets.forEach(function(p) { p.classList.remove("shake"); });
+    var pick = packets[Math.floor(Math.random() * packets.length)];
+    pick.classList.add("shake");
+    round++;
+    if (round < maxRound) {
+      timer = setTimeout(highlight, 90 + round * 22);
+    } else {
+      packets.forEach(function(p) { p.classList.remove("shake"); });
+      pick.classList.remove("shake");
+      var prize = prizeDeck[+pick.dataset.idx];
+      pick.classList.add("opened");
+      remain--; draws--;
+      settleResult(prize);
+    }
+  }
+  highlight();
+};
+
+function settleResult(prize) {
+  updateInfo();
+  var isWin = prize.name !== "再来一次";
+  if (isWin) {
+    wins++;
+    records.unshift({ name: "幸运用户", prize: prize.name, time: formatTime() });
+    renderRecords();
+    launchConfetti();
+    showModal(prize.icon, "恭喜中奖", prize.name, "奖品已放入您的账户");
+  } else {
+    showModal(prize.icon, "很遗憾没有中奖", "再来一次", "差一点点就中了，再试试！");
+  }
+}
+
+function formatTime() {
+  var d = new Date();
+  function p(n) { return n < 10 ? "0" + n : n; }
+  return (d.getMonth() + 1) + "月" + d.getDate() + "日 " + p(d.getHours()) + ":" + p(d.getMinutes());
+}
+
+function renderRecords() {
+  var ul = document.getElementById("recordList");
+  var tip = document.getElementById("emptyTip");
+  tip.style.display = records.length ? "none" : "block";
+  ul.innerHTML = records.slice(0, 8).map(function(r) {
+    return "<li><span class='r-name'>" + r.name + "</span><span class='r-prize'>" + r.prize +
+           "</span><span class='r-time'>" + r.time + "</span></li>";
+  }).join("");
+}
+
+function showModal(icon, title, prize, sub) {
+  document.getElementById("mCoin").textContent = icon;
+  document.getElementById("mTitle").textContent = title;
+  document.getElementById("mPrize").textContent = prize;
+  document.getElementById("mSub").textContent = sub;
+  mask.classList.add("show");
+}
+function showToastModal(t, icon, sub) { showModal(icon, t, "", sub); }
+function closeModal() { mask.classList.remove("show"); }
+mask.onclick = function(e) { if (e.target === mask) closeModal(); };
+
+// ===== 抽奖次数设置 =====
+var setMask = document.getElementById("setMask");
+var setNum = document.getElementById("setNum");
+
+function openSettings() {
+  setNum.value = Math.max(1, draws);
+  syncChips();
+  setMask.classList.add("show");
+}
+function closeSettings() { setMask.classList.remove("show"); }
+setMask.onclick = function(e) { if (e.target === setMask) closeSettings(); };
+
+function clampSetting(v) { return Math.min(99, Math.max(1, Math.round(v) || 1)); }
+function stepSetting(d) { setNum.value = clampSetting((parseInt(setNum.value) || 0) + d); syncChips(); }
+function quickSet(n) { setNum.value = n; syncChips(); }
+function syncChips() {
+  var v = parseInt(setNum.value);
+  document.querySelectorAll(".quick-chip").forEach(function(c) {
+    c.classList.toggle("active", parseInt(c.textContent) === v);
+  });
+}
+setNum.addEventListener("input", syncChips);
+
+function applySettings() {
+  draws = clampSetting(parseInt(setNum.value));
+  updateInfo();
+  closeSettings();
+  launchConfetti();
+  showModal("⚙", "设置成功", "抽奖机会 ×" + draws, "祝您好运连连！");
+}
+
+// ===== 彩带特效 =====
+var cvs = document.getElementById("confetti"), ctx = cvs.getContext("2d");
+function resize() { cvs.width = innerWidth; cvs.height = innerHeight; }
+resize(); addEventListener("resize", resize);
+var pieces = [], animating = false;
+function launchConfetti() {
+  var colors = ["#ffd257", "#ff5f4e", "#ffffff", "#f0b429", "#ff8f6b"];
+  for (var i = 0; i < 120; i++) {
+    pieces.push({
+      x: Math.random() * cvs.width, y: -20 - Math.random() * cvs.height * 0.5,
+      w: 6 + Math.random() * 6, h: 8 + Math.random() * 8,
+      c: colors[Math.floor(Math.random() * colors.length)],
+      vy: 2 + Math.random() * 3.5, vx: -1.5 + Math.random() * 3,
+      rot: Math.random() * Math.PI, vr: -0.1 + Math.random() * 0.2
+    });
+  }
+  if (!animating) { animating = true; requestAnimationFrame(tick); }
+}
+function tick() {
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  pieces = pieces.filter(function(p) { return p.y < cvs.height + 20; });
+  pieces.forEach(function(p) {
+    p.y += p.vy; p.x += p.vx; p.rot += p.vr;
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+    ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    ctx.restore();
+  });
+  if (pieces.length) requestAnimationFrame(tick);
+  else { animating = false; ctx.clearRect(0, 0, cvs.width, cvs.height); }
+}
+
+updateInfo();
+renderRecords();
+</script>
+</body>
+</html>
