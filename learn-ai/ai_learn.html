@@ -23,7 +23,7 @@ body{
 .wrap{width:100%;max-width:600px;}
 
 /* 顶部返回 */
-.back-bar{width:100%;max-width:600px;margin-bottom:18px;}
+.back-bar{width:100%;max-width:600px;margin-top:22px;text-align:center;}
 .back-btn{
   display:inline-flex;align-items:center;gap:6px;
   padding:9px 18px;border:none;border-radius:12px;
@@ -70,6 +70,14 @@ body{
 
 /* 底部说明 */
 .tip{margin-top:30px;text-align:center;font-size:.9rem;color:#94a3b8;}
+.tip .vip-link{
+  display:inline-block;margin:0 2px;padding:2px 9px;border-radius:999px;
+  background:#e8f7f0;color:#1fa873;font-weight:600;text-decoration:none;
+  white-space:nowrap;line-height:1.6;
+  transition:transform .15s,background .15s;
+  touch-action:manipulation;
+}
+.tip .vip-link:active{transform:scale(.95);background:#d9f2e6;}
 
 @media(max-width:480px){
   .title{font-size:2.4rem;}
@@ -81,9 +89,6 @@ body{
 </style>
 </head>
 <body>
-<a class="back-bar" href="index.html">
-  <button class="back-btn" type="button">← 返回主页</button>
-</a>
 <div class="wrap">
   <div class="head">
     <h1 class="title">AI学</h1>
@@ -92,7 +97,7 @@ body{
 
   <div class="cards" id="cards"></div>
 
-  <p class="tip">点击卡片即可前往学习 · 持续更新 · © 2026 两英豆豆教练</p>
+  <p class="tip">点击卡片即可前往学习 · <a class="vip-link" href="vip-trip.html">Vip群资料更新</a> · © 2026 两英豆豆教练</p>
 </div>
 
 <script>
@@ -103,14 +108,15 @@ body{
  *   desc: 一句话简介
  *   url:  网站地址（live 为 true 时点击新窗口打开）
  *   live: true=已上线可访问；false=建设中占位
+ *   inner:true=站内页面，同窗口打开（不出新标签页）
  * ===================================================================== */
 var SITES = [
+  { ico:'🧰', name:'学科AI万能提问模板', desc:'401 条可复制提示词 · 小学 1-6 年级 × 语数英 · 初中 7-9 年级 × 9 科', url:'dd-prompt/index.html', live:true, inner:true },
   { ico:'🌐', name:'OpenMAIC · 互动课堂', desc:'清华开源·一键生成沉浸式 AI 课堂', url:'https://openmaic.io/zh/',            live:true },
-  { ico:'💡', name:'Code.org · Hour of AI', desc:'编程一小时：AI 互动入门', url:'https://code.org/zh-Hant/hour-of-ai', live:true },
-  { ico:'🧑‍🏫', name:'AI 智能辅导', desc:'不懂就问，AI 随时答疑讲解',  url:'#', live:false },
-  { ico:'🗣️', name:'AI 口语陪练', desc:'开口练习，AI 陪你对话纠音',  url:'#', live:false },
-  { ico:'✍️', name:'AI 作文批改', desc:'提交作文，秒出点评与修改建议', url:'#', live:false },
-  { ico:'🎧', name:'AI 听读训练', desc:'听短文、读课文，磨耳朵练语感', url:'#', live:false }
+  { ico:'💡', name:'AI生成GGB', desc:'可视化教学平台', url:'https://www.ggbzls.cn/', live:true },
+  { ico:'🧑‍🏫', name:'AI 智能辅导', desc:'不懂就问，AI 随时答疑讲解',  url:'../dd-teacher/index.html', live:true },
+  { ico:'🗣️', name:'AI 口语陪练', desc:'开口练习，AI 陪你对话纠音',  url:'../learn-english/textbook/3a-unit1-oral.html', live:true},
+  { ico:'✍️', name:'AI 作文批改', desc:'提交作文，秒出点评与修改建议', url:'#', live:false }
 ];
 /* ===================================================================== */
 
@@ -120,8 +126,7 @@ SITES.forEach(function(s){
   a.className = 'card';
   a.href = s.url;
   if(s.live){
-    a.target = '_blank';
-    a.rel = 'noopener';
+    if(!s.inner){ a.target = '_blank'; a.rel = 'noopener'; }
   } else {
     a.addEventListener('click', function(e){ e.preventDefault(); });
   }
@@ -129,9 +134,13 @@ SITES.forEach(function(s){
     '<div class="ico">' + s.ico + '</div>' +
     '<div class="name">' + s.name + '</div>' +
     '<div class="desc">' + s.desc + '</div>' +
-    '<span class="tag' + (s.live ? ' live' : '') + '">' + (s.live ? '访问 ↗' : '建设中') + '</span>';
+    '<span class="tag' + (s.live ? ' live' : '') + '">' + (s.live ? (s.inner ? '进入 →' : '访问 ↗') : '建设中') + '</span>';
   cards.appendChild(a);
 });
 </script>
+
+<a class="back-bar" href="index.html">
+  <button class="back-btn" type="button">← 返回主页</button>
+</a>
 </body>
 </html>

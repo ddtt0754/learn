@@ -23,7 +23,7 @@ body{
 .wrap{width:100%;max-width:620px;}
 
 /* 顶部返回 */
-.back-bar{width:100%;max-width:620px;margin-bottom:18px;}
+.back-bar{width:100%;max-width:620px;margin-top:22px;text-align:center;}
 .back-btn{
   display:inline-flex;align-items:center;gap:6px;
   padding:9px 18px;border:none;border-radius:12px;
@@ -78,6 +78,14 @@ body{
 
 /* 底部说明 */
 .tip{margin-top:30px;text-align:center;font-size:.9rem;color:#94a3b8;}
+.tip .vip-link{
+  display:inline-block;margin:0 2px;padding:2px 9px;border-radius:999px;
+  background:#e8f7f0;color:#1fa873;font-weight:600;text-decoration:none;
+  white-space:nowrap;line-height:1.6;
+  transition:transform .15s,background .15s;
+  touch-action:manipulation;
+}
+.tip .vip-link:active{transform:scale(.95);background:#d9f2e6;}
 
 @media(max-width:480px){
   .title{font-size:2.4rem;}
@@ -89,9 +97,6 @@ body{
 </style>
 </head>
 <body>
-<a class="back-bar" href="index.html">
-  <button class="back-btn" type="button">← 返回主页</button>
-</a>
 <div class="wrap">
   <div class="head">
     <h1 class="title">学AI</h1>
@@ -100,7 +105,7 @@ body{
 
   <div id="groups"></div>
 
-  <p class="tip">点击卡片即可前往 · 持续更新 · © 2026 两英豆豆教练</p>
+  <p class="tip">点击卡片即可前往 ·  <a class="vip-link" href="vip-trip.html">Vip群资料更新</a> · © 2026 两英豆豆教练</p>
 </div>
 
 <script>
@@ -131,7 +136,7 @@ var GROUPS = [
     title: 'AI 编程 · 开发', ico: '💻',
     sites: [
       { ico:'🤝', name:'WorkBuddy',  desc:'腾讯 AI Agent：一句话让 AI 替你办公', url:'https://www.workbuddy.cn/' },
-      { ico:'💻', name:'CodeBuddy',  desc:'腾讯 AI 编程助手：对话式编程全流程',  url:'https://www.codebuddy.cn/' },
+      { ico:'💡', name:'Code.org · Hour of AI', desc:'编程一小时：AI 互动入门', url:'https://code.org/zh-Hant/hour-of-ai'},
       { ico:'🧩', name:'Coze 扣子',  desc:'字节 AI 智能体 / Bot 搭建平台',      url:'https://www.coze.cn/' },
       { ico:'🚀', name:'Trae',       desc:'字节 AI IDE：超级 AI 开发工程师',    url:'https://www.trae.cn/' }
     ]
@@ -229,5 +234,9 @@ GROUPS.forEach(function(g){
   groupsEl.appendChild(sec);
 });
 </script>
+
+<a class="back-bar" href="index.html">
+  <button class="back-btn" type="button">← 返回主页</button>
+</a>
 </body>
 </html>
