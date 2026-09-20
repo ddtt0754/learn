@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#2ebd85">
+<meta name="description" content="豆豆智学中心 · AI学习站目标功能应用说明：两大主入口、9 个页面、403 条学科提问模板与使用路径">
+<title>AI学习站 · 目标功能应用说明 - 豆豆智学中心</title>
+<style>
+:root{
+  --bg:#f5f7fa;
+  --text:#1e293b;
+  --text2:#64748b;
+  --text3:#94a3b8;
+  --green:#2ebd85;
+  --green-deep:#1fa873;
+  --line:#eef2f7;
+  --grad:linear-gradient(135deg,#35d29a,#2f9df0);
+  --shadow:0 6px 16px rgba(15,23,42,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;
+  padding:28px 20px 48px;
+}
+.wrap{width:100%;max-width:600px;}
+
+/* ===== 标题 ===== */
+.head{text-align:center;margin-bottom:20px;}
+.title{
+  font-size:2.5rem;font-weight:900;letter-spacing:.1em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.subtitle{font-size:1rem;color:var(--text2);margin-top:10px;font-weight:500;line-height:1.7;}
+.subtitle b{color:var(--text);margin:0 3px;}
+
+/* ===== 数据概览 ===== */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.stat{
+  background:#fff;border-radius:14px;padding:12px 4px;text-align:center;
+  box-shadow:var(--shadow);border:2px solid var(--line);
+}
+.stat .num{
+  display:block;font-size:1.3rem;font-weight:800;line-height:1.2;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.stat .lb{display:block;font-size:.7rem;color:var(--text2);margin-top:4px;font-weight:600;}
+
+/* ===== 区块卡 ===== */
+.sec{background:#fff;border-radius:16px;padding:18px 16px 16px;margin-bottom:14px;
+  box-shadow:var(--shadow);border:2px solid var(--line);}
+.sec h2{
+  font-size:1.05rem;font-weight:800;color:var(--text);
+  display:flex;align-items:center;gap:8px;
+  padding-bottom:10px;border-bottom:2px solid #f1f5f9;margin-bottom:12px;
+}
+.sec h2 .no{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:8px;background:var(--grad);
+  color:#fff;font-size:.8rem;flex-shrink:0;
+}
+.sec h3{font-size:.92rem;font-weight:700;color:#2c3e48;margin:14px 0 8px;
+  display:flex;align-items:center;gap:6px;}
+.sec h3:first-of-type{margin-top:2px;}
+.sec p{font-size:.9rem;color:#5a6b74;line-height:1.85;}
+.sec p+p{margin-top:8px;}
+.sec p b{color:var(--text);font-weight:700;}
+.sec .kv{font-size:.88rem;color:#5a6b74;line-height:1.9;}
+.sec .kv b{color:var(--green-deep);font-weight:700;}
+
+/* ===== 三支柱 ===== */
+.pillars{display:grid;grid-template-columns:1fr;gap:10px;margin-top:2px;}
+.pil{border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;background:#fafcfe;}
+.pil .t{font-size:.95rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
+.pil .t em{font-style:normal;font-size:.68rem;font-weight:700;color:var(--green-deep);
+  background:#e8f7f0;border-radius:999px;padding:2px 9px;}
+.pil .d{font-size:.85rem;color:var(--text2);line-height:1.75;margin-top:6px;}
+
+/* ===== 卡片网格（AI学 入口） ===== */
+.cgrid{display:grid;grid-template-columns:1fr;gap:9px;margin-top:2px;}
+.cc{border:1.5px solid var(--line);border-radius:13px;padding:11px 13px;background:#fafcfe;
+  display:flex;gap:11px;align-items:flex-start;}
+.cc .ico{font-size:1.35rem;line-height:1.2;flex-shrink:0;}
+.cc .bd{flex:1;min-width:0;}
+.cc .nm{font-size:.9rem;font-weight:700;color:var(--text);}
+.cc .ds{font-size:.8rem;color:var(--text2);line-height:1.65;margin-top:3px;}
+.cc .st{display:inline-block;margin-top:6px;font-size:.66rem;font-weight:700;
+  border-radius:999px;padding:2px 9px;background:#e8f7f0;color:var(--green-deep);}
+.cc .st.plan{background:#f1f5f9;color:#64748b;}
+
+/* ===== 分组（学AI / 专项 / 专题） ===== */
+.grp{margin-top:12px;}
+.grp:first-of-type{margin-top:2px;}
+.grp .gt{font-size:.86rem;font-weight:700;color:#2c3e48;display:flex;align-items:center;gap:6px;}
+.grp .gt .n{margin-left:auto;font-size:.68rem;font-weight:700;color:var(--text2);background:#f1f5f9;
+  border-radius:999px;padding:2px 8px;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;}
+.chip{font-size:.77rem;font-weight:600;color:#5a6b74;background:#f7fafc;
+  border:1.5px solid #e6eef5;border-radius:999px;padding:5px 11px;line-height:1.4;}
+
+/* ===== 功能清单 ===== */
+.fn{display:flex;gap:11px;padding:11px 0;border-bottom:1px dashed #eef2f7;}
+.fn:last-child{border-bottom:0;padding-bottom:2px;}
+.fn .idx{flex-shrink:0;width:24px;height:24px;border-radius:8px;background:var(--grad);
+  color:#fff;font-size:.75rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.fn .bd{flex:1;min-width:0;}
+.fn .nm{font-size:.9rem;font-weight:700;color:var(--text);}
+.fn .ds{font-size:.82rem;color:var(--text2);line-height:1.7;margin-top:4px;}
+
+/* ===== 提示条 ===== */
+.note{margin-top:12px;background:#f6fbf8;border-left:3px solid #b7e5d0;border-radius:10px;
+  padding:10px 12px;font-size:.82rem;color:#5a6b74;line-height:1.75;}
+.note b{color:#2c3e48;}
+.note .lb{font-weight:700;color:var(--green-deep);}
+
+/* ===== 页脚 / 返回 ===== */
+.site-footer{margin-top:20px;text-align:center;font-size:.75rem;color:var(--text3);line-height:1.9;}
+.site-footer a{color:#8aa09a;text-decoration:none;}
+.back-wrap{width:100%;max-width:600px;margin-top:18px;text-align:center;}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:10px 22px;border:none;border-radius:12px;
+  background:#fff;color:var(--green-deep);font-size:.92rem;font-weight:700;
+  text-decoration:none;cursor:pointer;font-family:inherit;
+  border:1.5px solid var(--green);
+  box-shadow:0 4px 12px rgba(46,158,107,.12);
+  transition:transform .15s;touch-action:manipulation;
+}
+.back-btn:active{transform:scale(.95);}
+
+/* 教练微信号提示框 */
+.coach-tip{position:relative;display:inline-block;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.coach-tip .tip{visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;transform:translateX(-50%) translateY(4px);background:linear-gradient(135deg,#35d29a,#2f9df0);color:#fff;padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;white-space:nowrap;letter-spacing:.5px;z-index:99;pointer-events:none;box-shadow:0 6px 18px rgba(47,157,240,.35);transition:opacity .2s ease,transform .2s ease,visibility .2s}
+.coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#2f9df0}
+.coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:480px){
+  .title{font-size:2rem;}
+  .stats{gap:6px;}
+  .stat .num{font-size:1.1rem;}
+  .stat .lb{font-size:.64rem;}
+  .sec{padding:16px 13px 14px;}
+  .subtitle{font-size:.92rem;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <h1 class="title">AI学习站</h1>
+    <p class="subtitle">功能说明 <b>·</b> 两大主入口 <b>·</b> 9 个页面 <b>·</b> 403 条学科模板</p>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <!-- 1 定位 -->
+  <section class="sec">
+    <h2><span class="no">1</span>本站定位与目标</h2>
+    <p><b>一句话：把「AI 怎么用来学习」和「怎么学 AI技能」两件事拆开，各给一条最短路径。</b></p>
+    <div class="pillars" id="pillars"></div>
+  </section>
+
+  <!-- 2 AI学 -->
+  <section class="sec">
+    <h2><span class="no">2</span>主入口一 · AI学（用 AI 来学习）</h2>
+    <p>面向 <b>学生与家长</b>：把 AI 当成随叫随到的学科助教。页面为 2 列卡片墙，点击即达，其中站内功能同窗口打开、外部工具新窗口打开。</p>
+    <div class="cgrid" id="aixue"></div>
+  </section>
+
+  <!-- 3 学AI -->
+  <section class="sec">
+    <h2><span class="no">3</span>主入口二 · 学AI（学 AI 工具）</h2>
+    <p>面向 <b>好奇心与工具欲</b>：按「先会说话 → 再会编程 → 会画会做 → 会用工具变现」的顺序，收录 10 组常用 AI 网址，共 32 张卡片。</p>
+    <div id="xueai"></div>
+  </section>
+
+  <!-- 4 核心功能 -->
+  <section class="sec">
+    <h2><span class="no">4</span>核心功能 · 豆豆学科AI万能提问模板</h2>
+    <p>本站最有价值的一块：把「怎么问 AI」变成可直接复制的模板库。<b>共 403 条收录提示词，可组合出 360 套</b>，覆盖小学 1-6 年级（语文 / 数学 / 英语）与初中 7-9 年级（9 学科）。</p>
+
+    <h3>🧰 8 大专项功能（横跨全部年级与学科）</h3>
+    <div id="funcs"></div>
+
+    <h3>📚 模板是怎么组织的</h3>
+    <p class="kv">
+      <b>小学版</b>：6 个年级 × 3 个学科 × 8 大功能，逐条独立编写，措辞随学段变化 → <b>18 条 / 功能</b>；<br>
+      <b>初中版</b>：3 个年级 × 9 个学科，除「学科名 + 学科关键词」外文字完全一致，给出语文基准版，切换学科时<b>自动改写关键词</b> → <b>24 条 / 功能</b>（3 年级 × 8 功能）。<br>
+      占位符（<code>[X]</code>、<code>【课文名】</code>、<code>[章节名称]</code>）粘贴后自行替换即可，也可以直接让 AI「先问我这三个信息」。
+    </p>
+
+    <h3>⭐ 专项突破与工具库（18 个分组 / 235 条）</h3>
+    <div id="spec"></div>
+
+    <h3>🧠 提问方法论与铁规矩</h3>
+    <div id="method"></div>
+  </section>
+
+  <!-- 5 专题页 -->
+  <section class="sec">
+    <h2><span class="no">5</span>专题页 · 少儿编程入门</h2>
+    <p>从「学AI」里再往下一层，为小学生单独做了两个零安装专题页，每个网站都标注<b>适合年级</b>、<b>亮点</b>与<b>注意</b>。</p>
+    <h3>🐍 Python 学习 · 5 组 9 站</h3>
+    <div id="pyt"></div>
+    <div class="note"><span class="lb">搭配方案：</span><b>1-3 年级</b> Code.org 熟悉逻辑 · <b>3-5 年级</b> 极客战记（主）+ Trinket 海龟画图（辅）· <b>5-6 年级</b> 极客战记 + W3Schools 系统学习 + CheckiO 解谜。</div>
+    <h3>🌐 HTML 学习 · 3 组 5 站</h3>
+    <div id="ht"></div>
+    <div class="note"><span class="lb">建议路线：</span>先用中文教程打基础（认识标签与结构）→ 到 CodePen 动手改代码做个人小主页 → 最后拿免费模板改成自己的作品。全程浏览器打开即可，无需安装任何软件。</div>
+  </section>
+
+  <footer class="site-footer">
+    © 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span> · AI学习本站说明<br>
+    <a href="ai_learn.html">AI学</a> ·
+    <a href="learn_ai.html">学AI</a> ·
+    <a href="index.html">智学系统</a>
+  </footer>
+
+  <div class="back-wrap">
+    <a class="back-btn" href="index.html">← 返回主页</a>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+ * ★ 说明页数据区 —— 后期页面 / 功能有变动，只需改这里 ★
+ * 改完请同步核对：头部 stats 数字、各 section 里的小字说明。
+ * 顺序即渲染顺序：STATS → PILLARS → AIXUE → XUEAI → FUNCS → SPEC → METHOD → PYT/HT
+ * ===================================================================== */
+
+/* 首屏统计 */
+var STATS = [
+  { n:'9',   lb:'页面' },
+  { n:'2',   lb:'主入口' },
+  { n:'52',  lb:'网址卡片' },
+  { n:'403', lb:'条提示词' }
+];
+
+/* 三大支柱 */
+var PILLARS = [
+  { ico:'🤖', t:'AI学', tag:'用 AI 学习', d:'一体化导航：提问模板、互动课堂、AI 辅导 / 口语陪练 / 作文批改，共 6 张功能卡。' },
+  { ico:'🧠', t:'学AI', tag:'学 AI 本领', d:'10 组 32 个常用 AI 网址：对话助手、编程启蒙、绘画、视频、数字人、音乐、工作流、变现。' },
+  { ico:'🧰', t:'提问模板库', tag:'可直接复制', d:'403 条学科提示词，8 大专项功能 × 小学 3 科 / 初中 9 科，按年级与学科精准取用。' }
+];
+
+/* AI学 6 张卡 */
+var AIXUE = [
+  { ico:'🧰', nm:'学科AI万能提问模板', ds:'403 条可复制提示词 · 小学 1-6 年级 × 语数英 · 初中 7-9 年级 × 9 科', st:'进入 →', live:true },
+  { ico:'🌐', nm:'OpenMAIC · 互动课堂', ds:'清华开源 · 一键生成沉浸式 AI 课堂', st:'访问 ↗', live:true },
+  { ico:'💡', nm:'AI生成GGB', ds:'可视化教学平台', st:'访问 ↗', live:true },
+  { ico:'🧑‍🏫', nm:'AI 智能辅导', ds:'不懂就问，AI 随时答疑讲解（站内 dd-teacher）', st:'进入 →', live:true },
+  { ico:'🗣️', nm:'AI 口语陪练', ds:'开口练习，AI 陪你对话纠音（站内口语测评页）', st:'进入 →', live:true },
+  { ico:'✍️', nm:'AI 作文批改', ds:'提交作文，秒出点评与修改建议', st:'建设中', live:false }
+];
+
+/* 学AI 10 组 */
+var XUEAI = [
+  { t:'AI 对话助手', ico:'💬', items:['🥤 豆包','🐋 DeepSeek'] },
+  { t:'编程语言学习', ico:'📘', items:['🐍 Python 学习','🌐 HTML 学习'] },
+  { t:'AI 编程 · 开发', ico:'💻', items:['🤝 WorkBuddy','💡 Code.org · Hour of AI','🧩 Coze 扣子','🚀 Trae'] },
+  { t:'AI 绘画 · 生图', ico:'🎨', items:['🖌️ 哩布哩布','🎨 MX 绘画','🖼️ MX 绘画中文站','✨ 星流'] },
+  { t:'AI 视频创作', ico:'🎬', items:['🌈 即梦','🐦 小云雀','🎥 可灵 Kling','🎞️ Vidu','🧬 Morph','🐚 海螺 AI','📺 Neowow','📽️ LiBTV'] },
+  { t:'AI 数字人', ico:'🧑‍🎤', items:['🪞 蝉镜 AI','💡 灵光 AI','🦋 飞影数字人','🎙️ 腾讯智影'] },
+  { t:'AI 音乐', ico:'🎵', items:['🎶 苏谱之音','🎼 天工 SkyMusic'] },
+  { t:'AI 工作流平台', ico:'⚙️', items:['🔄 OKflow','⚙️ RunningHub'] },
+  { t:'AI 综合 · 聚合', ico:'🌐', items:['🧠 MiniMax','🗼 灯塔 AI 聚合'] },
+  { t:'创作 · 变现', ico:'📣', items:['🍅 番茄达人中心','📱 抖音创作服务'] }
+];
+
+/* 8 大专项功能 */
+var FUNCS = [
+  { nm:'课前预习', ds:'带着问题进课堂：核心考点 + 课堂必答问题 + 15~20 分钟预习步骤（小学版逐年级贴合课本）。' },
+  { nm:'课内知识点深挖', ds:'把课上讲不透的点拆开 —— 是什么、为什么、怎么考，按「必须先懂的 → 课上再理解」排序。' },
+  { nm:'启发式答疑（不给答案）', ds:'默认只给思路与阶梯提示、禁止直给答案，把「看答案」变成「自己想」。' },
+  { nm:'错题溯源与变式强化', ds:'由错题反查考点 → 归类错因 → 出同源变式再练一遍，做到举一反三。' },
+  { nm:'背诵识记', ds:'按记忆节奏排背诵计划 + 抽背式问答，语数英各有对应做法（口诀、儿歌、听写等）。' },
+  { nm:'单元查漏补缺诊断', ds:'用一次单元测试定位薄弱点，输出分层补漏清单与优先级。' },
+  { nm:'答题规范与专项突破', ds:'按题型讲清踩分点与规范作答模板，中考向的答题规范单独成条。' },
+  { nm:'复盘与规划', ds:'周 / 月复盘 + 考前冲刺 + 中长期学习规划，把零散练习串成路径。' }
+];
+
+/* 专项分组（初中 8 组 / 小学 10 组，共 235 条） */
+var SPEC = [
+  { b:'初中版', n:'8 组 / 92 条', items:['一、理科专项突破','二、文科专项突破','三、全科学情诊断系统','四、分层学习体系','快捷指令库（WorkBuddy · 分年级）','豆包指令库（分年级）','学生自助提问模板','AI 互动课堂生成（OpenMAIC）'] },
+  { b:'小学版', n:'10 组 / 143 条', items:['专项工具包（作文 / 听写 / 阅读 / 口算 / 复习）','万能快捷指令库（WorkBuddy · 分学段）','WorkBuddy 高效使用','豆包指令库','学情诊断','IMA 知识库','Codex / 编程','WorkBuddy 提问法','学生自助提问模板','AI 互动课堂生成'] }
+];
+
+/* 方法论 6 块 */
+var METHOD = [
+  { t:'4S 提问法', d:'说清楚（要什么）· 说详细（几年级、什么科、什么课本）· 说难度（要不要分步骤）· 说安全（不透露真名与学校）。' },
+  { t:'5S 深化版', d:'在 4S 基础上再加一层，用于初中生把问题问到「能被 AI 精准回答」的程度。' },
+  { t:'五环提示词公式', d:'角色 → 背景 → 任务 → 约束 → 引导，五环齐全的提示词命中率最高，本站模板都按这个骨架写。' },
+  { t:'铁规矩（小学 3 条 / 初中 4 条）', d:'不泄露隐私 · AI 会犯错不能全信（以课本为准）· 不抄作业只问思路；初中另加「不依赖 AI，单次不超过 30 分钟」。' },
+  { t:'提问升级秘诀', d:'追问到底、限定格式（分 3 步讲 / 用表格对比 / 画思维导图）、让 AI 反过来出题考自己。' },
+  { t:'家长陪问三步法', d:'示范（前 3 次家长边做边说思路）→ 合作（一起整理问题）→ 放手（孩子独立提问，家长做复盘）。' }
+];
+
+/* Python 专题分组 */
+var PYT = [
+  { t:'游戏闯关类（首选 · 激发兴趣）', items:['⚔️ 极客战记 CodeCombat','🧩 CheckiO'] },
+  { t:'在线创作平台', items:['🐢 Trinket（海龟画图）','🚀 Replit'] },
+  { t:'中文系统教程', items:['📚 W3Schools Python 中文','💯 PythonTip'] },
+  { t:'过渡备选（先练逻辑）', items:['🌍 Code.org','🐱 Scratch'] },
+  { t:'免费视频课程', items:['🎓 可汗学院 · Python 入门'] }
+];
+
+/* HTML 专题分组 */
+var HT = [
+  { t:'中文教程（免费零基础）', items:['📘 菜鸟教程 · HTML','📚 W3School · HTML 中文'] },
+  { t:'在线创作 · 实时预览', items:['🖥️ CodePen','🧪 JSFiddle'] },
+  { t:'模板素材 · 动手改造', items:['📄 HTML5 UP'] }
+];
+
+/* =====================================================================
+ * 渲染区 —— 下面通常不用改
+ * ===================================================================== */
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function fill(id, html){
+  var box = document.getElementById(id);
+  if (box) box.innerHTML = html;   /* 元素不存在时静默跳过，避免整段脚本中断 */
+  return !!box;
+}
+
+/* 首屏统计 */
+fill('stats', STATS.map(function(s){
+  return '<div class="stat"><span class="num">' + esc(s.n) + '</span><span class="lb">' + esc(s.lb) + '</span></div>';
+}).join(''));
+
+/* 三大支柱 */
+fill('pillars', PILLARS.map(function(p){
+  return '<div class="pil">' +
+    '<div class="t">' + esc(p.ico) + ' ' + esc(p.t) + '<em>' + esc(p.tag) + '</em></div>' +
+    '<div class="d">' + esc(p.d) + '</div>' +
+  '</div>';
+}).join(''));
+
+/* AI学 卡片 */
+fill('aixue', AIXUE.map(function(c){
+  return '<div class="cc">' +
+    '<div class="ico">' + esc(c.ico) + '</div>' +
+    '<div class="bd">' +
+      '<div class="nm">' + esc(c.nm) + '</div>' +
+      '<div class="ds">' + esc(c.ds) + '</div>' +
+      '<span class="st' + (c.live ? '' : ' plan') + '">' + esc(c.st) + '</span>' +
+    '</div>' +
+  '</div>';
+}).join(''));
+
+/* 学AI 分组 */
+fill('xueai', XUEAI.map(function(g){
+  return '<div class="grp">' +
+    '<div class="gt">' + esc(g.ico) + ' ' + esc(g.t) + '<span class="n">' + g.items.length + ' 个</span></div>' +
+    '<div class="chips">' + g.items.map(function(x){ return '<span class="chip">' + esc(x) + '</span>'; }).join('') + '</div>' +
+  '</div>';
+}).join(''));
+
+/* 8 大功能 */
+fill('funcs', FUNCS.map(function(f,i){
+  return '<div class="fn">' +
+    '<div class="idx">' + (i+1) + '</div>' +
+    '<div class="bd"><div class="nm">' + esc(f.nm) + '</div><div class="ds">' + esc(f.ds) + '</div></div>' +
+  '</div>';
+}).join(''));
+
+/* 专项分组 */
+fill('spec', SPEC.map(function(s){
+  return '<div class="grp">' +
+    '<div class="gt">' + esc(s.b) + '<span class="n">' + esc(s.n) + '</span></div>' +
+    '<div class="chips">' + s.items.map(function(x){ return '<span class="chip">' + esc(x) + '</span>'; }).join('') + '</div>' +
+  '</div>';
+}).join(''));
+
+/* 方法论 */
+fill('method', METHOD.map(function(m){
+  return '<div class="fn">' +
+    '<div class="bd"><div class="nm">' + esc(m.t) + '</div><div class="ds">' + esc(m.d) + '</div></div>' +
+  '</div>';
+}).join(''));
+
+/* Python / HTML 专题 */
+function renderSeg(boxId, arr, unit){
+  fill(boxId, arr.map(function(g){
+    return '<div class="grp">' +
+      '<div class="gt">' + esc(g.t) + '<span class="n">' + g.items.length + ' ' + unit + '</span></div>' +
+      '<div class="chips">' + g.items.map(function(x){ return '<span class="chip">' + esc(x) + '</span>'; }).join('') + '</div>' +
+    '</div>';
+  }).join(''));
+}
+renderSeg('pyt', PYT, '站');
+renderSeg('ht', HT, '站');
+</script>
+</body>
+</html>
