@@ -348,7 +348,7 @@
 
   <!-- 返回 -->
   <div class="back-wrap">
-    <a class="back-btn" href="../index.html">🏠 返回首页</a>
+    <a class="back-btn" href="../../index.html">🏠 返回首页</a>
   </div>
 
   <footer>© 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span><br/><br/></footer>
@@ -521,7 +521,18 @@ var DATA = {
 
 /* ================= 渲染逻辑（一般无需修改） ================= */
 var STAGES = ["小学", "初中", "高中"];
-var state = { stage: STAGES[0], subject: 0 };
+var DEFAULT_SUBJECT = "数学";   /* ★ 默认选中的学科（切换学段后同样回到该学科）★ */
+
+/* 按名称定位默认学科下标；若该学段没有此学科则退回第一个 */
+function defaultSubjectIndex(stage){
+  var subs = DATA[stage] || [];
+  for (var i = 0; i < subs.length; i++) {
+    if (subs[i].name === DEFAULT_SUBJECT) return i;
+  }
+  return 0;
+}
+
+var state = { stage: STAGES[0], subject: defaultSubjectIndex(STAGES[0]) };
 
 var stageSelEl = document.getElementById("stageSel");
 var subjSelEl = document.getElementById("subjSel");
@@ -618,7 +629,7 @@ function renderList(){
 function selectStage(s){
   if (!DATA[s]) return;
   state.stage = s;
-  state.subject = 0;
+  state.subject = defaultSubjectIndex(s);
   stageSelEl.value = s;
   buildSubjectSelect();
   renderList();
