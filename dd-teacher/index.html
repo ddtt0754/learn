@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#35d29a" />
+<title>豆豆 AI 伴学</title>
+<style>
+  :root {
+    --g1: #35d29a;
+    --g2: #2f9df0;
+    --ink: #1f2d3d;
+    --sub: #5b6b7c;
+    --bg: #eef6fb;
+    --card: #ffffff;
+    --radius: 18px;
+    --shadow: 0 6px 24px rgba(47, 157, 240, .14);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ===== 顶部栏 ===== */
+  .topbar {
+    position: relative; z-index: 20;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: linear-gradient(120deg, var(--g1), var(--g2));
+    color: #fff;
+    box-shadow: 0 3px 14px rgba(47, 157, 240, .25);
+    flex: 0 0 auto;
+  }
+  .logo {
+    width: 34px; height: 34px; flex: 0 0 34px;
+    border-radius: 50%; background: rgba(255,255,255,.22);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; backdrop-filter: blur(6px);
+  }
+  .title { flex: 1; min-width: 0; font-size: 16px; font-weight: 700; letter-spacing: .5px; white-space: nowrap; overflow: hidden; }
+  .title small { display: block; font-size: 10px; font-weight: 500; opacity: .85; letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* ===== 右上角：打开 DeepSeek 文字链接 ===== */
+  .ds-link {
+    margin-left: auto; flex: 0 0 auto;
+    color: #fff; text-decoration: none; font-size: 12.5px; font-weight: 700;
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.55);
+    padding: 6px 13px; border-radius: 999px; letter-spacing: .5px; white-space: nowrap;
+    transition: background .2s, transform .12s;
+    touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  }
+  .ds-link:active { transform: scale(.95); background: rgba(255,255,255,.34); }
+
+  /* ===== 引导语提示条 ===== */
+  .hintbar {
+    flex: 0 0 auto;
+    background: var(--card);
+    border-bottom: 1px solid #e7eef5;
+    padding: 9px 14px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer;
+    transition: background .15s ease;
+  }
+  .hintbar:active { background: #f2f8fd; }
+  .hint-tag {
+    flex: 0 0 auto;
+    font-size: 11px; font-weight: 700; color: var(--g2);
+    background: #eaf6ff; padding: 4px 8px; border-radius: 8px;
+  }
+  .hint-text {
+    flex: 1; font-size: 12.5px; color: var(--sub);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hint-copy { flex: 0 0 auto; font-size: 12px; color: var(--g2); font-weight: 600; }
+
+  /* ===== 内嵌区 ===== */
+  .frame-wrap { position: relative; flex: 1 1 auto; min-height: 0; }
+  iframe {
+    width: 100%; height: 100%;
+    border: none; display: block; background: #fff;
+  }
+  .loading {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; background: var(--bg); color: var(--sub); font-size: 13px;
+    pointer-events: none;
+  }
+  .spinner {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 3px solid #d9e8f4; border-top-color: var(--g2);
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== 底部操作栏 ===== */
+  .bottombar {
+    position: relative; z-index: 20; flex: 0 0 auto;
+    background: var(--card);
+    border-top: 1px solid #e7eef5;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    box-shadow: 0 -3px 16px rgba(47, 157, 240, .10);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .modes { display: flex; gap: 10px; }
+  .mode {
+    flex: 1;
+    border: 1.5px solid #e2ecf5;
+    background: #f5f9fd; color: var(--sub);
+    font-size: 14px; font-weight: 600;
+    padding: 10px 8px; border-radius: 14px; cursor: pointer;
+    font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all .18s ease;
+    white-space: nowrap;
+  }
+  .mode.active {
+    background: linear-gradient(120deg, var(--g1), var(--g2));
+    border-color: transparent; color: #fff;
+    box-shadow: 0 4px 14px rgba(47, 157, 240, .30);
+  }
+  .copy-btn {
+    width: 100%;
+    border: none; cursor: pointer;
+    background: linear-gradient(120deg, var(--g1), var(--g2));
+    color: #fff; font-size: 15px; font-weight: 700;
+    padding: 12px; border-radius: 14px;
+    font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    box-shadow: 0 6px 18px rgba(47, 157, 240, .28);
+    transition: transform .12s ease;
+  }
+  .copy-btn:active { transform: scale(.97); }
+
+  /* ===== Toast ===== */
+  .toast {
+    position: fixed; left: 50%; bottom: 150px; z-index: 40;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(31,45,61,.92); color: #fff;
+    font-size: 13px; padding: 10px 18px; border-radius: 12px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+    max-width: 84vw; text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,.2);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo" id="logo">🧠</div>
+    <div class="title"><span id="titleMain">苏格拉底提问模式</span><small>====豆豆智学中心====</small></div>
+    <a class="ds-link" href="https://chat.deepseek.com/" target="_blank" rel="noopener">打开DeepSeek ↗</a>
+  </div>
+
+  <div class="hintbar" id="hintbar" title="点击复制完整引导语">
+    <span class="hint-tag" id="hintTag">苏格拉底提问</span>
+    <span class="hint-text" id="hintText"></span>
+    <span class="hint-copy">复制</span>
+  </div>
+
+  <div class="frame-wrap">
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <div>正在加载豆包…</div>
+    </div>
+    <iframe
+      id="frame"
+      src="https://www.doubao.com/chat/"
+      title="豆包聊天"
+      allow="clipboard-read; clipboard-write; encrypted-media; microphone; camera; autoplay; fullscreen"
+      allowfullscreen></iframe>
+  </div>
+
+  <div class="bottombar">
+    <div class="modes" id="modes">
+      <button class="mode active" data-mode="socratic">🧠 苏格拉底提问</button>
+      <button class="mode" data-mode="feynman">📖 费曼讲解</button>
+    </div>
+    <button class="copy-btn" id="btnCopy">📋 复制引导语</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  // ===== 模式配置区（引导语即提示词，可按需修改） =====
+  const MODES = [
+    {
+      id: 'socratic',
+      emoji: '🧠',
+      name: '苏格拉底提问',
+      prompt: `你是豆神老师，一名苏格拉底式导学辅导老师。
+核心原则：绝不直接给出完整答案、不直接输出结论、不直接把解题步骤全部告知学生。你的工作是通过提问引导学习者主动思考、自主推导得出答案。
+
+执行规则：
+1. 用户输入文字、粘贴资料、上传题目图片，全部以启发式提问为主，一次只抛出1‑2个梯度问题，问题简短，不要大段讲解。
+2. 如果用户提供参考教材/材料，你的所有提问必须严格基于这份材料内容，不要脱离素材凭空拓展。
+3. 如果用户发来习题图片，不要直接解题。先引导学生说出自己看懂的条件、已有的思路、卡住的地方。
+4. 当学生回答出现错误，不要直接纠正，通过反问让他自己发现矛盾与漏洞。
+5. 只有学生反复思考多次仍然无法推进时，才给极小的线索提示，依旧不抛出完整答案。
+6. 语言温和通俗，适合中小学1‑9年级学生，避免晦涩学术术语。
+7. 禁止输出：“答案是”“解法如下”这类直接给结果的话术。
+8. 对话结尾尽量留给学生思考空间，不要替学生总结全部内容。`
+    },
+    {
+      id: 'feynman',
+      emoji: '📖',
+      name: '费曼讲解',
+      prompt: `你是豆神老师，费曼学习辅导导师。
+核心原则：让学习者输出讲解，你负责找漏洞、辨误区，不代替用户讲课，不直接输出完整知识点。
+
+执行规则：
+1. 用户口头/文字讲解知识点、复述题目思路、口述解题过程，你聆听并识别：概念误解、逻辑断层、遗漏条件、适用范围搞错、逻辑自相矛盾。
+2. 不要直接告诉他“你错了”，使用追问、质疑、反问的方式，引导他自己发现问题。
+3. 用户上传习题图片：先让用户讲出自己的解题思路，不要直接做题。针对他讲出来的内容做审视，不要直接解析图片题目。
+4. 如果用户讲得很模糊，引导他把概念用大白话重新复述一遍。
+5. 当用户多次表达仍然存在理解缺口，可以给出少量提示线索，但不要直接完整输出知识点。
+6. 如果用户提供参考材料，全部点评、追问必须紧扣这份材料。
+7. 语言通俗，适配1-9年级学生，一次只点出1‑2处问题，不要一次性罗列大量问题打击信心。
+8. 禁止直接输出完整知识点、完整解题答案。`
+    }
+  ];
+  const CHAT_URL = 'https://www.doubao.com/chat/';
+  // ==========================================================
+
+  const $ = id => document.getElementById(id);
+  const iframe = $('frame');
+  const loading = $('loading');
+  let current = 'socratic';
+
+  function currentMode() { return MODES.find(m => m.id === current); }
+
+  // 复制（含 file:// 场景的降级方案）
+  function copyText(text) {
+    return new Promise((resolve, reject) => {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(resolve).catch(() => fallbackCopy(text, resolve, reject));
+      } else {
+        fallbackCopy(text, resolve, reject);
+      }
+    });
+  }
+  function fallbackCopy(text, resolve, reject) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.top = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    ok ? resolve() : reject(new Error('copy failed'));
+  }
+
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  async function doCopy() {
+    const m = currentMode();
+    try {
+      await copyText(m.prompt);
+      showToast('✅ 「' + m.name + '」引导语已复制，到豆包输入框粘贴(Ctrl+V)即可');
+    } catch (e) {
+      showToast('复制失败，请点击上方提示条手动复制');
+    }
+  }
+
+  function render() {
+    const m = currentMode();
+    $('logo').textContent = m.emoji;
+    $('titleMain').textContent = m.name + '模式';
+    $('hintTag').textContent = m.name;
+    $('hintText').textContent = m.prompt;
+    document.querySelectorAll('.mode').forEach(b => b.classList.toggle('active', b.dataset.mode === m.id));
+  }
+
+  function switchMode(id) {
+    if (id === current) { doCopy(); return; }
+    current = id;
+    render();
+    doCopy();
+  }
+
+  // 事件绑定
+  document.getElementById('modes').addEventListener('click', e => {
+    const btn = e.target.closest('.mode');
+    if (btn) switchMode(btn.dataset.mode);
+  });
+  $('btnCopy').addEventListener('click', doCopy);
+  $('hintbar').addEventListener('click', doCopy);
+
+  // iframe 加载完成：隐藏 loading，并自动复制默认模式引导语
+  iframe.addEventListener('load', () => {
+    loading.style.display = 'none';
+    doCopy();
+  });
+  // 兜底：6 秒后仍未 load 也隐藏 loading（可能被跨域跳转）
+  setTimeout(() => { loading.style.display = 'none'; }, 6000);
+
+  // 初始化渲染
+  render();
+</script>
+</body>
+</html>

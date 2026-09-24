@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2ebd85">
+<title>B站学科名师清单 · 小学初中高中</title>
+<style>
+  /* ============ 全局 ============ */
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  :root{
+    --green:#2ebd85;
+    --green-deep:#1fa873;
+    --blue:#2f9df0;
+    --text:#33434b;
+    --text-light:#8aa09a;
+    --card:#ffffff;
+    --shadow:0 8px 22px rgba(47,157,240,.10);
+    --radius:16px;
+  }
+  html,body{height:100%;}
+  body{
+    font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;
+    background:linear-gradient(180deg,#eefaf4 0%,#eef4fb 100%);
+    color:var(--text);
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:28px 16px calc(40px + env(safe-area-inset-bottom));
+    min-height:100vh;
+  }
+  .container{
+    width:100%;
+    max-width:620px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  /* ============ 顶部标题卡（绿蓝渐变） ============ */
+  .title-card{
+    position:relative;
+    width:100%;
+    background:linear-gradient(135deg,#35d29a 0%,#2f9df0 100%);
+    border-radius:22px;
+    padding:30px 20px 26px;
+    text-align:center;
+    color:#fff;
+    overflow:hidden;
+    box-shadow:0 14px 30px rgba(47,157,240,.25);
+  }
+  .title-card::before,.title-card::after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,.14);
+  }
+  .title-card::before{width:120px;height:120px;top:-40px;right:-30px;}
+  .title-card::after{width:70px;height:70px;bottom:-24px;left:-16px;}
+  .title-card h1{
+    position:relative;
+    font-size:23px;
+    letter-spacing:2px;
+    font-weight:700;
+    text-shadow:0 2px 6px rgba(0,0,0,.12);
+  }
+  .title-card .sub{
+    position:relative;
+    margin-top:10px;
+    font-size:13px;
+    letter-spacing:3px;
+    opacity:.92;
+  }
+
+  /* 数据来源说明 */
+  .source{
+    width:100%;
+    margin-top:10px;
+    text-align:center;
+    font-size:11px;
+    line-height:1.6;
+    color:var(--text-light);
+    letter-spacing:.3px;
+    padding:0 8px;
+  }
+
+  /* ============ 统计条 ============ */
+  .stats{
+    width:100%;
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+  }
+  .stats div{
+    background:#fff;
+    border-radius:12px;
+    padding:11px 4px;
+    text-align:center;
+    box-shadow:0 4px 10px rgba(47,157,240,.06);
+  }
+  .stats b{
+    display:block;
+    font-size:17px;
+    font-weight:700;
+    color:var(--green-deep);
+    letter-spacing:.5px;
+  }
+  .stats span{font-size:11px;color:var(--text-light);letter-spacing:.5px;}
+
+  /* ============ 顶部下拉导航（学段 + 学科） ============ */
+  .sel-row{
+    width:100%;
+    margin-top:16px;
+    display:grid;
+    grid-template-columns:1fr 1.35fr;
+    gap:8px;
+  }
+  .sel-wrap{
+    position:relative;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 4px 10px rgba(47,157,240,.08);
+  }
+  .sel-wrap::after{
+    content:"";
+    position:absolute;
+    right:14px;
+    top:50%;
+    width:7px;
+    height:7px;
+    border-right:2px solid var(--green-deep);
+    border-bottom:2px solid var(--green-deep);
+    transform:translateY(-70%) rotate(45deg);
+    pointer-events:none;
+  }
+  .sel{
+    width:100%;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:var(--text);
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:.3px;
+    padding:12px 32px 12px 14px;
+    border-radius:12px;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+    text-align:left;
+    text-align-last:left;
+    cursor:pointer;
+    touch-action:manipulation;
+  }
+  .sel option{color:var(--text);background:#fff;font-weight:400;}
+  .sel:focus{box-shadow:0 0 0 2px rgba(47,157,240,.18);}
+
+  /* ============ 当前信息栏 ============ */
+  .info{
+    width:100%;
+    margin-top:14px;
+    background:#fff;
+    border-radius:12px;
+    padding:9px 12px;
+    text-align:center;
+    font-size:13px;
+    color:var(--text-light);
+    box-shadow:0 4px 10px rgba(47,157,240,.06);
+  }
+  .info b{color:var(--green-deep);font-weight:600;}
+
+  /* ============ 名师卡片 ============ */
+  .list{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:14px;
+  }
+  .teacher{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px;
+    animation:riseIn .35s ease backwards;
+  }
+  @keyframes riseIn{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .t-head{
+    display:flex;
+    align-items:center;
+    gap:9px;
+  }
+  .t-rank{
+    flex:none;
+    width:24px;height:24px;
+    border-radius:8px;
+    background:linear-gradient(135deg,#35d29a,#2f9df0);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .t-name{
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.3px;
+    color:var(--text);
+  }
+  .t-desc{
+    margin-top:10px;
+    font-size:12.5px;
+    line-height:1.65;
+    color:var(--text-light);
+  }
+  .t-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-top:12px;
+    padding:8px 16px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#35d29a,#2f9df0);
+    color:#fff;
+    font-size:12.5px;
+    font-weight:700;
+    text-decoration:none;
+    box-shadow:0 5px 14px rgba(47,157,240,.28);
+    transition:transform .15s,box-shadow .25s;
+    touch-action:manipulation;
+  }
+  .t-link:active{transform:scale(.96);}
+
+  /* 备选 */
+  .alt{
+    width:100%;
+    margin-top:12px;
+    background:#f2faf6;
+    border-radius:12px;
+    padding:10px 13px;
+    font-size:11.5px;
+    line-height:1.7;
+    color:var(--text-light);
+    letter-spacing:.2px;
+  }
+  .alt b{color:var(--green-deep);font-weight:600;}
+
+  /* 提示条 */
+  .note{
+    width:100%;
+    margin-top:12px;
+    background:#fff;
+    border-left:3px solid var(--green);
+    border-radius:10px;
+    padding:11px 13px;
+    font-size:11.5px;
+    line-height:1.7;
+    color:var(--text-light);
+    box-shadow:0 4px 10px rgba(47,157,240,.06);
+  }
+  .note b{color:var(--green-deep);font-weight:600;}
+
+  /* ============ 返回按钮 ============ */
+  .back-wrap{width:100%;text-align:center;margin-top:18px;}
+  .back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:10px 22px;
+    background:#fff;
+    color:#1fa873;
+    border:1.5px solid #2ebd85;
+    border-radius:999px;
+    font-size:13.5px;
+    font-weight:700;
+    text-decoration:none;
+    box-shadow:0 4px 12px rgba(46,158,107,.12);
+    transition:transform .15s,background .25s,color .25s,box-shadow .25s;
+    touch-action:manipulation;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+  .back-btn:active{transform:scale(.96);}
+  @media (hover:hover){
+    .back-btn:hover{background:linear-gradient(135deg,#35d29a,#2f9df0);color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(47,157,240,.3);}
+  }
+
+  /* ============ 底部版权 ============ */
+  footer{
+    width:100%;
+    margin-top:22px;
+    text-align:center;
+    font-size:12px;
+    color:#a8bcb4;
+    letter-spacing:1px;
+  }
+
+  @media (max-width:360px){
+    .title-card h1{font-size:19px;letter-spacing:1px;}
+    .sel-row{grid-template-columns:1fr;}
+    .sel{font-size:14px;padding:11px 30px 11px 13px;}
+    .t-name{font-size:15px;}
+  }
+
+/* 教练微信号提示框 */
+.coach-tip{position:relative;display:inline-block;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.coach-tip .tip{visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;transform:translateX(-50%) translateY(4px);background:linear-gradient(135deg,#35d29a,#2f9df0);color:#fff;padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;white-space:nowrap;letter-spacing:.5px;z-index:99;pointer-events:none;box-shadow:0 6px 18px rgba(47,157,240,.35);transition:opacity .2s ease,transform .2s ease,visibility .2s}
+.coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#2f9df0}
+.coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 顶部标题 -->
+  <header class="title-card">
+    <h1>📺 B站学科名师清单</h1>
+    <div class="sub">小学 · 初中 · 高中</div>
+  </header>
+
+  <!-- 统计 -->
+  <div class="stats" id="stats"></div>
+
+  <!-- 顶部下拉导航：学段 + 学科 -->
+  <div class="sel-row">
+    <div class="sel-wrap">
+      <select class="sel" id="stageSel" aria-label="选择学段"></select>
+    </div>
+    <div class="sel-wrap">
+      <select class="sel" id="subjSel" aria-label="选择学科"></select>
+    </div>
+  </div>
+
+  <!-- 当前信息 -->
+  <p class="info" id="info"></p>
+
+  <!-- 名师卡片 -->
+  <div class="list" id="list"></div>
+
+  <!-- 通用兜底 -->
+  <div class="note" id="note"></div>
+
+  <!-- 返回 -->
+  <div class="back-wrap">
+    <a class="back-btn" href="../index.html">🏠 返回首页</a>
+  </div>
+
+  <footer>© 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span><br/><br/></footer>
+</div>
+
+<script>
+/* =====================================================================
+ * ★ 静态数据区 —— 后期增删老师 / 改链接，只需改动这里 ★
+ * 结构：DATA[学段] = { subjects: [ { name, icon, teachers:[{n,u,d}], alt } ] }
+ *   n = 老师名  u = B 站 UID  d = 定位与推荐理由
+ *   alt = 备选一行（可含 HTML）
+ * 链接统一拼为 https://space.bilibili.com/{u}
+ * ===================================================================== */
+var DATA = {
+
+"小学": [
+  { name:"语文", icon:"📖",
+    teachers:[
+      { n:"梓墨说语文", u:"316069678", d:"阅读理解考点与写法讲得最透，有完整知识点分类；家长圈口碑最高的语文老师之一，小初通用。" },
+      { n:"高盛元", u:"484417428", d:"北大文学硕士，《唐诗导读》合集被普遍推荐给小高年级以上；PPT 朴素但讲得通俗有深度。" }
+    ],
+    alt:"备选：我就是皮皮儿（名著导读，34579535）、戴建业（古诗词趣味讲解，偏素养，532741557）" },
+
+  { name:"数学", icon:"🧮",
+    teachers:[
+      { n:"数学微课帮", u:"351583506", d:"被家长称为「B 站最好的数学课之一」，紧扣教材，适合课前预习、课后复习，风格稳扎稳打。" },
+      { n:"数学林老师", u:"431569803", d:"视频短、聚焦单个题型分步骤拆解，分类极细，适合针对性攻克具体难点；小学中高年级到小升初。" }
+    ],
+    alt:"备选：张齐华（特级教师，被多份清单列为小学数学第一，但 <b>B 站无本人主体账号</b>，课堂实录由他人合集搬运）、一数（14229967）" },
+
+  { name:"英语", icon:"🔤",
+    teachers:[
+      { n:"英语兔", u:"483162496", d:"《全网最适合中国人的免费音标课》，音标/词汇/口语/听力全覆盖，被公认「讲得最清楚明白」。" },
+      { n:"敏而巧学", u:"221814745", d:"从英文童话故事到自然科普，难度循序渐进，适合启蒙与零基础入门，磨耳朵首选。" }
+    ],
+    alt:"备选：Susan 教英语（2000+ 集系统教学，454686762）、英语盖老师（单词精讲、也向下兼容初中，395867084）" }
+],
+
+"初中": [
+  { name:"语文", icon:"📖",
+    teachers:[
+      { n:"梓墨说语文", u:"316069678", d:"阅读理解答题公式、文言文、作文立意全覆盖，几乎所有初中语文榜单的第一名。" },
+      { n:"中文系五匪子", u:"7920565", d:"专攻作文技巧，拆解范文与素材，适合写作提分；也有古诗文与诗词鉴赏内容。" }
+    ],
+    alt:"备选：初中语文 studio（中考整套板块 + 真题解析，388007616）、高盛元（484417428）" },
+
+  { name:"数学", icon:"🧮",
+    teachers:[
+      { n:"一数", u:"14229967", d:"B 站百大 UP，有专门的「一数-初中版」中考复习全集，系统同步课口碑第一。" },
+      { n:"数学微课帮", u:"351583506", d:"初高中各知识点全覆盖，「量大管饱」，被网友称为「镇站之宝」级课程，约 390 万粉丝。" }
+    ],
+    alt:"" },
+
+  { name:"英语", icon:"🔤",
+    teachers:[
+      { n:"英语兔", u:"483162496", d:"语法体系搭建的零基础首选，从句/时态讲得通俗，发音标准。" },
+      { n:"英语的平行世界", u:"388576777", d:"课程体系完整、讲得极细，词汇与长难句双补，适配全年龄段与基础薄弱学生。" }
+    ],
+    alt:"备选：英语盖老师（395867084）、李辉英语（完形填空与听力套路）" },
+
+  { name:"物理", icon:"⚛️",
+    teachers:[
+      { n:"于总CEO", u:"328350981", d:"初中物理顶流（约 272 万粉丝），人教版八上/八下/九全精简合集，课堂氛围轻松、讲解通俗，零基础首选。" },
+      { n:"东吴学长", u:"337035320", d:"系统梳理初中物理考点，强调「必背 + 必会」，例题深度讲解到位，兼顾初高中衔接课。" }
+    ],
+    alt:"备选：马丁物理_初高中（重难点突破，116309632）、不刷题的吴姥姥（科普向，395877542）" },
+
+  { name:"化学", icon:"🧪",
+    teachers:[
+      { n:"化学灭霸", u:"574691943", d:"以课本为主、专攻易错陷阱与题型变形，号称「全网提分最快的实战型老师」。" },
+      { n:"清越姐姐的化学课", u:"334990508", d:"精准对标考试，配套记忆技巧，适合针对性巩固；与化学灭霸形成「基础—应试」互补。" }
+    ],
+    alt:"备选：化学超人（偏基础夯实，重心在高中，416601949）、化学小莫（冲刺高分向）" },
+
+  { name:"生物", icon:"🧬",
+    teachers:[
+      { n:"林旭生物讲堂", u:"594723171", d:"同步人教版七至九年级教材逐章精讲，把零散知识点串成体系，含中考/会考串讲与经典 100 题。" },
+      { n:"无穷小亮", u:"14804670", d:"趣味入门向，动植物鉴定与自然科普，解决「生物靠死记硬背」的抵触问题。" }
+    ],
+    alt:"备选：Anne 生物（图解 + 实验题专项，104971995）、岚山学堂欧文老师（<b>B 站查无主体账号</b>，内容为他人搬运合集）" },
+
+  { name:"道德与法治", icon:"⚖️",
+    teachers:[
+      { n:"咕噜咕噜将", u:"17565156", d:"教材知识串讲 + 思维导图梳理，讲解系统全面，初中道法第一选择。" },
+      { n:"粉元宝小傻瓜", u:"19697401", d:"细致总结型，内容贴近生活、重实践与思辨，适合素养提升与主观题表达。" }
+    ],
+    alt:"备选：不教书的木子（17.4 万粉，七/八年级道法总复习，8405162；九年级内容已停更）、教政治的木子（站内搜索）" },
+
+  { name:"历史", icon:"🏛️",
+    teachers:[
+      { n:"讲历史的张老师", u:"268996607", d:"课本逐课精讲（含七上/七下、中考一轮/二轮复习），材料题分层解读，基础弱的学生首选。" },
+      { n:"历史老师定哥", u:"321084528", d:"24 年教龄历史高级教师、《超级老师》全国冠军，时间轴 + 答题模板 + 课本逐章梳理，初高中通用。" }
+    ],
+    alt:"备选：正直讲史-李正Str（11646119）、无心插柳柳成荫太难得（25344120）" },
+
+  { name:"地理", icon:"🌏",
+    teachers:[
+      { n:"地理北纬老师", u:"471281368", d:"侧重区域地理识图与题型分析，解决「识图难、区域分析弱」的问题。" },
+      { n:"羊羊的地理教室", u:"471009583", d:"21 年教龄，手绘动画 + 记图系列 + 试题精讲，自然地理与人文地理均覆盖，约 135 万粉丝。" }
+    ],
+    alt:"备选：岚如姐姐讲地理（414440832）、李说地理（443846149）。报告另荐「小康地理」，但未找到可确证主页，暂不收录。" }
+],
+
+"高中": [
+  { name:"语文", icon:"📖",
+    teachers:[
+      { n:"学过石油的语文老师", u:"39737405", d:"2022 百大 UP，纯应试提分路线：文言文、现代文、答题模板全覆盖，其「收藏夹就是目录」。" },
+      { n:"国家玮的语文日常", u:"485578465", d:"北大中文系博士，作文思辨与阅读拔高见长，打破模板固化，冲 120+ 的高分首选。" }
+    ],
+    alt:"备选：朴鲤朴鲤（12575583）、乘风语文（442129187）、高考语文杨洋（443051548）" },
+
+  { name:"数学", icon:"🧮",
+    teachers:[
+      { n:"一数", u:"14229967", d:"全网口碑第一的高中数学免费课，《高中数学基础与解法全集》单集播放量过 2.4 亿，基础与一轮复习首选。" },
+      { n:"佟大大还是ETT", u:"123321175", d:"清华密码学博士，逻辑严谨完整、讲解温柔细致，导数与初高衔接尤其出色，适合中高分段拔高。" }
+    ],
+    alt:"备选：赵礼显老师（488738478）、胡源（43460443）" },
+
+  { name:"英语", icon:"🔤",
+    teachers:[
+      { n:"Free高考英语（陶然）", u:"2742391", d:"长难句拆分与真题精讲，阅读/完形/七选五/读后续写全覆盖，针对不同分数段分层授课，约 250 万粉丝。" },
+      { n:"英语兔", u:"483162496", d:"从零搭建完整语法体系，音标/从句/时态通俗易懂，语法混乱者的入门第一站。" }
+    ],
+    alt:"备选：李辉英语（73507313）、刘飞飞（高中语法系统精讲）" },
+
+  { name:"物理", icon:"⚛️",
+    teachers:[
+      { n:"HuangFuRen（黄夫人）", u:"23630128", d:"全网高中物理基础顶流，生活化举例，必修+选修全套免费，一轮复习合集单集播放超 2800 万，高一预习与补弱首选。" },
+      { n:"北大学长跳跳", u:"439177375", d:"约 430 万粉，「全网最细物理系统课」；讲解极细、耐性足，适合 30-80 分段补弱与难题还原，需配合练习册。" }
+    ],
+    alt:"备选：坤哥物理（11265345）、夏梦迪（电磁与动力学难题拔高）" },
+
+  { name:"化学", icon:"🧪",
+    teachers:[
+      { n:"化学老师李政", u:"476738879", d:"高三冲刺 tier 第一，有机、工业流程、反应机理深度拆解，多年高考教研经验，众多一线教师也在听。" },
+      { n:"一化儿", u:"1526560679", d:"全套同步免费课，方程式与元素周期表口诀化，零基础入门与跟不上校内进度者的首选。" }
+    ],
+    alt:"备选：化学超人（416601949）、高东辉（实验题与变式题型）" },
+
+  { name:"生物", icon:"🧬",
+    teachers:[
+      { n:"汉水丑生", u:"519546088", d:"「生物体系梳理第一人」，思维导图全覆盖，遗传规律与一轮系统复习串讲极佳，约 181 万粉丝。" },
+      { n:"一生儿", u:"2036187097", d:"同步课本逐字拆解，细碎知识点全覆盖，语速平缓，零基础与基础薄弱者友好。" }
+    ],
+    alt:"备选：万猛生物（387800295）、李林生物（新高考刷题体系，229823308）" },
+
+  { name:"思想政治", icon:"⚖️",
+    teachers:[
+      { n:"高考政治马宇轩", u:"327222408", d:"40 万+ 粉丝，时政热点解读 + 题型分类解析，独创「双管齐下」教学，擅拆解选择题逻辑。" },
+      { n:"FredTao高考政治", u:"281416828", d:"约 46 万粉，专攻大题「重塑做题观」与选择题秒杀技巧，「政治黑话」系列把晦涩概念讲成大白话。" }
+    ],
+    alt:"备选：刘勖雯政史地（文综答题模板天花板，341071568）、Koi 大大（教材知识梳理 + 思维导图，280683362）" },
+
+  { name:"历史", icon:"🏛️",
+    teachers:[
+      { n:"历史老师定哥", u:"321084528", d:"24 年教龄历史高级教师、《超级老师》全国冠军，时间轴 + 答题模板 + 课本逐章梳理，零基础必看。" },
+      { n:"讲历史的张老师", u:"268996607", d:"中考/高考一轮二轮复习合集完整，材料题分层拆解，打通主观题答题逻辑。" }
+    ],
+    alt:"备选：段 sir 是懂王（402847001）、正直讲史-李正Str（11646119）" },
+
+  { name:"地理", icon:"🌏",
+    teachers:[
+      { n:"张艳平地理", u:"452971381", d:"高中地理顶流（「平哥」），自然/人文/区域地理全套，等值线与地球运动解题思路完整，全分段适配。" },
+      { n:"一地er（冷冷老师）", u:"1231108399", d:"约 315 万粉，重庆一中地理教师；《高中地理基础与解法全集》从零讲起，另有高考系统课 + 考试刷题，口诀多、好记。" }
+    ],
+    alt:"备选：羊羊的地理教室（471009583）、地理安迎老师（492547140）" }
+]
+
+};
+
+/* ================= 渲染逻辑（一般无需修改） ================= */
+var STAGES = ["小学", "初中", "高中"];
+var state = { stage: STAGES[0], subject: 0 };
+
+var stageSelEl = document.getElementById("stageSel");
+var subjSelEl = document.getElementById("subjSel");
+var infoEl = document.getElementById("info");
+var listEl = document.getElementById("list");
+var statsEl = document.getElementById("stats");
+var noteEl = document.getElementById("note");
+
+function esc(s){
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function linkHtml(label, uid){
+  return '<a class="t-link" href="https://space.bilibili.com/' + esc(uid) +
+         '" target="_blank" rel="noopener noreferrer">🔗 ' + esc(label) + '</a>';
+}
+function altHtml(s){
+  /* 备选行内允许 <b> 高亮；括号里的纯数字自动变主页链接 */
+  var out = esc(s).replace(/&lt;b&gt;/g, "<b>").replace(/&lt;\/b&gt;/g, "</b>");
+  return out.replace(/(\d{5,})/g, function(_, uid){
+    return '<a href="https://space.bilibili.com/' + uid +
+           '" target="_blank" rel="noopener noreferrer" style="color:#1fa873;font-weight:600;text-decoration:none">' + uid + '</a>';
+  });
+}
+
+/* 首屏统计 */
+function buildStats(){
+  var sc = 0, tc = 0, uids = {};
+  STAGES.forEach(function(s){
+    DATA[s].forEach(function(sub){
+      sc++;
+      sub.teachers.forEach(function(t){ tc++; uids[t.u] = 1; });
+      var m = (sub.alt || "").match(/\d{5,}/g);
+      if (m) m.forEach(function(u){ uids[u] = 1; });
+    });
+  });
+  statsEl.innerHTML =
+    '<div><b>' + STAGES.length + '</b><span>学段</span></div>' +
+    '<div><b>' + sc + '</b><span>学科格</span></div>' +
+    '<div><b>' + Object.keys(uids).length + '</b><span>已核实主页</span></div>';
+}
+
+/* 学段下拉 */
+function buildStageSelect(){
+  stageSelEl.innerHTML = "";
+  STAGES.forEach(function(s){
+    var o = document.createElement("option");
+    o.value = s;
+    o.textContent = s;
+    o.selected = (s === state.stage);
+    stageSelEl.appendChild(o);
+  });
+  stageSelEl.value = state.stage;
+}
+
+/* 学科下拉 */
+function buildSubjectSelect(){
+  subjSelEl.innerHTML = "";
+  DATA[state.stage].forEach(function(sub, i){
+    var o = document.createElement("option");
+    o.value = i;
+    o.textContent = sub.icon + "  " + sub.name;
+    o.selected = (i === state.subject);
+    subjSelEl.appendChild(o);
+  });
+  subjSelEl.value = String(state.subject);
+}
+
+/* 内容区 */
+function renderList(){
+  var sub = DATA[state.stage][state.subject];
+  infoEl.innerHTML = "当前：<b>" + esc(state.stage) + "</b> · <b>" + esc(sub.name) +
+                     "</b> · 主推 <b>" + sub.teachers.length + "</b> 位";
+  listEl.innerHTML = "";
+  sub.teachers.forEach(function(t, i){
+    var card = document.createElement("div");
+    card.className = "teacher";
+    card.style.animationDelay = (i * 60) + "ms";
+    card.innerHTML =
+      '<div class="t-head"><span class="t-rank">' + (i + 1) + '</span>' +
+      '<span class="t-name">' + esc(t.n) + '</span></div>' +
+      '<div class="t-desc">' + esc(t.d) + '</div>' +
+      linkHtml("打开 B 站主页", t.u);
+    listEl.appendChild(card);
+  });
+  if (sub.alt) {
+    var box = document.createElement("div");
+    box.className = "alt";
+    box.innerHTML = altHtml(sub.alt);
+    box.style.animationDelay = (sub.teachers.length * 60) + "ms";
+    listEl.appendChild(box);
+  }
+}
+
+function selectStage(s){
+  if (!DATA[s]) return;
+  state.stage = s;
+  state.subject = 0;
+  stageSelEl.value = s;
+  buildSubjectSelect();
+  renderList();
+}
+
+function selectSubject(i){
+  if (isNaN(i) || !DATA[state.stage][i]) return;
+  state.subject = i;
+  subjSelEl.value = String(i);
+  renderList();
+}
+
+/* 通用兜底说明 */
+function buildNote(){
+  noteEl.innerHTML =
+    "<b>使用提示</b><br>" +
+    "① 精力有限，一门学科固定 1-2 位老师，频繁换师易乱；② 直接切换至合集与系列观看，按分数段选课：基础弱看同步课本类，中等看题型归纳类，冲刺看压轴命题类；" +
+    "③ 看完必须做题，只听不练是最大的坑；④ 建议 1.25 倍速精听并整理错题；⑤ 小学段每天网课控制在 30-40 分钟。" +
+    "<br><br><b>兜底资源</b>：国家中小学智慧教育平台（basic.smartedu.cn），教育部官方、全学段全学科、完全免费无广告。" ;
+}
+
+stageSelEl.addEventListener("change", function(){ selectStage(stageSelEl.value); });
+subjSelEl.addEventListener("change", function(){ selectSubject(parseInt(subjSelEl.value, 10)); });
+
+buildStats();
+buildStageSelect();
+buildSubjectSelect();
+renderList();
+buildNote();
+</script>
+</body>
+</html>
