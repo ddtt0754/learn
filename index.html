@@ -65,9 +65,14 @@ body{
 
 .tip{margin-top:26px;font-size:.95rem;color:#94a3b8;}
 
-/* 右上角 Ai 入口 */
+/* 左上角 / 右上角 入口（分列两侧） */
+.entry-tl,.entry-tr{
+  position:fixed;top:calc(12px + env(safe-area-inset-top));z-index:99;
+  display:flex;gap:8px;align-items:center;
+}
+.entry-tl{left:14px;}
+.entry-tr{right:14px;}
 .ai-entry{
-  position:fixed;top:calc(12px + env(safe-area-inset-top));right:14px;z-index:99;
   padding:5px 13px;border-radius:999px;
   font-size:13px;font-weight:700;letter-spacing:.5px;
   color:#fff;text-decoration:none;
@@ -78,6 +83,20 @@ body{
   user-select:none;-webkit-user-select:none;
 }
 .ai-entry:active{transform:scale(.92);}
+
+/* 下载中心入口（左上角，与右上角 Ai 分列两侧；白底蓝字胶囊） */
+.dl-entry{
+  padding:5px 13px;border-radius:999px;
+  font-size:13px;font-weight:700;letter-spacing:.5px;
+  color:#2f9df0;text-decoration:none;
+  background:#fff;
+  box-shadow:0 6px 16px rgba(47,157,240,.18);
+  transition:transform .15s,box-shadow .2s;
+  touch-action:manipulation;
+  user-select:none;-webkit-user-select:none;
+  white-space:nowrap;
+}
+.dl-entry:active{transform:scale(.92);}
 
 @media(max-width:520px){
   .title{font-size:2.8rem;}
@@ -90,7 +109,12 @@ body{
 </style>
 </head>
 <body>
-<a class="ai-entry" href="ai/index.html">Ai</a>
+<div class="entry-tl">
+  <a class="dl-entry" href="download/index.html">下载中心</a>
+</div>
+<div class="entry-tr">
+  <a class="ai-entry" href="ai/index.html">Ai</a>
+</div>
 <div class="wrap">
   <h1 class="title">智学系统</h1>
   <p class="subtitle">选择学科，开启专注学习</p>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeachStep 费曼讲台 · 训练协议台</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232B6DE0'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>T</text></svg>">
+<style>
+:root{
+  --bg:#FBF7F0;--card:#FFFFFF;--line:#EFE7DA;--line-2:#E4D9C6;
+  --ink:#2A2E35;--mut:#7A7568;--mut-2:#A39C8C;
+  --blue:#2B6DE0;--blue-d:#1E56C0;--blue-wash:#EEF4FF;
+  --orange:#E8842C;--orange-d:#C96A14;--orange-wash:#FDF1E3;
+  --green:#0E9F6E;--amber:#B97A13;--amber-wash:#FBF3E0;
+  --r-lg:20px;--r-md:14px;--r-sm:10px;
+  --sh:0 1px 2px rgba(42,46,53,.04),0 8px 28px rgba(42,46,53,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;min-height:100vh}
+.view{display:none;animation:fade .35s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.wrap{max-width:1000px;margin:0 auto;padding:22px 18px 72px}
+
+/* ===== 顶栏 ===== */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:11px}
+.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--blue),#5B8DEF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;box-shadow:0 4px 12px rgba(43,109,224,.28)}
+.brand-name{font-size:17px;font-weight:800;letter-spacing:.2px}
+.brand-sub{font-size:11.5px;color:var(--mut);margin-top:-2px}
+.flow-mini{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;box-shadow:var(--sh)}
+.flow-mini .dot{width:7px;height:7px;border-radius:50%;background:#D8D2C4}
+.flow-mini .dot.now{background:var(--orange);box-shadow:0 0 0 3px var(--orange-wash)}
+.flow-mini b{color:var(--ink);font-weight:600}
+
+/* ===== 配置视图 ===== */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:26px 30px;box-shadow:var(--sh);margin-bottom:16px;overflow:hidden;position:relative}
+.hero::after{content:"";position:absolute;right:-90px;top:-90px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(232,132,44,.10),transparent 70%)}
+.hero-copy{position:relative;z-index:1}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--blue);background:var(--blue-wash);border-radius:999px;padding:4px 11px;letter-spacing:.4px}
+.hero h2{font-size:24px;line-height:1.35;font-weight:800;margin:12px 0 8px}
+.hero h2 em{font-style:normal;color:var(--blue)}
+.hero p{font-size:13.5px;color:var(--mut);max-width:430px}
+.hero-img{position:relative;z-index:1;display:flex;align-items:center;justify-content:center}
+.hero-img img{width:100%;max-width:330px;border-radius:16px;box-shadow:var(--sh);display:block}
+.principle{margin-top:14px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut);background:var(--orange-wash);border:1px dashed rgba(232,132,44,.4);border-radius:10px;padding:7px 12px;width:fit-content}
+.principle b{color:var(--orange-d);font-weight:700}
+
+.steps{display:flex;gap:10px;margin-bottom:14px}
+.step-tag{flex:1;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:10px 12px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--mut)}
+.step-tag .n{width:22px;height:22px;border-radius:50%;background:#EDE7DA;color:var(--mut);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.step-tag.on{border-color:var(--blue);background:var(--blue-wash)}
+.step-tag.on .n{background:var(--blue);color:#fff}
+.step-tag b{color:var(--ink);font-weight:700}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px 22px;margin-bottom:14px;box-shadow:var(--sh)}
+.card-h{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;margin-bottom:4px}
+.card-h .tag{font-size:10.5px;font-weight:700;color:var(--mut);background:#F3EFE6;border-radius:6px;padding:2px 7px;letter-spacing:.3px}
+.card-sub{font-size:12px;color:var(--mut);margin-bottom:14px}
+.row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+.row:last-child{margin-bottom:0}
+.field{flex:1;min-width:210px}
+label{display:block;font-size:12px;font-weight:600;color:var(--ink);margin-bottom:5px}
+label .opt{font-weight:400;color:var(--mut-2)}
+input[type=text],select,textarea{width:100%;border:1.5px solid var(--line-2);border-radius:var(--r-sm);padding:9px 12px;font-size:14px;background:#FFFDF9;color:var(--ink);font-family:inherit;transition:border-color .15s,box-shadow .15s}
+textarea{resize:vertical}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(43,109,224,.12)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;min-width:92px;background:#F6F1E7;border:1.5px solid transparent;border-radius:var(--r-sm);padding:8px 8px;font-size:13px;color:var(--mut);cursor:pointer;transition:all .15s;font-family:inherit}
+.seg button:hover{border-color:var(--line-2)}
+.seg button.on{background:var(--blue);color:#fff;font-weight:600;box-shadow:0 3px 10px rgba(43,109,224,.25)}
+.fold-h{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:10px 2px;border-radius:8px}
+.fold-h .arr{transition:transform .2s;color:var(--mut);font-size:11px}
+.fold-h.open .arr{transform:rotate(90deg)}
+.fold-h b{font-size:13.5px;font-weight:700;color:var(--ink)}
+.fold-h .cnt{font-size:11px;color:var(--mut-2)}
+.fold-body{display:none;padding-top:12px;border-top:1px dashed var(--line);margin-top:4px}
+.fold-body.open{display:block;animation:fade .25s ease}
+
+.cta-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:var(--r-md);padding:13px 26px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .12s,box-shadow .15s,background .15s}
+.btn-primary{background:var(--orange);color:#fff;box-shadow:0 6px 18px rgba(232,132,44,.35)}
+.btn-primary:hover{background:var(--orange-d);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.cta-note{font-size:12px;color:var(--mut)}
+
+/* ===== 结果视图 ===== */
+.result-head{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;background:linear-gradient(135deg,#FFFFFF,#FDF6EC);border:1px solid var(--line);border-radius:24px;padding:20px 26px;box-shadow:var(--sh);margin-bottom:14px}
+.result-head h2{font-size:18px;font-weight:800}
+.result-head p{font-size:12.5px;color:var(--mut);margin-top:3px}
+.result-head .tid{display:inline-flex;align-items:center;gap:7px;margin-top:9px;background:var(--blue-wash);border:1px solid rgba(43,109,224,.25);border-radius:8px;padding:4px 11px;font-size:12px;color:var(--blue);font-weight:700;font-family:ui-monospace,Menlo,monospace;letter-spacing:.4px}
+.result-head .tid .lbl{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;font-weight:600;color:var(--mut)}
+.result-head .mini-ill{width:82px;border-radius:14px;overflow:hidden;box-shadow:var(--sh)}
+.result-head .mini-ill img{width:100%;display:block}
+.mode-bar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:10px 14px;margin-bottom:14px;box-shadow:var(--sh);flex-wrap:wrap}
+.mode-bar .ml{font-size:12px;color:var(--mut);font-weight:600;white-space:nowrap}
+.mode-bar .seg{flex:1;min-width:280px}
+.mode-bar .seg button{min-width:0;padding:7px 6px;font-size:12px}
+.loop{display:flex;gap:0;margin:0 0 14px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px;box-shadow:var(--sh);overflow-x:auto}
+.loop .li{flex:1;min-width:130px;display:flex;align-items:center;gap:7px;justify-content:center;font-size:12px;color:var(--mut);padding:7px 10px;border-radius:999px;white-space:nowrap}
+.loop .li .n{width:19px;height:19px;border-radius:50%;background:#EDE7DA;color:var(--mut);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.loop .li.now{background:var(--blue);color:#fff}
+.loop .li.now .n{background:rgba(255,255,255,.22);color:#fff}
+.arrow{color:#D8D2C4;font-size:12px;display:flex;align-items:center}
+
+.pool{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pool-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;box-shadow:var(--sh);display:flex;flex-direction:column}
+.pool-card.wide{grid-column:1/-1}
+.pool-card .ph{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+.pool-card .pt{font-size:14.5px;font-weight:800;display:flex;align-items:center;gap:8px}
+.badge{font-size:10.5px;font-weight:700;padding:2.5px 9px;border-radius:999px;letter-spacing:.3px;white-space:nowrap}
+.badge.stage{background:var(--blue-wash);color:var(--blue)}
+.badge.warn{background:var(--amber-wash);color:var(--amber)}
+.badge.green{background:#E7F6EF;color:var(--green)}
+.badge.orange{background:var(--orange-wash);color:var(--orange-d)}
+.pool-card .pd{font-size:12px;color:var(--mut);margin-bottom:10px}
+.pool-card textarea{width:100%;min-height:200px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;flex:1}
+.copy{background:var(--blue);color:#fff;border:none;border-radius:var(--r-sm);padding:8px 14px;font-size:12.5px;cursor:pointer;font-weight:600;transition:background .15s;font-family:inherit;white-space:nowrap}
+.copy:hover{background:var(--blue-d)}
+.copy.done{background:var(--green)}
+.next-step{font-size:11.5px;color:var(--mut);background:#F8F3E9;border-radius:8px;padding:7px 10px;margin-top:10px;line-height:1.5}
+.next-step b{color:var(--ink)}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--mut);cursor:pointer;border:none;background:none;font-family:inherit;padding:6px 0;margin-bottom:12px}
+.back:hover{color:var(--blue)}
+.boundary{font-size:12px;color:var(--mut);background:var(--amber-wash);border:1px dashed rgba(185,122,19,.35);border-radius:var(--r-md);padding:10px 14px;margin-top:14px}
+.boundary b{color:var(--amber)}
+
+.foot{margin-top:22px;font-size:12px;color:var(--mut-2);text-align:center;line-height:1.9}
+.foot b{color:var(--blue)}
+.foot a{color:var(--blue);text-decoration:none;font-weight:600}
+.foot a:hover{text-decoration:underline}
+
+@media(max-width:840px){
+  .hero{grid-template-columns:1fr;padding:22px}
+  .hero-img{order:-1}
+  .hero-img img{max-width:220px}
+  .pool{grid-template-columns:1fr}
+  .result-head{grid-template-columns:1fr}
+  .result-head .mini-ill{display:none}
+}
+@media(max-width:520px){
+  .wrap{padding:16px 12px 56px}
+  .flow-mini{display:none}
+  .hero h2{font-size:21px}
+  .step-tag{font-size:11px;padding:8px 10px}
+  .btn-primary{width:100%}
+  .cta-note{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">T</div>
+      <div>
+        <div class="brand-name">TeachStep 费曼讲台</div>
+        <div class="brand-sub">训练协议台 · 电脑出单 → 手机执行 → 电脑回收</div>
+      </div>
+    </div>
+    <div class="flow-mini"><span class="dot now"></span><b>电脑出单</b><span>→</span><span class="dot"></span>手机执行<span>→</span><span class="dot"></span>电脑回收</div>
+  </div>
+
+  <!-- ===== 视图 A：配置 ===== -->
+  <div class="view on" id="viewConfig">
+    <div class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">费曼输出训练 · 讲得清才算会</span>
+        <h2>让孩子当小老师，<br>把知识<em>讲出来</em></h2>
+        <p>一分钟生成一份跨设备训练协议：启动单、续接单、回收单使用同一个训练编号。孩子在手机视频/语音里讲给 AI 听，讲完回电脑端回收证据、生成小结，验得过才算会。</p>
+        <div class="principle"><b>活动 ≠ 掌握</b>&nbsp;先审证据，再下结论；未测 ≠ 已掌握</div>
+      </div>
+      <div class="hero-img"><img src="assets/hero.png" alt="孩子当小老师，AI 认真听"></div>
+    </div>
+
+    <div class="steps">
+      <div class="step-tag on"><span class="n">1</span><b>孩子与内容</b></div>
+      <div class="step-tag on"><span class="n">2</span>执行方式与时长</div>
+      <div class="step-tag"><span class="n">3</span>更多设置（选填）</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">① 孩子与内容 <span class="tag">必填：年级 · 学科 · 练什么 · 知识点</span></div>
+      <div class="card-sub">只填 4 项就能出单，称呼可后补。</div>
+      <div class="row">
+        <div class="field"><label>孩子称呼 <span class="opt">（选填，默认"同学"）</span></label><input type="text" id="inName" placeholder="如：UU"></div>
+        <div class="field"><label>年级</label><select id="selGrade"></select></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>学科 / 内容</label><select id="selSubject"></select></div>
+        <div class="field" id="customRow" style="display:none"><label>自定义内容名称</label><input type="text" id="inCustom" placeholder="如：游戏机制 / 手工折纸"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>本次练什么（不同模式有不同证据要求）</label>
+          <div class="seg" id="kindSeg">
+            <button data-k="concept">讲概念</button>
+            <button data-k="example">讲例题</button>
+            <button data-k="mistake">讲错题</button>
+            <button data-k="review">复习巩固</button>
+            <button data-k="express">仅练表达</button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field"><label>知识点或题目 <span class="opt">（留空则通话时由孩子展示 / 口述，需先确认再开始）</span></label>
+          <textarea id="inTopic" rows="2" placeholder="如：分数加减法——为什么分母相同才能直接相加"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">② 执行方式与时长 <span class="tag">决定协议形态与最低完成目标</span></div>
+      <div class="row">
+        <div class="field"><label>本次执行方式</label>
+          <div class="seg" id="devSeg">
+            <button data-d="cloud">电脑 · 文字/语音</button>
+            <button data-d="voice">手机 · 语音通话</button>
+            <button data-d="video">手机 · 视频通话</button>
+          </div>
+        </div>
+        <div class="field"><label>练多久（决定本次最低完成目标）</label>
+          <div class="seg" id="timeSeg">
+            <button data-t="5">5 分钟</button>
+            <button data-t="10">10 分钟</button>
+            <button data-t="15">15 分钟</button>
+          </div>
+        </div>
+      </div>
+      <div class="hint" id="goalHint" style="font-size:12px;color:var(--mut);margin-top:4px"></div>
+    </div>
+
+    <div class="card">
+      <div class="fold-h" id="foldToggle">
+        <span class="arr">▶</span><b>③ 更多设置</b><span class="cnt">教材坐标 · 上次进度与已知证据 · 家长补充说明（选填）</span>
+      </div>
+      <div class="fold-body" id="foldBody">
+        <div class="row" style="margin-top:12px">
+          <div class="field"><label>教材坐标 <span class="opt">（选填，仅定位用）</span></label><input type="text" id="inCoord" placeholder="如：五年级 · 人教版 · 上册 · 分数加减法"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>上次进度 <span class="opt">（选填，用于续接单）</span></label>
+            <select id="selStage">
+              <option value="">— 新训练 —</option>
+              <option>已确认题目</option>
+              <option>已完成首次讲解</option>
+              <option>已完成一次提示</option>
+              <option>已完成重讲</option>
+              <option>已完成变式</option>
+              <option>已完成边界验证</option>
+            </select>
+          </div>
+          <div class="field"><label>变式结果 <span class="opt">（选填，上次训练已知证据）</span></label>
+            <select id="selVar">
+              <option value="">— 未知 —</option>
+              <option>未测</option>
+              <option>独立完成</option>
+              <option>提示后完成</option>
+              <option>未完成</option>
+            </select>
+          </div>
+          <div class="field"><label>边界结果 <span class="opt">（选填，上次训练已知证据）</span></label>
+            <select id="selBnd">
+              <option value="">— 未知 —</option>
+              <option>未测</option>
+              <option>能识别</option>
+              <option>提示后识别</option>
+              <option>未识别</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field"><label>家长补充说明 <span class="opt">（选填，如孩子状态、上次卡点、老师要求）</span></label>
+            <textarea id="inNote" rows="2" placeholder="如：上次在"为什么需要通分"卡住，今天重点验证这里"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn btn-primary" id="btnGenerate">生成训练协议 →</button>
+      <span class="cta-note">启动单、续接单、回收单使用同一训练编号</span>
+    </div>
+  </div>
+
+  <!-- ===== 视图 B：结果 ===== -->
+  <div class="view" id="viewResult">
+    <button class="back" id="btnBack">← 返回修改</button>
+
+    <div class="result-head">
+      <div>
+        <h2>训练协议已准备好<span id="resName"></span></h2>
+        <p id="resDesc"></p>
+        <span class="tid"><span class="lbl">训练编号</span><span id="resTid"></span></span>
+      </div>
+      <div class="mini-ill"><img src="assets/praise.png" alt=""></div>
+    </div>
+
+    <div class="mode-bar">
+      <span class="ml">输出模式</span>
+      <div class="seg" id="modeSeg">
+        <button data-m="quick">快速开始</button>
+        <button data-m="standard">标准训练</button>
+        <button data-m="resume">中断续接</button>
+        <button data-m="review">家长复盘</button>
+      </div>
+    </div>
+
+    <div class="loop" id="loopBar"></div>
+
+    <div class="pool" id="poolCards"></div>
+
+    <div class="boundary"><b>数据边界：</b>工作台不保存训练数据。总结报告、周报、月报只能在豆包对话中依据<b>真实回收过的回执</b>生成——请始终在<b>同一个电脑端对话</b>里回收；无回执不生成报告，只有一份回执不生成趋势，编号不一致不合并统计。一次训练只能说明本次表现，未测内容不代表已掌握。</div>
+  </div>
+
+  <div class="foot">TeachStep 费曼讲台 · 活动不等于掌握，讲得清、验得过才算会<br><br><a href="http://l.iddtt.com" target="_blank" rel="noopener">@智学中心</a></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const SUBJ = {
+  '语文':'文章/诗词理解、字词用法、作者意图、用自己的话复述',
+  '数学':'概念定义、推理步骤、为什么这样解、边界条件',
+  '英语':'语法规则、词汇用法、句型结构、为什么这样用',
+  '物理':'物理原理、适用条件、步骤推理、单位与量纲',
+  '化学':'概念与反应原理、反应条件、方程式含义',
+  '生物':'概念、结构与功能关系、因果关系、举例',
+  '历史':'事件因果、时间线、人物与影响、用自己的话讲',
+  '地理':'概念、因果、分布规律、举例',
+  '道法':'观点、理由、例子、判断对错',
+  '编程':'代码逻辑、算法步骤、为什么这样做、边界情况',
+  '科学实验':'实验原理、变量控制、现象解释',
+  '自定义':'以家长/孩子给出的内容为准：先问"这个内容里最核心的是什么"，再围绕它讲'
+};
+const KIND = {'concept':'讲概念','example':'讲例题','mistake':'讲错题','review':'复习巩固','express':'仅练表达'};
+const KIND_FOCUS = {
+  'concept':'是什么、为什么、什么时候用、什么时候不能用、能否举例',
+  'example':'读题、选择方法、每一步的理由、条件变化后是否仍适用',
+  'mistake':'原先怎么想、错在第几步、错因属于哪一类、修改后能否重做',
+  'review':'多知识点区分、相似概念辨别、反例、新情境迁移',
+  'express':'能否说明关键关系、能否解释为什么、是否用自己的例子、是否前后矛盾'
+};
+const KIND_MIN = {
+  'concept':'能独立举例 + 能说明一个不能用的情境',
+  'example':'独立完成一道条件变化的变式',
+  'mistake':'独立完成一道相似题',
+  'review':'能区分一组易混概念 + 完成一个迁移',
+  'express':'仅评价表达，不进行变式/边界验证，不得声称已验证掌握'
+};
+const DUR_GOAL = {
+  '5':'一次首次讲解 + 一个关键追问 + 一个小变式。边界题不强求，时间不足标"未测"，不压缩、不编造。',
+  '10':'首次讲解 + 诊断 + 重讲 + 一个变式。边界题视剩余时间，时间不足标"未测"。',
+  '15':'首次讲解 + 重讲 + 换情境变式 + 边界题 + 小结。各环节尽量完成，仍未完成标"未测"。'
+};
+function genId(){
+  const d=new Date(), y=String(d.getFullYear()).slice(2), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s='';for(let i=0;i<3;i++)s+=chars[Math.floor(Math.random()*chars.length)];
+  return 'TS-'+y+m+day+'-'+s;
+}
+const state = {name:'', grade:'小学·五年级', subject:'数学', custom:'', kind:'concept', minutes:'10', topic:'', coord:'', stage:'', varRes:'', bndRes:'', note:'', device:'video', mode:'standard', tid:genId()};
+
+function fillGrade(){
+  const o=[];
+  for(let i=1;i<=6;i++) o.push('小学·'+'一二三四五六'[i-1]+'年级');
+  for(let i=1;i<=3;i++) o.push('初中·'+'一二三'[i-1]+'年级');
+  $('selGrade').innerHTML = o.map(g=>`<option ${g===state.grade?'selected':''}>${g}</option>`).join('');
+}
+function fillSubject(){
+  $('selSubject').innerHTML = Object.keys(SUBJ).map(s=>`<option ${s===state.subject?'selected':''}>${s}</option>`).join('');
+}
+function seg(id,key,val){document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset[key]===val));}
+function subjName(){ return state.subject==='自定义' && state.custom ? state.custom : state.subject; }
+function focusTxt(){ return state.topic.trim() || '（题目未预先提供：先请孩子把题目对准镜头/口述，确认后再开始）'; }
+function coordTxt(){ return state.coord.trim() ? '\n教材坐标：' + state.coord.trim() : ''; }
+function noteTxt(){ return state.note.trim() ? '\n家长补充说明：' + state.note.trim() : ''; }
+function kindTxt(){ return KIND[state.kind]; }
+function deviceName(){ return state.device==='cloud'?'电脑 · 文字/语音对话':state.device==='voice'?'手机 · 语音通话':'手机 · 视频通话'; }
+
+function buildIdentity(){
+  return '【训练身份】\n训练编号：' + state.tid + '（本训练所有单据沿用此编号，不新造）\n称呼：' + (state.name.trim()||'同学') + '\n年级：' + state.grade + '\n学科/内容：' + subjName() + '\n训练类型：' + kindTxt() + '\n知识点或题目：' + focusTxt() + coordTxt() + noteTxt() + '\n计划时长：' + state.minutes + ' 分钟\n本次最低完成目标：' + DUR_GOAL[state.minutes];
+}
+function buildExecution(){
+  const head = state.device==='cloud' ? '请在接下来的对话中，执行一次 TeachStep 费曼讲学训练。' : state.device==='video' ? '请在接下来的视频通话中，执行一次 TeachStep 费曼讲学训练。' : '请在接下来的语音通话中，执行一次 TeachStep 费曼讲学训练。';
+  const start = state.device==='video'
+    ? '【开始】\n若题目通过镜头展示：① 先请孩子把题目对准镜头；② 复述你能确认的题干和关键条件；③ 请孩子确认；④ 未确认前不得开始讲解或出题。看不清的数字、符号、图形关系必须问清，不要猜测，也不要承诺一直看到了完整书写过程。\n若题目未预先提供：按上述两阶段流程，先请孩子口述完整题目并确认。'
+    : '【开始】\n若题目未预先输入，先请孩子口述题目内容与条件，你复述确认；听不清必须问清，不要猜测。未确认前不得开始讲解或出题。';
+  const mis = state.kind==='mistake' ? '\n若是错题，先请孩子讲当时自己的解题思路（不看订正），再定位错因。' : '';
+  return head + '\n\n【你的角色】\n你是认真听讲的 AI 学习伙伴，请孩子当小老师。语气自然、简短，每次只给一个主要任务，等孩子回应。不要一次读出训练流程，也不要替孩子连续讲解。孩子不会时可以教学，随后请孩子自己解释。\n\n' + start + mis + '\n确认后选定本次最需要讲清的一个核心点。请孩子先讲："你准备怎么做？为什么这样做？" 如果练概念，请孩子解释含义并举例。\n\n【观察与追问】\n根据任务，内部检查概念、条件、原理、方法、边界、迁移和表达，不必逐项问完。优先处理最影响理解的一个问题。以孩子说出的解释、确认的题目和可辨认的草稿为依据。停顿时可询问是否需要帮助，不用表情判断理解或人格。允许孩子用术语、画图、算式或指认辅助说明。听不清或看不清时，记录为无法确认，不算答错。\n\n【D0-D4 帮助层级】\nD0：澄清追问，不提供解题线索。\nD1：指出需要检查的位置或条件。\nD2：提供类比、图像或具体例子。\nD3：示范关键的一步。\nD4：简短讲解当前障碍，必要时完整示范。\n根据困难选择层级，不机械逐级追问。防重复升级：同一个障碍最多连续追问两次；回答没有新增信息时，5 分钟训练直接进入 D1 或 D2，10/15 分钟先给一个类比（D2），仍无法推进才用 D3/D4。禁止同一问题反复追问，也禁止从 D0 直接跳到 D4 讲答案。获得实质帮助后，请孩子重新组织解释。不要把提示后复述记为独立掌握。\n\n【本次验证重点】\n' + KIND_FOCUS[state.kind] + '\n【最小证据要求】\n' + KIND_MIN[state.kind];
+}
+function buildEvidence(){
+  if(state.kind==='express'){
+    return '【验证】\n本次为仅练表达模式，不进行变式与边界验证。结束时只能评价知识表达表现，不得声称已验证掌握。\n【证据要求】\n表达表现只记录：能否说明关键关系、是否能解释"为什么"、是否使用了自己的例子、是否前后矛盾、是否需要提示才能继续。禁止评价说得顺不顺、像不像标准答案、是否足够流利、口头停顿次数。';
+  }
+  return '【验证】\n核心解释修正后，给一道适龄、条件完整的新题。先让孩子独立尝试，暂不提供解题线索。若使用了提示，记录为提示后完成。再给一个适龄的边界问题，例如：一个错误说法，或者一个看似相似但不能直接用原方法的情境。请孩子判断并说明原因，不一定要求孩子自行构造反例。出题前检查答案、条件和难度。训练不只靠换数字，要适当检查"为什么"和适用条件。\n【证据要求】\n必须记录：是否给了实质提示、给的是哪一级（D0-D4）、提示前孩子说了什么、提示后改变了什么；区分独立完成与提示后完成；未完成的环节写"未测"，不压缩、不编造。';
+}
+function buildRecovery(){
+  return '【结束与回收】\n不要在原题讲顺后立即宣告掌握，应推进到验证。孩子要求停止、感到疲劳或训练需要结束时，及时收尾，未完成的环节写"未测"。不以回合数认定掌握，不因一次训练标记"已稳定掌握"。结束时先口头给出两三句简短反馈。\n随后若当前通道支持文字输出，生成下面的证据回执；不要默认逐字朗读整份回执。如果通话内无法输出文字，待回到文字对话后，仅依据仍可访问的本次记录生成，缺失信息明确标注。训练编号沿用 ' + state.tid + '。\n\n【费曼训练证据回执】\n训练编号：\n知识点与核心目标：\n题目确认情况：\n首次表现：\n- 孩子的解释片段或概述：\n- 发现的具体问题：\n帮助过程：\n- 关键提示及 D 层级：\n- 使用时机（提示前孩子说了什么）：\n- 提示后改变了什么：\n' + (state.kind==='express' ? '表达表现：\n- 能否说明关键关系：\n- 是否能解释"为什么"：\n- 是否使用了自己的例子：\n- 是否前后矛盾：\n- 是否需要提示才能继续：\n' : '变式验证：\n- 题目：\n- 孩子的回答或做法：\n- 是否给予实质提示：\n- 结果：独立完成 / 提示后完成 / 未完成 / 未测\n边界验证：\n- 问题：\n- 孩子的判断及理由：\n- 是否给予实质提示：\n- 结果：独立完成 / 提示后完成 / 未完成 / 未测\n') + '本次证据支持的结论：\n仍不确定的部分：\n下次建议：\n只记录实际发生且能确认的内容。能确认原话时才使用引号，否则写"概述"。无法取得的信息写"未记录"。';
+}
+function buildStart(){
+  return [buildIdentity(),'',buildExecution(),'',buildEvidence(),'',buildRecovery()].join('\n');
+}
+function buildResume(){
+  const ev = [];
+  if(state.varRes) ev.push('\n变式结果：' + state.varRes);
+  if(state.bndRes) ev.push('\n边界结果：' + state.bndRes);
+  return '【TeachStep 续接单】\n\n训练编号：' + state.tid + '（沿用上次编号，不新造）\n上次已完成阶段：' + (state.stage || '（未记录）') + ev.join('') + '\n\n【续接确认】\n先向家长或孩子确认以下信息，无法确认的统一标记"未知"，不得假设：\n1. 上次已经做到哪个阶段；\n2. 是否给过实质提示（哪一级）；\n3. 变式题结果（独立完成 / 提示后完成 / 未完成 / 未测）；\n4. 边界题结果（能识别 / 提示后识别 / 未识别 / 未测）；\n5. 哪些内容未完成。\n题目未重新确认前，不得直接开始出题。\n\n【训练身份】\n年级：' + state.grade + '\n学科/内容：' + subjName() + '\n训练类型：' + kindTxt() + '\n知识点或题目：' + focusTxt() + coordTxt() + noteTxt() + '\n计划时长：' + state.minutes + ' 分钟\n\n【你的角色】\n你是认真听讲的 AI 学习伙伴，请孩子当小老师。语气自然、简短，每次只给一个主要任务，等孩子回应。孩子不会时可以教学，随后请孩子自己解释。\n\n【恢复】\n确认后请孩子从上次停下的位置继续讲。其余规则（学科侧重、观察追问、D0-D4 防重复升级、验证与最小证据要求、结束与回收）与上次启动单一致；若规则已丢失，按"认真听讲的 AI 学习伙伴、D0-D4 分层帮助、变式与边界验证、不编造回执"执行。\n\n' + buildEvidence() + '\n\n' + buildRecovery();
+}
+function buildRecycle(){
+  return '请依据下面的费曼训练证据回执，先做证据审核，再生成学习小结。\n\n【第一步：证据审核】\n检查：\n1. 是否有孩子的实际回答或行为记录；\n2. 是否记录了题目；\n3. 是否说明是否使用提示；\n4. 是否区分独立完成与提示后完成；\n5. 变式是否真的是新题；\n6. 边界题是否真正完成；\n7. 是否标注了未测 / 无法核验。\n证据完整度：完整 / 部分完整 / 不足\n可以确认：\n不能确认：\n需要下次验证：\n只有通过审核的内容才能进入本次结论；证据不足时输出"证据不足，建议补一次验证训练"，不生成掌握结论。\n不得补写回执中没有的孩子回答、题目、提示或训练过程；无法核验标注"无法核验"。\n\n【第二步：输出】\n【本次表现】\n核心知识：\n独立完成：\n提示后完成：\n未完成：\n未测：\n【写给孩子的反馈】\n两句话，适龄语言，基于具体行为。\n【下一次训练】\n只验证一个最值得验证的薄弱点，附一份自包含复习训练单（可直接复制到视频通话执行）。\n\n单次训练只能说明本次表现。没有隔日或跨场景复测证据，不标记"已稳定掌握"。\n\n【粘贴证据回执】';
+}
+const REP = {
+  progress:{t:'近期进步报告',d:'几次训练之后，看孩子进步在哪、卡在哪。需要本对话里已回收至少 2 份回执。',b:'orange',
+    txt:'请根据本对话中已积累的费曼训练证据回执，生成一份近期进步报告。\n要求：\n1. 没有回执时：只输出"请先粘贴至少一份真实的费曼训练回执。当前没有可审核的训练证据。"，不生成报告；只有 1 份回执时，只能生成单次训练小结，注明"样本不足以生成趋势报告"。\n2. 多份回执编号不一致时：先确认是否属于同一个孩子和同一训练周期，无法确认时不合并统计。\n3. 只基于真实回收过的回执，逐知识点列出：能独立解释、提示后完成、仍卡壳、边界未测，并注明回执编号。\n4. 进步结论必须有对比证据（如"某知识点从提示后完成变为独立完成"），禁止写"进步很大"这类无依据的夸奖。\n5. 用适龄语言写给孩子的一句话肯定（基于具体行为）+ 给家长的一句话建议。'},
+  week:{t:'学习周报（家长向）',d:'每周给家长一份可读汇总。需要本周至少 2 份回执，否则只出单次小结。',b:'blue',
+    txt:'请根据本对话中本周已回收的费曼训练证据回执，生成学习周报（家长向）。\n要求：\n1. 没有回执：只输出"请先粘贴至少一份真实的费曼训练回执"，不生成周报；只有 1 份：只能生成单次训练小结，注明"样本不足以生成周报"。\n2. 多份回执编号不一致：先确认是否同一孩子同一周期，无法确认不合并统计。\n3. 只统计真实发生过的训练（次数、知识点、时长），不编造。\n4. 掌握状态逐知识点标注：能独立解释 / 提示后完成 / 仍需帮助 / 边界未测，并注明回执编号。\n5. 列出本周最常见卡点和帮助层级使用情况；下周建议 2-3 个最值得验证的目标。\n6. 语气克制、基于证据，不写"进步很大"这类无依据的夸奖。'},
+  month:{t:'学习月报（家长向）',d:'月度总览。需要本月至少 3 份回执，样本不足时如实标注。',b:'orange',
+    txt:'请根据本对话中本月已回收的费曼训练证据回执，生成学习月报（家长向）。\n要求：\n1. 没有回执：只输出"请先粘贴至少一份真实的费曼训练回执"，不生成月报；回执过少时只出单次小结并注明样本不足。\n2. 多份回执编号不一致：先确认是否同一孩子同一周期，无法确认不合并统计。\n3. 只统计本月真实发生过的训练（次数、知识点分布、时长），不编造。\n4. 逐知识点标注掌握状态（四种状态 + 回执编号）；状态变化对比（月初 vs 月末）必须有同知识点前后两份回执支持。\n5. 卡点收敛情况：哪些已通过、哪些反复出现、常用帮助层级。\n6. 下月建议 2-3 个最值得验证的目标，各附复习训练单要点。\n7. 语气克制；样本不足时明确标注覆盖范围，不下"整体进步"类结论。'},
+  review:{t:'复习计划',d:'根据所有回执生成未来一周的复习训练单计划。无回执时只给最小建议。',b:'green',
+    txt:'请根据本对话中已回收的费曼训练证据回执，生成未来一周的复习计划。\n要求：\n1. 没有回执时：输出"当前没有可审核的训练证据，建议先完成一次训练"，并给出最小可行的复习建议（围绕孩子当前学习内容，不问诊、不编造）。\n2. 从回执中挑出"提示后完成""仍卡壳""边界未测"的知识点作为复习重点，注明回执编号。\n3. 按间隔建议安排：当天快讲一遍 / 2-3 天后换题重讲 / 一周后进新测。\n4. 每个复习任务输出一份自包含复习训练单（可直接复制到视频通话执行），含知识点与验证要点。\n5. 只依据真实回执安排，不凭空添加未训练过的内容。'}
+};
+const LOOP = ['电脑出单','手机执行','电脑回收与报告'];
+const MODE_CARDS = {quick:['start'], standard:['start','recycle'], resume:['resume','recycle'], review:['recycle','report']};
+const MODE_NOTE = {
+  quick:'先复制启动单开始训练；训练结束后回到本页，切换"标准训练"回收证据。',
+  standard:'先复制启动单到手机开始训练；结束后把回执连同回收指令贴回电脑端对话。',
+  resume:'复制续接单到手机继续训练；结束后把回执连同回收指令贴回电脑端对话。',
+  review:'把回执连同回收指令贴回电脑端，或直接在电脑端对话发送报告指令。'
+};
+
+function repCardsHtml(){
+  return `<div class="rep-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+    ${['progress','week','month','review'].map(k=>{
+      const r=REP[k];
+      return `<div style="background:#FFFDF9;border:1px solid var(--line);border-radius:10px;padding:10px 12px">
+        <div class="ph" style="margin-bottom:4px"><span class="pt" style="font-size:13px">${r.t}</span><button class="copy" data-copy="rep_${k}" data-label="复制" style="padding:5px 12px;font-size:12px">复制</button></div>
+        <div class="pd" style="font-size:11px;margin-bottom:6px">${r.d}</div>
+        <textarea id="ta_rep_${k}" style="min-height:110px" readonly></textarea>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function cardDefs(){
+  const startLabel = state.device==='cloud' ? '复制到电脑：开始训练' : '复制到手机：开始训练';
+  return {
+    start:{t:'① 启动单', d:'本次训练的全部协议（身份/执行/证据/回收），自包含、可直接执行。', txt:buildStart(), badge:'现在就用', bs:'stage', label:startLabel,
+      n: state.device==='cloud' ? '粘贴到<b>电脑端豆包对话</b>发送；训练结束拿到回执后，复制③回收指令继续。' : (state.device==='video' ? '粘贴到<b>手机豆包</b>，进入<b>视频通话</b>发送。镜头对准题目和草稿，先确认题目再开始讲。' : '粘贴到<b>手机豆包</b>，进入<b>语音通话</b>发送。题目需口述或预先输入。')},
+    resume:{t:'② 续接单', d:'通话中断后，从上次进度恢复。训练编号与启动单一致。', txt:buildResume(), badge:'中断恢复', bs:'warn', label:'复制到手机：继续训练',
+      n:'复制后粘贴到<b>当前通道的豆包</b>。模型会先确认上次阶段与已知证据，无法确认时标"未知"，不从头重来。'},
+    recycle:{t:'③ 回收指令', d:'训练后贴回电脑端：先做证据审核，通过后才生成小结与下次复习单。', txt:buildRecycle(), badge:'训练后', bs:'orange', label:'复制到电脑：回收证据',
+      n:'训练结束后，把通话生成的回执复制到<b>电脑端豆包对话</b>，在回执后面粘贴这段指令发送。只有通过证据审核的内容才会进入结论。'},
+    report:{t:'④ 对话报告', d:'近期进步、周报、月报、复习计划四个指令。无回执不生成报告。', txt:'', badge:'长期积累', bs:'green', label:'', wide:true, n:'在<b>电脑端豆包对话</b>中发送对应指令。先保证该对话里已回收过至少一份回执；无回执时模型会拒绝生成。'}
+  };
+}
+function cardsHtml(){
+  const defs = cardDefs();
+  return MODE_CARDS[state.mode].map(k=>{
+    const c = defs[k];
+    const extra = c.wide ? repCardsHtml() : '';
+    return `<div class="pool-card${c.wide?' wide':''}">
+      <div class="ph"><div class="pt">${c.t}<span class="badge ${c.bs}">${c.badge}</span></div>${c.label?`<button class="copy" data-copy="${k}" data-label="${c.label}">${c.label}</button>`:''}</div>
+      <div class="pd">${c.d}</div>
+      ${c.wide?'':`<textarea id="ta_${k}" readonly></textarea>`}
+      ${extra}
+      <div class="next-step">${c.n}</div>
+    </div>`;
+  }).join('');
+}
+function loopHtml(){
+  return LOOP.map((s,i)=>`<span class="li ${i===0?'now':''}"><span class="n">${i+1}</span>${s}</span>`+ (i<2?'<span class="arrow">→</span>':'')).join('');
+}
+function renderConfig(){
+  $('inName').value=state.name; $('inTopic').value=state.topic; $('inCoord').value=state.coord; $('inCustom').value=state.custom; $('inNote').value=state.note;
+  $('selGrade').value=state.grade; $('selSubject').value=state.subject; $('selStage').value=state.stage; $('selVar').value=state.varRes; $('selBnd').value=state.bndRes;
+  $('customRow').style.display = state.subject==='自定义' ? '' : 'none';
+  seg('kindSeg','k',state.kind); seg('timeSeg','t',state.minutes); seg('devSeg','d',state.device);
+  $('goalHint').textContent = '本次最低完成目标：' + DUR_GOAL[state.minutes];
+}
+function renderResult(){
+  $('resName').textContent = state.name.trim() ? '，' + state.name.trim() : '';
+  $('resTid').textContent = state.tid;
+  $('resDesc').textContent = `${state.grade} · ${subjName()} · ${kindTxt()} · ${deviceName()} · ${state.minutes} 分钟`;
+  seg('modeSeg','m',state.mode);
+  $('loopBar').innerHTML = loopHtml();
+  $('poolCards').innerHTML = cardsHtml();
+  ['start','resume','recycle'].forEach(k=>{ const v = k==='start'?buildStart():k==='resume'?buildResume():buildRecycle(); const el=$('ta_'+k); if(el) el.value=v; });
+  ['progress','week','month','review'].forEach(k=>{ const el=$('ta_rep_'+k); if(el) el.value=REP[k].txt; });
+}
+function showView(v){
+  $('viewConfig').classList.toggle('on',v==='config');
+  $('viewResult').classList.toggle('on',v==='result');
+  if(v==='result') renderResult();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function doCopy(b){
+  const key=b.dataset.copy;
+  const el=$(key.startsWith('rep_')?'ta_'+key:'ta_'+key);
+  if(!el) return;
+  const v=el.value, label=b.dataset.label||'复制';
+  const done=()=>{b.textContent='已复制 ✓';b.classList.add('done');setTimeout(()=>{b.textContent=label;b.classList.remove('done');},1600);};
+  const fb=()=>{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();done();};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(done).catch(fb);}else{fb();}
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('.copy');
+  if(c) doCopy(c);
+});
+$('btnGenerate').onclick=()=>showView('result');
+$('btnBack').onclick=()=>showView('config');
+$('foldToggle').onclick=()=>{$('foldToggle').classList.toggle('open');$('foldBody').classList.toggle('open');};
+document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>{state.mode=b.dataset.m;renderResult();});
+$('inName').oninput=e=>{state.name=e.target.value;};
+$('inTopic').oninput=e=>{state.topic=e.target.value;};
+$('inCoord').oninput=e=>{state.coord=e.target.value;};
+$('inCustom').oninput=e=>{state.custom=e.target.value;};
+$('inNote').oninput=e=>{state.note=e.target.value;};
+$('selGrade').onchange=e=>{state.grade=e.target.value;};
+$('selSubject').onchange=e=>{state.subject=e.target.value;renderConfig();};
+$('selStage').onchange=e=>{state.stage=e.target.value;};
+$('selVar').onchange=e=>{state.varRes=e.target.value;};
+$('selBnd').onchange=e=>{state.bndRes=e.target.value;};
+document.querySelectorAll('#kindSeg button').forEach(b=>b.onclick=()=>{state.kind=b.dataset.k;renderConfig();});
+document.querySelectorAll('#timeSeg button').forEach(b=>b.onclick=()=>{state.minutes=b.dataset.t;renderConfig();});
+document.querySelectorAll('#devSeg button').forEach(b=>b.onclick=()=>{state.device=b.dataset.d;renderConfig();});
+fillGrade();fillSubject();renderConfig();
+</script>
+</body>
+</html>

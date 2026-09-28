@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2ebd85">
+<meta name="description" content="豆豆智学中心 · 下载中心：精选学习软件与 APP，官网原版下载，安全无捆绑">
+<title>下载中心 · 豆豆智学中心</title>
+<style>
+:root{
+  --bg:#f5f7fa; --card:#ffffff; --text:#1e293b; --text2:#64748b; --faint:#94a3b8;
+  --line:#e8eef4; --line2:#dbe4ee;
+  --g1:#35d29a; --g2:#2f9df0; --grad:linear-gradient(135deg,#35d29a,#2f9df0);
+  --accent:#2ebd85; --accent-deep:#1fa873; --accentbg:#e8f7f0;
+  --sh:0 2px 10px rgba(47,157,240,.06);
+  --sh-hi:0 8px 22px rgba(47,157,240,.13);
+  --pill:999px;
+  --fs-h1:17.5px; --fs-h2:14px; --fs-body:12.5px; --fs-note:11.5px;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text); font-size:var(--fs-body); line-height:1.65;
+  font-family:var(--font);
+  padding-bottom:calc(84px + env(safe-area-inset-bottom));
+}
+.wrap{max-width:600px;margin:0 auto;padding:16px 14px 0}
+
+/* ---------- 头部：独立圆角渐变卡（对齐 resources.html 版式） ---------- */
+.hero{position:relative;overflow:hidden;border-radius:18px;
+  background:var(--grad);color:#fff;
+  padding:24px 18px 22px;text-align:center;
+  box-shadow:0 10px 26px rgba(47,157,240,.20)}
+.hero .c1,.hero .c2,.hero .c3{position:absolute;border-radius:50%;background:rgba(255,255,255,.14)}
+.hero .c1{width:122px;height:122px;top:-48px;left:-36px}
+.hero .c2{width:82px;height:82px;bottom:-36px;right:-20px}
+.hero .c3{width:46px;height:46px;top:18px;right:56px;background:rgba(255,255,255,.10)}
+.hero h1{margin:0;font-size:var(--fs-h1);font-weight:800;letter-spacing:.3px;line-height:1.5;position:relative}
+.hero .sub{display:inline-block;max-width:100%;margin:10px 0 0;padding:5px 14px;border-radius:var(--pill);
+  background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.55);
+  font-size:var(--fs-body);font-weight:700;letter-spacing:.2px;
+  word-break:break-word;position:relative}
+.hero .stat{display:flex;justify-content:center;gap:10px;margin-top:14px;position:relative;flex-wrap:wrap}
+.hero .stat div{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);
+  border-radius:var(--pill);padding:4px 13px;font-size:var(--fs-note);font-weight:600}
+
+/* ---------- 安全提示条 ---------- */
+.notice{display:flex;gap:9px;align-items:flex-start;
+  margin-top:14px;padding:11px 14px;border-radius:14px;
+  background:var(--accentbg);border:1px solid rgba(46,189,133,.22);
+  font-size:var(--fs-note);color:var(--accent-deep);line-height:1.6}
+.notice .ni{flex:0 0 auto;font-size:14px;line-height:1.4}
+
+/* ---------- 工具条：搜索 + 分类芯片 ---------- */
+.tools{margin-top:16px}
+.search{position:relative;display:flex;align-items:center}
+.search svg{position:absolute;left:13px;pointer-events:none}
+.search input{
+  width:100%;padding:11px 42px 11px 38px;border:1px solid var(--line2);border-radius:14px;
+  background:#fff;font-size:var(--fs-body);font-family:inherit;color:var(--text);
+  outline:0;transition:border-color .18s,box-shadow .18s;box-shadow:var(--sh);
+}
+.search input::placeholder{color:var(--faint)}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,189,133,.13)}
+.search .clr{position:absolute;right:8px;width:26px;height:26px;border:0;border-radius:50%;
+  background:#f1f5f9;color:var(--text2);font-size:15px;line-height:1;cursor:pointer;display:none;
+  align-items:center;justify-content:center}
+.search .clr.on{display:flex}
+.chipbar{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.chip{border:1px solid var(--line2);background:#fff;color:var(--text2);
+  border-radius:var(--pill);padding:6px 14px;font-size:var(--fs-note);font-weight:600;
+  font-family:inherit;cursor:pointer;transition:all .18s;user-select:none;
+  display:inline-flex;align-items:center;gap:5px}
+.chip:active{transform:scale(.95)}
+.chip.on{background:var(--grad);border-color:transparent;color:#fff;
+  box-shadow:0 4px 12px rgba(47,157,240,.26)}
+
+/* ---------- 结果条 ---------- */
+.result-bar{margin-top:15px;font-size:var(--fs-note);color:var(--faint)}
+.result-bar b{color:var(--accent)}
+
+/* ---------- 卡片网格 ---------- */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:11px}
+.dcard{
+  display:flex;flex-direction:column;
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:16px 14px 14px;text-decoration:none;color:var(--text);
+  box-shadow:var(--sh);transition:transform .18s,box-shadow .2s,border-color .2s;
+  user-select:none;
+}
+.dcard:hover{transform:translateY(-3px);box-shadow:var(--sh-hi);border-color:#dceaf6}
+.dcard:active{transform:scale(.975)}
+.dcard .top{display:flex;align-items:center;gap:10px}
+.dcard .ico{
+  flex:0 0 auto;width:44px;height:44px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;line-height:1;
+  background:linear-gradient(135deg,rgba(53,210,154,.14),rgba(47,157,240,.14));
+}
+.dcard .nm{font-size:1rem;font-weight:800;word-break:break-word;line-height:1.3}
+.dcard .platform{display:block;font-size:10.5px;font-weight:700;color:var(--faint);letter-spacing:.4px;margin-top:2px}
+.dcard .ds{font-size:var(--fs-note);color:var(--text2);margin-top:10px;line-height:1.6;min-height:2.6em}
+.dcard .meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.dcard .meta span{font-size:10.5px;font-weight:600;color:var(--text2);
+  background:#f1f5f9;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.dcard .act{
+  margin-top:auto;padding-top:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.dcard .act .pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:7px 15px;border-radius:var(--pill);
+  background:var(--grad);color:#fff;font-size:var(--fs-note);font-weight:700;
+  box-shadow:0 4px 12px rgba(47,157,240,.24);
+}
+.dcard .act .ghost{font-size:10.5px;color:var(--faint);font-weight:600;white-space:nowrap}
+
+/* 空状态 */
+.empty{display:none;background:var(--card);border:1px dashed var(--line2);border-radius:16px;
+  margin-top:12px;padding:34px 16px;text-align:center;color:var(--faint);font-size:var(--fs-body)}
+.empty.on{display:block}
+
+/* ---------- 页脚 ---------- */
+.foot{text-align:center;padding:24px 10px 6px;color:var(--faint);font-size:var(--fs-note);line-height:1.9}
+.coach-tip{position:relative;display:inline-block;cursor:pointer;color:var(--accent);font-weight:600;
+  -webkit-tap-highlight-color:transparent}
+.coach-tip .tip{visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;
+  transform:translateX(-50%) translateY(4px);background:var(--grad);
+  color:#fff;padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;white-space:nowrap;
+  letter-spacing:.5px;z-index:99;pointer-events:none;box-shadow:0 6px 18px rgba(47,157,240,.35);
+  transition:opacity .2s ease,transform .2s ease,visibility .2s}
+.coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:var(--g2)}
+.coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{
+  visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- 底部返回（页内流式，位于版权声明上方） ---------- */
+.bottombar{display:flex;justify-content:center;margin-top:26px}
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:var(--grad);
+  color:#fff;border:0;border-radius:var(--pill);padding:10px 26px;font-size:.95rem;font-weight:700;
+  font-family:inherit;cursor:pointer;box-shadow:0 4px 14px rgba(47,157,240,.28);transition:.18s;
+  touch-action:manipulation;text-decoration:none}
+.back-btn:active{transform:scale(.95)}
+
+@media(max-width:400px){
+  .hero{padding:20px 14px 18px}
+  .grid{gap:10px}
+  .dcard{padding:14px 12px 12px;border-radius:14px}
+  .dcard .ico{width:38px;height:38px;font-size:1.35rem}
+  .dcard .nm{font-size:.93rem}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="c1"></span><span class="c2"></span><span class="c3"></span>
+    <h1>豆豆下载中心</h1>
+    <p class="sub">精选学习软件 · 全部走官网原版，安全无捆绑</p>
+    <div class="stat">
+      <div id="stAll">0 款软件</div>
+      <div id="stPlat">0 个平台</div>
+      <div id="stFree">全部免费</div>
+    </div>
+  </header>
+
+  <div class="notice">
+    <span class="ni">🛡️</span>
+    <span>本页只收录<b>官方渠道</b>下载地址，点击后跳转官网。请认准官方地址，避免从第三方站点下载被捆绑推广软件。</span>
+  </div>
+
+  <div class="tools">
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2"
+           stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      <input id="q" type="search" placeholder="搜索软件名 / 用途，如：沙盒、点读、编程" autocomplete="off">
+      <button class="clr" id="clr" aria-label="清空">×</button>
+    </div>
+    <div class="chipbar" id="chips"></div>
+  </div>
+
+  <div class="result-bar">共 <b id="count">0</b> 款软件可下载</div>
+
+  <main class="grid" id="grid"></main>
+  <div class="empty" id="empty">没有匹配的软件，换个关键词试试～</div>
+
+  <div class="bottombar">
+    <a class="back-btn" href="../index.html">← 返回首页</a>
+  </div>
+
+  <p class="foot">
+    所有软件版权归原作者所有，本页仅提供官方下载入口<br>
+    © 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span>
+  </p>
+</div>
+
+
+
+<script>
+/* =====================================================================
+ * ★ 下载数据区 —— 后期增删软件，只需改动这里 ★
+ *   ico:  卡片图标（emoji）
+ *   name: 软件名称
+ *   desc: 一句话简介
+ *   url:  官方下载页地址
+ *   plat: 支持平台（显示在名称下方）
+ *   tags: 分类标签数组（同时决定分类芯片，新增分类会自动出现）
+ *   meta: 规格标签数组（版本 / 体积 / 系统要求）
+ *   cta:  按钮文案
+ * ===================================================================== */
+var APPS = [
+  {
+    ico:'🧱', name:'Luanti', plat:'Windows · macOS · Linux',
+    desc:'开源体素沙盒游戏 · 可玩可加模组 · 带孩子在搭建中理解编程与逻辑',
+    url:'https://www.luanti.org/en/downloads/',
+    tags:['编程启蒙','动手创造'], meta:['v5.17.0','约 16.7 MB','完全免费开源'],
+    cta:'官网下载 ↗'
+  },
+  {
+    ico:'📖', name:'爱点读', plat:'Android · iOS',
+    desc:'同步课本点读 · 英语口语跟读评测 · 还有超多配套学习小工具',
+    url:'https://h5.520diandu.com/pages/webview/webview?url=https%253A%252F%252Fdownload.520diandu.com%252F',
+    tags:['课本点读','英语听说'], meta:['手机 APP','扫课本即点读','免费下载'],
+    cta:'前往下载 ↗'
+  }
+];
+/* ===================================================================== */
+
+var grid   = document.getElementById('grid');
+var chips  = document.getElementById('chips');
+var qEl    = document.getElementById('q');
+var clrEl  = document.getElementById('clr');
+var emptyEl= document.getElementById('empty');
+var countEl= document.getElementById('count');
+var state  = { cat:'全部', kw:'' };
+
+/* ---------- 统计与分类芯片 ---------- */
+function uniq(arr){
+  var out = [];
+  arr.forEach(function(v){ if(out.indexOf(v) < 0) out.push(v); });
+  return out;
+}
+var allTags = uniq(APPS.reduce(function(acc,a){ return acc.concat(a.tags); }, []));
+var allPlat = uniq(APPS.reduce(function(acc,a){ return acc.concat(a.plat.split(' · ')); }, []));
+document.getElementById('stAll').textContent  = APPS.length + ' 款软件';
+document.getElementById('stPlat').textContent = allPlat.length + ' 个平台';
+
+var cats = ['全部'].concat(allTags);
+cats.forEach(function(c){
+  var b = document.createElement('button');
+  b.className = 'chip' + (c === '全部' ? ' on' : '');
+  b.type = 'button';
+  b.textContent = c;
+  b.addEventListener('click', function(){
+    state.cat = c;
+    Array.prototype.forEach.call(chips.children, function(n){
+      n.classList.toggle('on', n.textContent === c);
+    });
+    render();
+  });
+  chips.appendChild(b);
+});
+
+/* ---------- 渲染 ---------- */
+function match(a){
+  if(state.cat !== '全部' && a.tags.indexOf(state.cat) < 0) return false;
+  if(!state.kw) return true;
+  var hay = (a.name + ' ' + a.desc + ' ' + a.plat + ' ' + a.tags.join(' ') + ' ' + a.meta.join(' ')).toLowerCase();
+  return hay.indexOf(state.kw) >= 0;
+}
+
+function render(){
+  var list = APPS.filter(match);
+  grid.innerHTML = '';
+  list.forEach(function(a){
+    var el = document.createElement('a');
+    el.className = 'dcard';
+    el.href = a.url;
+    el.target = '_blank';
+    el.rel = 'noopener';
+
+    var metaHtml = a.meta.map(function(m){ return '<span>' + m + '</span>'; }).join('');
+
+    el.innerHTML =
+      '<div class="top">' +
+        '<div class="ico">' + a.ico + '</div>' +
+        '<div><div class="nm">' + a.name + '</div>' +
+        '<span class="platform">' + a.plat + '</span></div>' +
+      '</div>' +
+      '<div class="ds">' + a.desc + '</div>' +
+      '<div class="meta">' + metaHtml + '</div>' +
+      '<div class="act">' +
+        '<span class="pill">' + a.cta + '</span>' +
+        '<span class="ghost">官方渠道</span>' +
+      '</div>';
+
+    grid.appendChild(el);
+  });
+
+  countEl.textContent = list.length;
+  emptyEl.classList.toggle('on', list.length === 0);
+}
+
+/* ---------- 搜索 ---------- */
+qEl.addEventListener('input', function(){
+  state.kw = qEl.value.trim().toLowerCase();
+  clrEl.classList.toggle('on', qEl.value.length > 0);
+  render();
+});
+clrEl.addEventListener('click', function(){
+  qEl.value = ''; state.kw = '';
+  clrEl.classList.remove('on');
+  render();
+  qEl.focus();
+});
+
+render();
+</script>
+
+</body>
+</html>
