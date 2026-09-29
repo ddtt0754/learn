@@ -9,6 +9,7 @@
 :root{
   --bg:#f5f7fa; --card:#ffffff; --text:#1e293b; --sub:#64748b; --faint:#94a3b8;
   --line:#e8eef4; --g1:#35d29a; --g2:#2f9df0; --accent:#2ebd85; --accentbg:#e8f7f0;
+  --hot:#e53935;
   --fs-h1:17.5px; --fs-h2:14px; --fs-body:12.5px; --fs-note:11.5px;
   --sh:0 2px 10px rgba(47,157,240,.06);
 }
@@ -85,6 +86,8 @@ body{
 .li i{flex:0 0 auto;width:20px;font-style:normal;color:var(--faint);font-size:var(--fs-note);
   text-align:right;padding-top:1px;font-variant-numeric:tabular-nums}
 .li .nm{flex:1;min-width:0;word-break:break-word}
+/* 红色强调条目（按名称命中，见脚本 HOT 白名单）；仅改样式，不动文本 */
+.li.hot .nm{color:var(--hot);font-weight:700}
 .li.hide{display:none}
 .li mark{background:#fff3bf;color:#8a6d00;border-radius:3px;padding:0 1px}
 .note{margin:8px 0 0;font-size:var(--fs-note);color:var(--faint);background:var(--bg);
@@ -348,6 +351,10 @@ var DATA = [
 ];
 /* ================================================================ */
 
+/* 红色强调条目：需红色显示的条目名（精确匹配；只给 .li 加 hot 类，
+   文本仍为纯文本 ⇒ 搜索、高亮、data-nm0 快照均不受影响） */
+var HOT = ["英语启蒙磨耳朵"];
+
 var $ = function(id){ return document.getElementById(id); };
 var esc = function(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -358,7 +365,8 @@ var TOTAL = DATA.reduce(function(a,c){ return a + c.items.length; }, 0);
 function render(){
   var cats = DATA.map(function(c){
     var lis = c.items.map(function(name, i){
-      return '<div class="li" data-nm="' + esc(name.toLowerCase()) + '">'
+      var cls = HOT.indexOf(name) > -1 ? 'li hot' : 'li';
+      return '<div class="' + cls + '" data-nm="' + esc(name.toLowerCase()) + '">'
            +   '<i>' + (i + 1) + '</i>'
            +   '<div class="nm">' + esc(name) + '</div>'
            + '</div>';
