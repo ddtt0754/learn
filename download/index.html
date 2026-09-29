@@ -25,7 +25,7 @@ body{
   font-family:var(--font);
   padding-bottom:calc(84px + env(safe-area-inset-bottom));
 }
-.wrap{max-width:600px;margin:0 auto;padding:16px 14px 0}
+.wrap{max-width:820px;margin:0 auto;padding:16px 14px 0}
 
 /* ---------- 头部：独立圆角渐变卡（对齐 resources.html 版式） ---------- */
 .hero{position:relative;overflow:hidden;border-radius:18px;
@@ -141,6 +141,8 @@ body{
   touch-action:manipulation;text-decoration:none}
 .back-btn:active{transform:scale(.95)}
 
+/* ---------- 宽屏：容器 820px 下卡片恒为两列，四张卡 2×2 铺满（避免末行落单） ---------- */
+
 @media(max-width:400px){
   .hero{padding:20px 14px 18px}
   .grid{gap:10px}
@@ -170,7 +172,7 @@ body{
 
   <div class="notice">
     <span class="ni">🛡️</span>
-    <span>本页只收录<b>官方渠道</b>下载地址，点击后跳转官网。请认准官方地址，避免从第三方站点下载被捆绑推广软件。</span>
+    <span>本页只收录<b>官方渠道</b>下载地址，点击后跳转官方下载页。请认准官方地址，避免从第三方站点下载被捆绑推广软件。</span>
   </div>
 
   <div class="tools">
@@ -214,7 +216,7 @@ body{
  * ===================================================================== */
 var APPS = [
   {
-    ico:'🧱', name:'Luanti', plat:'Windows · macOS · Linux',
+    ico:'🧱', name:'Minetest(别名Luanti)', plat:'Windows · macOS · Linux',
     desc:'开源体素沙盒游戏 · 可玩可加模组 · 带孩子在搭建中理解编程与逻辑',
     url:'https://www.luanti.org/en/downloads/',
     tags:['编程启蒙','动手创造'], meta:['v5.17.0','约 16.7 MB','完全免费开源'],
@@ -225,7 +227,21 @@ var APPS = [
     desc:'同步课本点读 · 英语口语跟读评测 · 还有超多配套学习小工具',
     url:'https://h5.520diandu.com/pages/webview/webview?url=https%253A%252F%252Fdownload.520diandu.com%252F',
     tags:['课本点读','英语听说'], meta:['手机 APP','扫课本即点读','免费下载'],
-    cta:'前往下载 ↗'
+    cta:'官网下载 ↗'
+  },
+  {
+    ico:'📘', name:'蓝思英语', plat:'Android',
+    desc:'英语分级阅读与配套训练 · 可自制学习课件分享给同学 · 小学英语情景视频',
+    url:'https://sj.qq.com/appdetail/com.dxdxapp.ting',
+    tags:['分级阅读','英语听说'], meta:['创作中心lansiyingyu.cn','APP内搜课程编码：829781'],
+    cta:'应用宝下载 ↗'
+  },
+  {
+    ico:'🤖', name:'豆包爱学', plat:'Android · iOS',
+    desc:'豆包旗下 AI 教育应用 · AI 老师分步讲解 · 拍题答疑 · 全科作业批改',
+    url:'https://sj.qq.com/appdetail/com.aitutor.hippo',
+    tags:['AI 辅导','作业批改'], meta:['手机应用','2026.9.21 更新','免费下载'],
+    cta:'应用宝下载 ↗'
   }
 ];
 /* ===================================================================== */
