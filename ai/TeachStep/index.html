@@ -131,6 +131,42 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .foot a{color:var(--blue);text-decoration:none;font-weight:600}
 .foot a:hover{text-decoration:underline}
 
+/* ===== 顶栏操作区 ===== */
+.top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dl-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;
+  background:var(--blue);color:#fff;font-size:12.5px;font-weight:700;text-decoration:none;
+  white-space:nowrap;box-shadow:0 4px 12px rgba(43,109,224,.26);transition:transform .12s,background .15s;
+}
+.dl-btn:hover{background:var(--blue-d)}
+.dl-btn:active{transform:scale(.96)}
+
+/* ===== 底部导航与版权 ===== */
+.foot-nav{margin-top:24px;text-align:center}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:9px 18px;
+  background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:var(--r-md);
+  font-size:13.5px;font-weight:700;text-decoration:none;font-family:inherit;
+  box-shadow:0 4px 12px rgba(43,109,224,.14);transition:transform .15s;
+}
+.back-btn:active{transform:scale(.96)}
+.site-footer{text-align:center;font-size:12px;color:var(--mut-2);margin-top:22px;letter-spacing:.5px;line-height:2}
+.coach-tip{position:relative;display:inline-block;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.coach-tip .tip{
+  visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;
+  transform:translateX(-50%) translateY(4px);background:linear-gradient(135deg,var(--blue),#5B8DEF);color:#fff;
+  padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;white-space:nowrap;
+  letter-spacing:.5px;z-index:99;pointer-events:none;box-shadow:0 6px 18px rgba(43,109,224,.35);
+  transition:opacity .2s ease,transform .2s ease,visibility .2s;
+}
+.coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#5B8DEF}
+.coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:520px){
+  .top-actions{width:100%}
+  .dl-btn{width:100%;justify-content:center}
+}
+
 @media(max-width:840px){
   .hero{grid-template-columns:1fr;padding:22px}
   .hero-img{order:-1}
@@ -160,7 +196,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);bo
         <div class="brand-sub">训练协议台 · 电脑出单 → 手机执行 → 电脑回收</div>
       </div>
     </div>
-    <div class="flow-mini"><span class="dot now"></span><b>电脑出单</b><span>→</span><span class="dot"></span>手机执行<span>→</span><span class="dot"></span>电脑回收</div>
+    <div class="top-actions">
+      <div class="flow-mini"><span class="dot now"></span><b>电脑出单</b><span>→</span><span class="dot"></span>手机执行<span>→</span><span class="dot"></span>电脑回收</div>
+      <a class="dl-btn" href="SKILL.rar" download>SKILL下载</a>
+    </div>
   </div>
 
   <!-- ===== 视图 A：配置 ===== -->
@@ -314,7 +353,15 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div class="boundary"><b>数据边界：</b>工作台不保存训练数据。总结报告、周报、月报只能在豆包对话中依据<b>真实回收过的回执</b>生成——请始终在<b>同一个电脑端对话</b>里回收；无回执不生成报告，只有一份回执不生成趋势，编号不一致不合并统计。一次训练只能说明本次表现，未测内容不代表已掌握。</div>
   </div>
 
-  <div class="foot">TeachStep 费曼讲台 · 活动不等于掌握，讲得清、验得过才算会<br><br><a href="http://l.iddtt.com" target="_blank" rel="noopener">© 两英豆豆教练</a></div>
+  <div class="foot">TeachStep 费曼讲台 · 活动不等于掌握，讲得清、验得过才算会</div>
+
+  <nav class="foot-nav">
+    <a class="back-btn" href="../ai_learn.html">← 返回 AI学</a>
+  </nav>
+
+  <footer class="site-footer">
+    © 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span>
+  </footer>
 </div>
 
 <script>

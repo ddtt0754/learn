@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpeakStep 听说练习台</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2314B8A6'/%3E%3Cpath d='M14 32c0 9 7 16 16 16s16-7 16-16-7-16-16-16S14 23 14 32z' fill='%23FFF6EC'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23F97316'/%3E%3C/svg%3E">
+<style>
+:root{
+  --cream:#FFF6EC; --card:#FFF; --ink:#3B2E24; --ink-soft:#8A7A6D;
+  --orange:#F97316; --orange-deep:#EA580C; --teal:#14B8A6; --teal-deep:#0F766E;
+  --teal-soft:#E6F7F4; --green:#22C55E; --line:#F0E6D8; --shadow:0 10px 30px rgba(190,140,70,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.55;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 22px 40px}
+
+/* ===== 顶栏 ===== */
+.top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.logo{width:52px;height:52px;border-radius:16px;flex:none;object-fit:cover;box-shadow:var(--shadow)}
+.top h1{font-size:21px;letter-spacing:.5px}
+.top p{font-size:13px;color:var(--ink-soft);margin-top:2px}
+.quick-btn{margin-left:auto}
+.steps{
+  display:flex;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:12px 16px;margin-bottom:18px;
+}
+.step{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft)}
+.step b{
+  width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;font-size:13px;
+}
+.step:not(:last-child)::after{content:"";width:26px;height:2px;border-radius:2px;background:var(--line);margin:0 2px}
+
+/* ===== 卡片 ===== */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:16px}
+.card-h{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.card-h h2{font-size:16px}
+.card-h span{font-size:12px;color:var(--ink-soft)}
+
+/* ===== 分段与选择 ===== */
+.seg{display:inline-flex;background:#F7EEE1;border-radius:12px;padding:4px;gap:4px}
+.seg button{
+  border:0;background:transparent;padding:8px 16px;border-radius:9px;font-size:14px;cursor:pointer;
+  color:var(--ink-soft);font-family:inherit;transition:all .15s;
+}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(190,140,70,.15);font-weight:600}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:999px;
+  padding:7px 15px;font-size:13.5px;cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.chip:hover{border-color:var(--teal);color:var(--teal-deep)}
+.chip.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-deep);font-weight:600}
+
+/* ===== 表单 ===== */
+.f-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.f-label{font-size:13.5px;font-weight:600;min-width:64px;color:var(--ink)}
+select{
+  appearance:none;-webkit-appearance:none;border:1.5px solid var(--line);background:#fff;
+  border-radius:10px;padding:9px 34px 9px 12px;font-size:14px;color:var(--ink);cursor:pointer;
+  font-family:inherit;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7A6D' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+select:focus{outline:none;border-color:var(--teal)}
+input[type=text]{
+  border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14px;color:var(--ink);
+  font-family:inherit;flex:1;min-width:200px;background:#fff;
+}
+input[type=text]:focus{outline:none;border-color:var(--teal)}
+.hint{font-size:12px;color:var(--ink-soft)}
+
+/* ===== 面板切换 ===== */
+.panel{display:none}
+.panel.on{display:block;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ===== 高级设置 ===== */
+details.adv{border:1px dashed var(--line);border-radius:12px;padding:10px 14px}
+details.adv summary{cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink-soft);user-select:none}
+details.adv[open] summary{margin-bottom:10px;color:var(--ink)}
+details.adv .f-row{margin-bottom:10px}
+details.adv .f-row:last-child{margin-bottom:0}
+
+/* ===== 预览 ===== */
+.pv{background:var(--teal-soft);border:1px dashed var(--teal);border-radius:14px;padding:14px 16px}
+.pv-row{display:flex;gap:8px;font-size:13.5px;margin-bottom:6px}
+.pv-row:last-child{margin-bottom:0}
+.pv-k{color:var(--teal-deep);font-weight:600;flex:none;min-width:58px}
+.pv-v{color:var(--ink)}
+
+/* ===== 提示词 ===== */
+.prompt-box{
+  background:#2E2620;border-radius:14px;padding:16px 18px;color:#F5EBDD;font-size:13.5px;
+  line-height:1.8;white-space:pre-wrap;min-height:210px;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;
+}
+.btn{
+  border:0;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:hover{background:var(--orange-deep)}
+.btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal-deep)}
+.btn-sm{padding:8px 14px;font-size:13px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.copied{background:var(--green)!important}
+
+/* ===== 说明 ===== */
+.how{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;color:var(--ink-soft);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.how img{width:44px;height:44px;border-radius:12px;object-fit:cover;flex:none}
+
+/* ===== 页脚 ===== */
+.foot{font-size:12px;color:var(--ink-soft);text-align:center;margin-top:22px;line-height:1.8}
+
+/* ===== 快速开练抽屉 ===== */
+.mask{position:fixed;inset:0;background:rgba(59,46,36,.4);display:none;z-index:50}
+.mask.on{display:block}
+.drawer{
+  position:fixed;top:0;right:0;width:400px;max-width:92vw;height:100%;z-index:51;
+  background:var(--card);box-shadow:-10px 0 40px rgba(59,46,36,.18);padding:24px 22px;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .25s ease;overflow-y:auto;
+}
+.drawer.on{opacity:1;visibility:visible;pointer-events:auto}
+.drawer h2{font-size:17px;margin-bottom:4px}
+.drawer .sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:16px}
+.qp{
+  display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:#fff;
+  border-radius:14px;padding:14px 16px;margin-bottom:12px;cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.qp:hover{border-color:var(--teal)}
+.qp b{display:block;font-size:14.5px;color:var(--ink);margin-bottom:3px}
+.qp span{font-size:12.5px;color:var(--ink-soft)}
+.qp small{display:block;font-size:11.5px;color:var(--teal-deep);margin-top:6px}
+.close-x{position:absolute;top:18px;right:18px;border:0;background:#F7EEE1;border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;color:var(--ink-soft);font-family:inherit}
+
+/* ===== Toast ===== */
+.toast{
+  position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);z-index:60;
+  background:#2E2620;color:#F5EBDD;font-size:13.5px;border-radius:12px;padding:12px 20px;
+  opacity:0;pointer-events:none;transition:all .25s ease;max-width:86vw;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== 顶栏操作区 ===== */
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+a.btn{text-decoration:none}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-teal:hover{background:var(--teal-deep)}
+
+/* ===== 底部导航与版权 ===== */
+.foot-nav{margin-top:24px;text-align:center}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:9px 18px;
+  background:#fff;color:var(--teal-deep);border:1.5px solid var(--teal);border-radius:12px;
+  font-size:13.5px;font-weight:700;text-decoration:none;font-family:inherit;
+  box-shadow:0 4px 12px rgba(20,184,166,.14);transition:transform .15s;
+}
+.back-btn:active{transform:scale(.96)}
+.site-footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:22px;letter-spacing:.5px;line-height:2}
+.coach-tip{position:relative;display:inline-block;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.coach-tip .tip{
+  visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;
+  transform:translateX(-50%) translateY(4px);background:var(--teal);color:#fff;
+  padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;white-space:nowrap;
+  letter-spacing:.5px;z-index:99;pointer-events:none;box-shadow:0 6px 18px rgba(20,184,166,.35);
+  transition:opacity .2s ease,transform .2s ease,visibility .2s;
+}
+.coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--teal)}
+.coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:960px){
+  .top{flex-wrap:wrap}
+  .top-actions{width:100%;margin-left:0;justify-content:flex-start}
+  .top-actions .btn{flex:1;justify-content:center}
+}
+
+/* ===== 响应式 ===== */
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;align-items:start}
+@media (max-width:960px){
+  .grid{grid-template-columns:1fr}
+  .wrap{padding:14px 14px 30px}
+  .top h1{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 顶栏 ===== -->
+  <header class="top">
+    <img class="logo" src="assets/coach.jpg" alt="SpeakStep 教练">
+    <div>
+      <h1>SpeakStep 听说练习台</h1>
+      <p>一分钟生成练习单，复制到豆包，让孩子马上开口</p>
+    </div>
+    <nav class="top-actions">
+      <a class="btn btn-teal btn-sm" href="speakstep-english-coach.rar" download>SKILL下载</a>
+      <a class="btn btn-ghost btn-sm" href="ReadMe/index.html">安装说明</a>
+      <button class="btn btn-ghost btn-sm quick-btn" id="openQuick">快速开练</button>
+    </nav>
+  </header>
+
+  <div class="steps">
+    <div class="step"><b>1</b><span>填孩子水平</span></div>
+    <div class="step"><b>2</b><span>选今天练什么</span></div>
+    <div class="step"><b>3</b><span>定重点与时长</span></div>
+    <div class="step"><b>4</b><span>复制到豆包开练</span></div>
+  </div>
+
+  <div class="grid">
+    <!-- ===== 左列：设置 ===== -->
+    <div>
+
+      <!-- 模式入口 -->
+      <section class="card">
+        <div class="card-h"><h2>怎么开始</h2><span>快速开练适合马上开口；按教材练适合结合课本</span></div>
+        <div class="f-row">
+          <div class="seg" id="modeSeg">
+            <button data-mode="quick" class="on">快速开练</button>
+            <button data-mode="school">按教材练</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 输出什么 -->
+      <section class="card">
+        <div class="card-h"><h2>输出什么</h2><span>听说练习单练对话；新词听读卡练本单元生词</span></div>
+        <div class="f-row">
+          <div class="seg" id="kindSeg">
+            <button data-kind="practice" class="on">听说练习单</button>
+            <button data-kind="cards">新词听读卡</button>
+          </div>
+        </div>
+        <p class="hint" id="kindHint">围绕教材坐标，生成 8-15 张单词听读卡：每个词给例句、跟读提示和一个小应用问题，帮孩子快速记住本单元新词。</p>
+      </section>
+
+      <!-- 使用方式 -->
+      <section class="card">
+        <div class="card-h"><h2>在哪里练</h2><span>云电脑带技能；手机通话为自包含单</span></div>
+        <div class="f-row">
+          <div class="seg" id="deviceSeg">
+            <button data-dev="cloud" class="on">电脑云电脑 · 带技能</button>
+            <button data-dev="phone">手机语音通话 · 自包含单</button>
+          </div>
+        </div>
+        <p class="hint" id="devHint">电脑工作任务云电脑加载技能，教学规则由技能自动处理，练习单保持精简。</p>
+      </section>
+
+      <!-- 谁来练 -->
+      <section class="card">
+        <div class="card-h"><h2>谁来练</h2><span>不填称呼也可以，默认叫"同学"</span></div>
+        <div class="f-row" id="quickGradeRow">
+          <span class="f-label">年级</span>
+          <select id="selGradeQuick"></select>
+        </div>
+        <div class="f-row">
+          <span class="f-label">称呼</span>
+          <input type="text" id="inName" placeholder="选填：孩子的小名或昵称" maxlength="12">
+        </div>
+        <div class="f-row">
+          <span class="f-label">表达情况</span>
+          <div class="chips" id="selfChips">
+            <button class="chip" data-self="刚开始，需要较多提示">刚开始</button>
+            <button class="chip on" data-self="能说简单句">能说简单句</button>
+            <button class="chip" data-self="能连续说几句">能说几句</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 快速开练：内容来源 -->
+      <section class="card panel on" id="panelQuick">
+        <div class="card-h"><h2>今天用什么内容练</h2><span>兴趣让开口更容易</span></div>
+        <div class="f-row">
+          <span class="f-label">来源</span>
+          <div class="chips" id="srcChips">
+            <button class="chip on" data-src="topic">兴趣主题</button>
+            <button class="chip" data-src="task">生活任务</button>
+            <button class="chip" data-src="world">世界见闻</button>
+            <button class="chip" data-src="free">自由主题</button>
+          </div>
+        </div>
+        <div class="f-row" id="topicRow">
+          <span class="f-label">主题</span>
+          <div class="chips" id="topicChips"></div>
+        </div>
+        <div class="f-row" id="freeRow" style="display:none">
+          <span class="f-label">主题</span>
+          <input type="text" id="inTopicFree" placeholder="孩子想聊什么？如：恐龙、我的学校">
+        </div>
+        <p class="hint">选主题后，教练按孩子水平自动适配难度与表达。</p>
+      </section>
+
+      <!-- 按教材练：教材轨道 -->
+      <section class="card panel" id="panelSchool">
+        <div class="card-h"><h2>教材与考试</h2><span>结合课本或备考内容</span></div>
+        <div class="f-row">
+          <span class="f-label">来源</span>
+          <div class="seg" id="trackSeg">
+            <button data-track="school" class="on">校内同步</button>
+            <button data-track="exam">剑桥考试</button>
+          </div>
+        </div>
+
+        <div class="panel on" id="panelSchoolInner">
+          <div class="f-row">
+            <span class="f-label">学段</span>
+            <div class="seg" id="stageSeg">
+              <button data-stage="primary" class="on">小学</button>
+              <button data-stage="junior">初中</button>
+            </div>
+          </div>
+          <div class="f-row">
+            <span class="f-label">年级</span>
+            <select id="selGrade"></select>
+          </div>
+          <div class="f-row">
+            <span class="f-label">教材</span>
+            <select id="selBook"></select>
+          </div>
+          <div class="f-row">
+            <span class="f-label">册</span>
+            <select id="selTerm">
+              <option value="上册">上册</option>
+              <option value="下册">下册</option>
+            </select>
+          </div>
+          <div class="f-row">
+            <span class="f-label">单元</span>
+            <select id="selUnit"></select>
+            <span class="f-label" style="min-width:auto">课时</span>
+            <select id="selLesson">
+              <option value="">不指定</option>
+              <option value="第1课时">第1课时</option>
+              <option value="第2课时">第2课时</option>
+              <option value="第3课时">第3课时</option>
+            </select>
+          </div>
+          <p class="hint">围绕当前学习单元生成同主题、同难度的听说练习。如需严格同步课本，请在豆包对话中提供课本页面或关键词。</p>
+        </div>
+
+        <div class="panel" id="panelExamInner">
+          <div class="f-row">
+            <span class="f-label">级别</span>
+            <select id="selExam"></select>
+          </div>
+          <div class="f-row">
+            <span class="f-label">模块</span>
+            <div class="chips" id="examMods">
+              <button class="chip" data-mod="听力">听力</button>
+              <button class="chip" data-mod="口语">口语</button>
+              <button class="chip on" data-mod="听力 + 口语">听力 + 口语</button>
+            </div>
+          </div>
+          <div class="f-row">
+            <span class="f-label">Part</span>
+            <select id="selPart"></select>
+          </div>
+          <p class="hint">按真实考试结构与官方词表组题，适合备考。</p>
+        </div>
+      </section>
+
+      <!-- 今天重点练什么 -->
+      <section class="card">
+        <div class="card-h"><h2>今天重点练什么</h2><span>一次只练一个重点</span></div>
+        <div class="chips" id="focusChips">
+          <button class="chip on" data-focus="听说综合">听说综合</button>
+          <button class="chip" data-focus="听懂关键信息">听懂关键信息</button>
+          <button class="chip" data-focus="开口完成对话">开口完成对话</button>
+          <button class="chip" data-focus="听完简单复述">听完简单复述</button>
+          <button class="chip" data-focus="表达自己的想法">表达自己的想法</button>
+        </div>
+      </section>
+
+      <!-- 练多久 -->
+      <section class="card">
+        <div class="card-h"><h2>练多久</h2><span>短时高频，比一次练很久更有效</span></div>
+        <div class="chips" id="timeChips">
+          <button class="chip" data-min="5">5 分钟</button>
+          <button class="chip on" data-min="10">10 分钟</button>
+          <button class="chip" data-min="15">15 分钟</button>
+        </div>
+      </section>
+
+      <!-- 高级设置 -->
+      <section class="card">
+        <details class="adv">
+          <summary>高级设置</summary>
+          <div class="f-row">
+            <span class="f-label">反馈语言</span>
+            <div class="chips" id="langChips">
+              <button class="chip on" data-lang="auto">自动（随水平）</button>
+              <button class="chip" data-lang="中英结合">中英结合</button>
+              <button class="chip" data-lang="英语为主">英语为主</button>
+              <button class="chip" data-lang="全英语为主">全英语</button>
+            </div>
+          </div>
+          <div class="f-row">
+            <span class="f-label">跟读练习</span>
+            <div class="chips" id="pronChips">
+              <button class="chip on" data-p="1">加入一句跟读</button>
+              <button class="chip" data-p="0">不需要</button>
+            </div>
+          </div>
+          <div class="f-row">
+            <span class="f-label">结束小结</span>
+            <div class="chips" id="sumChips">
+              <button class="chip on" data-s="1">生成简短小结</button>
+              <button class="chip" data-s="0">不需要</button>
+            </div>
+          </div>
+          <div class="f-row">
+            <span class="f-label">目标表达</span>
+            <input type="text" id="inGoal" placeholder="选填：想练的句子，如 I like ... because ...">
+          </div>
+        </details>
+      </section>
+    </div>
+
+    <!-- ===== 右列：预览 + 提示词 ===== -->
+    <div>
+
+      <!-- 内容预览 -->
+      <section class="card">
+        <div class="card-h"><h2>今天的练习</h2><span>随选择实时更新</span></div>
+        <div class="pv" id="pvBox">
+          <div class="pv-row"><span class="pv-k">内容</span><span class="pv-v" id="pvCoord">兴趣主题 · 动物与自然</span></div>
+          <div class="pv-row"><span class="pv-k">重点</span><span class="pv-v" id="pvFocus">听说综合</span></div>
+          <div class="pv-row"><span class="pv-k">时长</span><span class="pv-v" id="pvTime">10 分钟</span></div>
+        </div>
+      </section>
+
+      <!-- 练习单 -->
+      <section class="card">
+        <div class="card-h"><h2>听说练习单</h2><span>复制后粘贴到豆包对话</span></div>
+        <div class="prompt-box" id="promptBox"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="copyBtn">复制提示词</button>
+          <button class="btn btn-ghost" id="sampleBtn">换个示例</button>
+        </div>
+        <div class="how">
+          <img src="assets/kid.jpg" alt="孩子">
+          <span id="howText">粘贴到豆包对话发送即可。教练会一次只给一个任务，先让孩子回答再反馈，结束后给出简短小结。</span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <p class="foot">SpeakStep 英语听说 · 活动不等于掌握：能听懂、能说出、换个场景还能用<br>不填称呼也能开练；技术规则由技能处理，练习单只负责"谁来练、练什么、练多久"</p>
+  <nav class="foot-nav">
+    <a class="back-btn" href="../ai_learn.html">← 返回 AI学</a>
+  </nav>
+
+  <footer class="site-footer">
+    © 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span>
+  </footer>
+</div>
+
+<!-- ===== 快速开练抽屉 ===== -->
+<div class="mask" id="mask"></div>
+<div class="drawer" id="drawer">
+  <button class="close-x" id="closeQuick" aria-label="关闭">×</button>
+  <h2>快速开练</h2>
+  <p class="sub">选一个方案，设置自动填好；仍可在下方修改。</p>
+  <div id="quickBox"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 数据 ===== */
+const GRADES_ALL = ['一年级','二年级','三年级','四年级','五年级','六年级','七年级','八年级','九年级'];
+const GRADES = { primary:['一年级','二年级','三年级','四年级','五年级','六年级'], junior:['七年级','八年级','九年级'] };
+const BOOKS = {
+  primary:['人教PEP（三年级起点）','人教新起点','外研版（一起）','外研版（三起）','译林版','北师大版','冀教版','湘少版','沪教版','其他'],
+  junior:['人教版（新目标）','外研版','译林版','北师大版','冀教版','仁爱版','鲁教版','沪教版','其他']
+};
+const EXAMS = ['剑桥少儿·Starters','剑桥少儿·Movers','剑桥少儿·Flyers','KET（A2 Key）','PET（B1 Preliminary）'];
+const EXAM_STRUCT = {
+  '剑桥少儿·Starters':{ lv:'L', words:'约 500 词（Starters 官方词表）',
+    listen:['Part 1 听名字连线人物','Part 2 听对话填空（数字/名字）','Part 3 听信息选择图片','Part 4 听指令涂色'],
+    speak:['Part 1 打招呼与个人问题','Part 2 看图问答','Part 3 看图讲故事','Part 4 开放个人问题'] },
+  '剑桥少儿·Movers':{ lv:'M', words:'约 700 词（Movers 官方词表）',
+    listen:['Part 1 听名字连线人物','Part 2 听对话填空','Part 3 听信息选择图片','Part 4 听短文选择','Part 5 听指令涂色'],
+    speak:['Part 1 看图找不同','Part 2 看图讲故事','Part 3 看图问答','Part 4 开放问答'] },
+  '剑桥少儿·Flyers':{ lv:'M', words:'约 900 词（Flyers 官方词表）',
+    listen:['Part 1 连线','Part 2 填空','Part 3 选择','Part 4 选择','Part 5 涂色'],
+    speak:['Part 1 看图找不同','Part 2 信息问答','Part 3 看图讲故事','Part 4 开放问答'] },
+  'KET（A2 Key）':{ lv:'H', words:'约 1500 词（A2 Key 官方词表）',
+    listen:['Part 1 短对话三选一（标准 5 题）','Part 2 长对话信息填空（标准 5 空）','Part 3 独白信息填空（标准 5 空）','Part 4 长对话三选一（标准 5 题）','Part 5 匹配（标准 5 题）'],
+    speak:['Part 1 个人信息问答','Part 2 情景交流与看图讨论'] },
+  'PET（B1 Preliminary）':{ lv:'H', words:'约 3500 词（B1 Preliminary 官方词表）',
+    listen:['Part 1 短对话三选一（标准 7 题）','Part 2 长对话三选一（标准 6 题）','Part 3 独白填空（标准 6 空）','Part 4 独白三选一（标准 6 题）'],
+    speak:['Part 1 个人问答','Part 2 情景交流','Part 3 看图描述','Part 4 观点讨论'] }
+};
+const UNIT_NUM = ['不指定','Unit 1','Unit 2','Unit 3','Unit 4','Unit 5','Unit 6','Unit 7','Unit 8','Unit 9','Unit 10','Unit 11','Unit 12'];
+const THEMES = {
+  '人教PEP（三年级起点）|三年级|上册|3':'身体部位',
+  '人教PEP（三年级起点）|三年级|上册|4':'动物',
+  '人教PEP（三年级起点）|四年级|上册|1':'教室',
+  '人教PEP（三年级起点）|四年级|上册|4':'房间与家居',
+  '人教PEP（三年级起点）|五年级|上册|3':'食物与饮品',
+  '人教PEP（三年级起点）|五年级|上册|4':'活动与技能',
+  '人教PEP（三年级起点）|六年级|上册|1':'交通方式',
+  '人教PEP（三年级起点）|六年级|上册|3':'周末计划',
+  '人教新起点|一年级|上册|1':'问候与自我介绍',
+  '人教版（新目标）|七年级|上册|3':'家庭与物品',
+  '人教版（新目标）|七年级|上册|5':'运动与爱好',
+  '人教版（新目标）|八年级|上册|6':'未来计划',
+  '人教版（新目标）|八年级|下册|6':'故事与传说',
+  '外研版（三起）|三年级|上册|1':'问候与自我介绍'
+};
+const TOPICS = {
+  topic:['动物与自然','足球与篮球','游戏与动画','科学与太空','音乐与舞蹈','食物与旅行','恐龙与探险','机器人与编程'],
+  task:['认识新朋友','在餐厅点餐','在商店买东西','问路','介绍自己的学校','邀请朋友参加活动','制订周末计划','介绍家乡和中国节日','旅行中的简单交流'],
+  world:['世界各地的校园','不同国家的早餐','国际节日','世界动物与地理','太空探索','环境保护','体育赛事','不同文化中的礼貌表达']
+};
+const SRC_NAME = { topic:'兴趣主题', task:'生活任务', world:'世界见闻', free:'自由主题' };
+const FOCUS_NOTE = {
+  '听说综合':'听力与口语交替进行，先听后说',
+  '听懂关键信息':'听人物、地点、时间与动作，听后选择或找关键词',
+  '开口完成对话':'回答问题、情境对话或角色扮演，完成一个小任务',
+  '听完简单复述':'复述一句话、说大意或按顺序重讲',
+  '表达自己的想法':'介绍兴趣、说明原因、比较或表达简单观点'
+};
+const QUICK_PLANS = [
+  { n:'放学后聊一聊', d:'5 分钟 · 校园生活 · 简单问答', set:{ src:'topic', topic:'校园生活', focus:'开口完成对话', minutes:5 } },
+  { n:'我最喜欢的动物', d:'5 分钟 · 兴趣主题 · 听说综合', set:{ src:'topic', topic:'动物与自然', focus:'听说综合', minutes:5 } },
+  { n:'在餐厅点餐', d:'10 分钟 · 生活任务 · 开口完成对话', set:{ src:'task', topic:'在餐厅点餐', focus:'开口完成对话', minutes:10 } },
+  { n:'世界各地的早餐', d:'10 分钟 · 世界见闻 · 听后表达', set:{ src:'world', topic:'不同国家的早餐', focus:'听完简单复述', minutes:10 } },
+  { n:'介绍我的兴趣', d:'10 分钟 · 兴趣主题 · 说出理由', set:{ src:'topic', topic:'我的兴趣', focus:'表达自己的想法', minutes:10 } }
+];
+const SAMPLES = [
+  { mode:'quick', grade:'五年级', src:'topic', topic:'动物与自然', focus:'听说综合', minutes:10, name:'小虎' },
+  { mode:'quick', grade:'四年级', src:'task', topic:'在餐厅点餐', focus:'开口完成对话', minutes:10, name:'小虎' },
+  { mode:'school', track:'school', stage:'primary', grade:'五年级', book:'人教PEP（三年级起点）', term:'上册', unit:3, lesson:'第1课时', focus:'开口完成对话', minutes:10, name:'小虎', goal:'What would you like? / I\'d like ...' },
+  { mode:'school', track:'exam', exam:'KET（A2 Key）', mod:'听力 + 口语', part:'L0', focus:'听懂关键信息', minutes:15, name:'小虎' }
+];
+
+/* ===== 状态 ===== */
+const state = {
+  mode:'quick', kind:'practice',
+  name:'', self:'能说简单句', grade:'五年级',
+  src:'topic', topic:'动物与自然',
+  track:'school', stage:'primary', gradeS:'三年级', book:'人教PEP（三年级起点）',
+  term:'上册', unit:3, lesson:'',
+  exam:'KET（A2 Key）', mod:'听力 + 口语', part:'',
+  focus:'听说综合', minutes:10,
+  langMode:'auto', pronCheck:true, summary:true, goal:'',
+  device:'cloud'
+};
+const $ = id => document.getElementById(id);
+
+/* ===== 渲染 ===== */
+function gradeLevel(){
+  if(state.mode==='school' && state.track==='exam') return EXAM_STRUCT[state.exam].lv;
+  const g = state.mode==='quick' ? state.grade : state.gradeS;
+  if(['一年级','二年级','三年级'].includes(g)) return 'L';
+  if(['四年级','五年级','六年级'].includes(g)) return 'M';
+  return 'H';
+}
+function fillGrade(){ $('selGrade').innerHTML = GRADES[state.stage].map(g => `<option ${g===state.gradeS?'selected':''}>${g}</option>`).join(''); }
+function fillGradeQuick(){ $('selGradeQuick').innerHTML = GRADES_ALL.map(g => `<option ${g===state.grade?'selected':''}>${g}</option>`).join(''); }
+function fillBook(){ $('selBook').innerHTML = BOOKS[state.stage].map(b => `<option ${b===state.book?'selected':''}>${b}</option>`).join(''); }
+function fillUnit(){
+  $('selUnit').innerHTML = UNIT_NUM.map((u,i) => `<option value="${i}" ${i===state.unit?'selected':''}>${u}</option>`).join('');
+}
+function fillExam(){ $('selExam').innerHTML = EXAMS.map(e => `<option ${e===state.exam?'selected':''}>${e}</option>`).join(''); }
+function fillTopic(){
+  const list = TOPICS[state.src] || [];
+  let extra = '';
+  if(state.src!=='free' && state.topic && !list.includes(state.topic)) extra = `<button class="chip on" data-topic="${state.topic}">${state.topic}</button>`;
+  $('topicChips').innerHTML = extra + list.map(t => `<button class="chip ${t===state.topic?'on':''}" data-topic="${t}">${t}</button>`).join('');
+  $('topicRow').style.display = state.src==='free' ? 'none' : '';
+  $('freeRow').style.display = state.src==='free' ? '' : 'none';
+  $('inTopicFree').value = state.src==='free' && state.topic ? state.topic : '';
+}
+function partOptions(){
+  const st = EXAM_STRUCT[state.exam]; if(!st) return [];
+  const opts = [];
+  if(state.mod.includes('听力')) st.listen.forEach((p,i) => opts.push({v:'L'+i, t:'[听] '+p}));
+  if(state.mod.includes('口语')) st.speak.forEach((p,i) => opts.push({v:'S'+i, t:'[说] '+p}));
+  return opts;
+}
+function fillPart(){
+  const opts = partOptions();
+  let html = '<option value="">不指定（按顺序混练）</option>';
+  html += opts.map(o => `<option value="${o.v}" ${o.v===state.part?'selected':''}>${o.t}</option>`).join('');
+  $('selPart').innerHTML = html;
+}
+function partMeta(){
+  if(!state.part || state.mode!=='school' || state.track!=='exam') return null;
+  const k = state.part[0]==='L' ? 'listen' : 'speak';
+  const idx = +state.part.slice(1);
+  const st = EXAM_STRUCT[state.exam];
+  const name = st[k][idx] || '';
+  const m = name.match(/（标准 (\d+) (题|空)）/);
+  return { kind:k==='listen'?'听力':'口语', name:name.replace(/（标准.*$/,''), std:m?m[1]:'' };
+}
+function themePreview(){
+  if(state.mode!=='school' || state.track!=='school' || state.unit===0) return '';
+  return THEMES[`${state.book}|${state.gradeS}|${state.term}|${state.unit}`] || '';
+}
+function langDesc(){
+  const lv = gradeLevel();
+  let mode = state.langMode;
+  if(mode==='auto') mode = lv==='L' ? '中英结合' : (lv==='M' ? '英语为主' : '全英语为主');
+  return `反馈语言：${mode}，必要时中文提示`;
+}
+
+function buildPrompt(){
+  const lvName = { L:'入门', M:'成长', H:'自主' }[gradeLevel()];
+  const lv = gradeLevel();
+  const name = state.name || '同学';
+  /* ===== 新词听读卡模式 ===== */
+  if(state.kind==='cards'){
+    const nWord = lv==='L' ? 8 : lv==='M' ? 12 : 15;
+    const sentLen = lv==='L' ? 6 : lv==='M' ? 10 : 15;
+    const lines = ['【SpeakStep 新词听读卡】',
+      `称呼：${name}（学习与小结中使用）`,
+      `年级：${state.mode==='quick'?state.grade:state.gradeS}（${lvName}档）`];
+    if(state.mode==='quick'){
+      lines.push(`内容来源：${SRC_NAME[state.src]}`, `主题：${state.topic}`);
+    } else if(state.track==='school'){
+      const unitTxt = state.unit===0 ? '当前单元' : 'Unit '+state.unit + (state.lesson?'（'+state.lesson+'）':'');
+      lines.push(`内容来源：校内同步`,
+        `教材坐标：${state.stage==='primary'?'小学':'初中'} · ${state.gradeS} · ${state.book} · ${state.term} · ${unitTxt}`);
+      if(state.goal) lines.push(`本课词句：${state.goal}`);
+      lines.push('请围绕上述坐标设计；不声称复现教材词表原文，如需严格同步请在本对话提供课本内容');
+    } else {
+      lines.push(`内容来源：剑桥考试`, `考试：${state.exam}`, `词汇范围：${EXAM_STRUCT[state.exam].words}`);
+    }
+    lines.push('',
+      '【请按以下规则输出单词听读卡】',
+      `1. 先选出本单元/本主题核心新词 ${nWord} 个（按${lv}档），按出现频率从高到低排`,
+      `2. 每张卡包含：单词 + 教练读一遍 + 一个适龄例句（不超过 ${sentLen} 词）+ 一个跟读提示（重音/尾音/连读，不编发音分数）+ 一个小应用问题（让孩子用这个词说一句自己的话）`,
+      '3. 逐张出卡：先读词 → 例句 → 让孩子跟读 → 问小应用问题，孩子答完再出下一张，不要一次性把所有卡片倒出来',
+      '4. 出完卡片后，请孩子从这组词里挑 3 个，各说一句和自己有关的话',
+      '5. 最后做一个快速小测：随机念 3 个词的中文意思，让孩子说出英文，或反过来',
+      '6. 结束用「'+name+'」称呼给简短小结：哪几个词读得顺、哪个词还不熟、下次建议复习哪几个');
+    if(state.device==='phone'){
+      lines.push('',
+        '【执行规则：语音通话模式，技能未加载，请严格遵守】',
+        '- 你是'+lv+'档英语听说教练，句子难度按孩子水平，新词先说再解释',
+        '- 一次只出一张卡；先让孩子跟读/回答，再简短反馈',
+        '- 发音可指出重音、尾音、节奏，但不编造百分制分数');
+    }
+    return lines.join('\n');
+  }
+  /* ===== 听说练习单模式 ===== */
+  const lines = ['【SpeakStep 听说练习单】',
+    `称呼：${name}（学习与小结中使用）`];
+  if(state.mode==='quick') lines.push(`年级：${state.grade}（${lvName}档）`);
+  else if(state.track==='school') lines.push(`年级：${state.gradeS}（${lvName}档）`);
+  lines.push(`起步水平：${state.self}`);
+  if(state.mode==='quick'){
+    lines.push(`内容来源：${SRC_NAME[state.src]}`, `主题：${state.topic}`);
+  } else if(state.track==='school'){
+    const unitTxt = state.unit===0 ? '当前单元' : 'Unit '+state.unit + (state.lesson?'（'+state.lesson+'）':'');
+    lines.push(`内容来源：校内同步`,
+      `教材坐标：${state.stage==='primary'?'小学':'初中'} · ${state.gradeS} · ${state.book} · ${state.term} · ${unitTxt}`);
+    if(state.goal) lines.push(`本课词句：${state.goal}`);
+    lines.push('请围绕上述坐标设计适龄的听说练习；不声称复现教材原文，如需严格同步请在本对话提供课本内容');
+  } else {
+    const pm = partMeta();
+    const partTxt = pm ? `${pm.kind} ${pm.name}${pm.std?`（标准 ${pm.std} 题，本次练 2-3 题）`:''}` : '各 Part 按顺序混练';
+    lines.push(`内容来源：剑桥考试`,
+      `考试：${state.exam} · ${partTxt}`,
+      `词汇范围：${EXAM_STRUCT[state.exam].words}`);
+  }
+  lines.push(`今天重点：${state.focus}`, `时长：${state.minutes} 分钟`, langDesc());
+  if(state.pronCheck) lines.push('加入一句跟读练习：孩子按教练示范自行比较清晰度与节奏，不提供机器发音分数');
+  if(state.summary) lines.push('结束生成简短小结：练习证据 + 需要复习 + 下次建议');
+  lines.push('请直接开始语音友好的听说练习：一次只给一个任务，先让孩子回答，再简短反馈');
+  if(state.device==='phone'){
+    const mins = state.minutes;
+    const rounds = mins<=5 ? '3-4 个回合' : mins<=10 ? '5-7 个回合' : '7-9 个回合';
+    lines.push('',
+      '【执行规则：语音通话模式，技能未加载，请严格遵守】',
+      `- 你是${gradeLevel()==='L'?'入门':'成长'}档英语听说教练，面向${name}（${state.mode==='quick'?state.grade:state.gradeS}），句子难度按其水平，新词先说再解释`,
+      '- 一次只给一个任务；先让孩子开口回答，再简短反馈，不连续讲长课',
+      '- 每轮最多纠正 1-2 个最重要问题：先肯定有效部分 → 给更自然的说法 → 让孩子再说一遍 → 继续情境',
+      '- 反馈语言：' + (state.langMode==='auto' ? (gradeLevel()==='L'?'中英结合':'英语为主') : state.langMode) + '，必要时中文一句提示',
+      '- 发音：可具体指出重音、尾音、节奏问题，但不编造百分制分数',
+      '',
+      '【流程骨架：本次练习共 '+mins+' 分钟，必须走完以下环节，不要 2-3 个回合就收尾】',
+      '1. 热身（1 轮）：用熟悉话题问一个简单问题，让孩子开口',
+      '2. 示范输入（1 轮）：围绕教材/主题，主动给出 2-4 句英语示范；如来自教材坐标，先从该单元提炼 2-3 个核心句型作为本轮目标表达',
+      '3. 理解检查（1 轮）：就示范内容问一个低负担问题（关键词/对错/大意）',
+      '4. 口语输出（'+(mins<=5?'1':'3-4')+' 轮）：围绕核心句型让孩子完成情境任务，逐轮追问或换场景',
+      '5. 变式迁移（1 轮）：把刚练的句型换到新人物/新地点/新任务，让孩子自己换说法',
+      '6. 小结（1 轮）：用「'+name+'」称呼简短收尾',
+      `全程至少 ${rounds}；每环节都要推进内容深度，不要泛泛聊两三句就结束`,
+      '结束用「'+name+'」称呼给简短小结（练了什么 / 哪里好 / 下次练什么）');
+  }
+  return lines.join('\n');
+}
+
+function renderPV(){
+  if(state.mode==='quick'){
+    $('pvCoord').textContent = `${SRC_NAME[state.src]} · ${state.topic}`;
+  } else if(state.track==='school'){
+    const unitTxt = state.unit===0 ? '当前单元' : 'Unit '+state.unit;
+    const th = themePreview();
+    $('pvCoord').textContent = `${state.stage==='primary'?'小学':'初中'} · ${state.book} · ${state.term} · ${unitTxt}${th?' · '+th:''}`;
+  } else {
+    const st = EXAM_STRUCT[state.exam];
+    const pm = partMeta();
+    $('pvCoord').textContent = state.exam + (pm ? ` · ${pm.kind} ${pm.name}` : '');
+  }
+  $('pvFocus').textContent = state.focus;
+  $('pvTime').textContent = state.minutes + ' 分钟';
+  $('promptBox').textContent = buildPrompt();
+  $('howText').textContent = state.kind==='cards'
+    ? (state.device==='cloud'
+        ? '粘贴到豆包对话发送即可。教练会逐张出词卡：读词 → 例句 → 孩子跟读 → 小应用问题，最后做快速小测。'
+        : '复制后在手机语音通话中粘贴发送。通话不带技能，词卡规则已写在提示词里。')
+    : (state.device==='cloud'
+        ? '粘贴到豆包对话发送即可。教练会一次只给一个任务，先让孩子回答再反馈，结束后给出简短小结。'
+        : '复制后在手机语音通话中粘贴发送。通话不带技能，练习单末尾已写好教学规则，教练按规则执行。');
+  const head = document.querySelector('#panelResult .card-h h2');
+  if(head) head.textContent = state.kind==='cards' ? '新词听读卡' : '听说练习单';
+  const btn = $('copyBtn');
+  if(btn) btn.textContent = state.kind==='cards' ? '复制词卡提示词' : '复制练习单';
+}
+function render(){
+  $('panelQuick').classList.toggle('on', state.mode==='quick');
+  $('panelSchool').classList.toggle('on', state.mode==='school');
+  $('quickGradeRow').style.display = state.mode==='quick' ? '' : 'none';
+  $('panelSchoolInner').classList.toggle('on', state.mode==='school' && state.track==='school');
+  $('panelExamInner').classList.toggle('on', state.mode==='school' && state.track==='exam');
+  fillGradeQuick(); fillGrade(); fillBook(); fillUnit(); fillExam(); fillPart(); fillTopic();
+  renderPV();
+}
+function syncUI(){
+  $('inName').value = state.name; $('selTerm').value = state.term;
+  $('selLesson').value = state.lesson; $('inGoal').value = state.goal;
+  const seg = (id, key, val) => document.querySelectorAll('#'+id+' button').forEach(x => x.classList.toggle('on', x.dataset[key]===val));
+  seg('modeSeg','mode',state.mode); seg('trackSeg','track',state.track); seg('stageSeg','stage',state.stage);
+  document.querySelectorAll('#examMods .chip').forEach(x => x.classList.toggle('on', x.dataset.mod===state.mod));
+  document.querySelectorAll('#srcChips .chip').forEach(x => x.classList.toggle('on', x.dataset.src===state.src));
+  document.querySelectorAll('#selfChips .chip').forEach(x => x.classList.toggle('on', x.dataset.self===state.self));
+  document.querySelectorAll('#focusChips .chip').forEach(x => x.classList.toggle('on', x.dataset.focus===state.focus));
+  document.querySelectorAll('#timeChips .chip').forEach(x => x.classList.toggle('on', +x.dataset.min===state.minutes));
+  document.querySelectorAll('#langChips .chip').forEach(x => x.classList.toggle('on', x.dataset.lang===state.langMode));
+  document.querySelectorAll('#pronChips .chip').forEach(x => x.classList.toggle('on', x.dataset.p===(state.pronCheck?'1':'0')));
+  document.querySelectorAll('#sumChips .chip').forEach(x => x.classList.toggle('on', x.dataset.s===(state.summary?'1':'0')));
+  render();
+}
+
+/* ===== Toast ===== */
+let toastTimer = null;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('on'), 2600);
+}
+
+/* ===== 事件 ===== */
+$('modeSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.mode = b.dataset.mode;
+  document.querySelectorAll('#modeSeg button').forEach(x => x.classList.toggle('on', x===b));
+  render();
+});
+$('trackSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.track = b.dataset.track; state.part='';
+  document.querySelectorAll('#trackSeg button').forEach(x => x.classList.toggle('on', x===b));
+  render();
+});
+$('stageSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.stage = b.dataset.stage;
+  state.gradeS = GRADES[state.stage][2]; state.book = BOOKS[state.stage][0];
+  document.querySelectorAll('#stageSeg button').forEach(x => x.classList.toggle('on', x===b));
+  render();
+});
+$('srcChips').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.src = b.dataset.src;
+  state.topic = TOPICS[state.src] ? TOPICS[state.src][0] : '';
+  document.querySelectorAll('#srcChips .chip').forEach(x => x.classList.toggle('on', x===b));
+  render();
+});
+$('topicChips').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.topic = b.dataset.topic;
+  document.querySelectorAll('#topicChips .chip').forEach(x => x.classList.toggle('on', x===b));
+  renderPV();
+});
+$('selfChips').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.self = b.dataset.self;
+  document.querySelectorAll('#selfChips .chip').forEach(x => x.classList.toggle('on', x===b));
+  renderPV();
+});
+$('focusChips').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.focus = b.dataset.focus;
+  document.querySelectorAll('#focusChips .chip').forEach(x => x.classList.toggle('on', x===b));
+  renderPV();
+});
+$('timeChips').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.minutes = +b.dataset.min;
+  document.querySelectorAll('#timeChips .chip').forEach(x => x.classList.toggle('on', x===b));
+  renderPV();
+});
+$('langChips').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.langMode = b.dataset.lang;
+  document.querySelectorAll('#langChips .chip').forEach(x => x.classList.toggle('on', x===b));
+  renderPV();
+});
+$('pronChips').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.pronCheck = b.dataset.p==='1';
+  document.querySelectorAll('#pronChips .chip').forEach(x => x.classList.toggle('on', x===b));
+  renderPV();
+});
+$('sumChips').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.summary = b.dataset.s==='1';
+  document.querySelectorAll('#sumChips .chip').forEach(x => x.classList.toggle('on', x===b));
+  renderPV();
+});
+$('deviceSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.device = b.dataset.dev;
+  document.querySelectorAll('#deviceSeg button').forEach(x => x.classList.toggle('on', x===b));
+  $('devHint').textContent = state.device==='cloud'
+    ? '电脑工作任务云电脑加载技能，教学规则由技能自动处理，练习单保持精简。'
+    : '手机语音通话不带技能，练习单已自包含教学规则；复制后在手机通话中粘贴发送。';
+  renderPV();
+});
+$('kindSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.kind = b.dataset.kind;
+  document.querySelectorAll('#kindSeg button').forEach(x => x.classList.toggle('on', x===b));
+  $('kindHint').textContent = state.kind==='practice'
+    ? '围绕教材坐标或兴趣主题，生成 5-15 分钟的听说练习单，一次只练一个重点。'
+    : '围绕教材坐标，生成 8-15 张单词听读卡：每个词给例句、跟读提示和一个小应用问题，帮孩子快速记住本单元新词。';
+  renderPV();
+});
+['selGradeQuick','selGrade','selBook','selTerm','selUnit','selLesson','selExam','selPart'].forEach(id => {
+  $(id).addEventListener('change', e => {
+    const v = e.target.value;
+    if(id==='selGradeQuick') state.grade = v;
+    else if(id==='selGrade') state.gradeS = v;
+    else if(id==='selBook') state.book = v;
+    else if(id==='selTerm') state.term = v;
+    else if(id==='selUnit') state.unit = +v;
+    else if(id==='selLesson') state.lesson = v;
+    else if(id==='selExam'){ state.exam = v; state.part=''; }
+    else if(id==='selPart') state.part = v;
+    renderPV();
+  });
+});
+$('examMods').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.mod = b.dataset.mod; state.part='';
+  document.querySelectorAll('#examMods .chip').forEach(x => x.classList.toggle('on', x===b));
+  renderPV();
+});
+$('inName').addEventListener('input', e => { state.name = e.target.value.trim(); renderPV(); });
+$('inGoal').addEventListener('input', e => { state.goal = e.target.value.trim(); renderPV(); });
+$('inTopicFree').addEventListener('input', e => { state.topic = e.target.value.trim(); renderPV(); });
+
+$('copyBtn').addEventListener('click', async () => {
+  const txt = buildPrompt();
+  let ok = false;
+  try{ await navigator.clipboard.writeText(txt); ok = true; }
+  catch(err){
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    ok = document.execCommand('copy'); ta.remove();
+  }
+  const btn = $('copyBtn');
+  btn.textContent = ok ? '已复制，去豆包对话粘贴发送' : '复制失败，请手动选择复制';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = '复制练习单'; btn.classList.remove('copied'); }, 2200);
+});
+
+/* ===== 快速开练抽屉 ===== */
+function fillQuick(){
+  $('quickBox').innerHTML = QUICK_PLANS.map((q,i) => `
+    <button class="qp" data-i="${i}">
+      <b>${q.n}</b><span>${q.d}</span><small>点击后自动填入，仍可修改</small>
+    </button>`).join('');
+}
+$('openQuick').addEventListener('click', () => { $('drawer').classList.add('on'); $('mask').classList.add('on'); });
+$('closeQuick').addEventListener('click', () => { $('drawer').classList.remove('on'); $('mask').classList.remove('on'); });
+$('mask').addEventListener('click', () => { $('drawer').classList.remove('on'); $('mask').classList.remove('on'); });
+$('quickBox').addEventListener('click', e => {
+  const b = e.target.closest('.qp'); if(!b) return;
+  const q = QUICK_PLANS[+b.dataset.i];
+  Object.assign(state, q.set, { mode:'quick' });
+  $('drawer').classList.remove('on'); $('mask').classList.remove('on');
+  syncUI();
+  toast('已填入：' + q.n + '，仍可在下方修改');
+});
+
+/* ===== 示例 ===== */
+let sampleIdx = 0;
+$('sampleBtn').addEventListener('click', () => {
+  const s = SAMPLES[sampleIdx % SAMPLES.length]; sampleIdx++;
+  Object.assign(state, s);
+  syncUI();
+});
+
+/* ===== 初始 ===== */
+fillQuick();
+render();
+</script>
+</body>
+</html>

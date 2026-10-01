@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpeakStep 听说 · 安装说明书与使用指南</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2314B8A6'/%3E%3Cpath d='M14 32c0 9 7 16 16 16s16-7 16-16-7-16-16-16S14 23 14 32z' fill='%23FFF6EC'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23F97316'/%3E%3C/svg%3E">
+<style>
+:root{
+  --cream:#FFF6EC; --card:#FFF; --ink:#3B2E24; --ink-soft:#8A7A6D;
+  --orange:#F97316; --orange-deep:#EA580C; --teal:#14B8A6; --teal-deep:#0F766E;
+  --teal-soft:#E6F7F4; --amber:#F59E0B; --line:#F0E6D8;
+  --shadow:0 10px 30px rgba(190,140,70,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.65;
+}
+.wrap{max-width:920px;margin:0 auto;padding:22px 20px 48px}
+
+/* ===== 页头 ===== */
+.hero{
+  background:linear-gradient(135deg,#FFF1DF 0%,#FFF6EC 55%,#E6F7F4 100%);
+  border:1px solid var(--line);border-radius:20px;padding:26px 28px;margin-bottom:20px;
+  display:flex;gap:20px;align-items:center;
+}
+.hero img{width:88px;height:88px;border-radius:22px;object-fit:cover;flex:none;box-shadow:var(--shadow)}
+.hero h1{font-size:24px;letter-spacing:.5px}
+.hero .sub{font-size:14px;color:var(--ink-soft);margin-top:6px}
+.hero .tag{
+  display:inline-block;margin-top:10px;background:var(--teal);color:#fff;border-radius:999px;
+  padding:3px 12px;font-size:12px;font-weight:600;
+}
+
+/* ===== 导航 ===== */
+.nav{
+  display:flex;gap:8px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:10px 14px;margin-bottom:20px;
+}
+.nav a{
+  text-decoration:none;color:var(--ink-soft);font-size:13.5px;padding:6px 12px;border-radius:8px;
+  transition:all .15s;
+}
+.nav a:hover{background:var(--teal-soft);color:var(--teal-deep)}
+
+/* ===== 章节 ===== */
+.sec{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 24px;margin-bottom:18px}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;border-bottom:2px solid var(--line);padding-bottom:10px}
+.sec-h .no{
+  width:30px;height:30px;border-radius:10px;background:var(--orange);color:#fff;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;
+}
+.sec-h h2{font-size:19px}
+.sec-h span{font-size:12.5px;color:var(--ink-soft)}
+h3{font-size:15.5px;margin:18px 0 8px;color:var(--teal-deep)}
+p{font-size:14px;margin-bottom:8px}
+li{font-size:14px;margin:5px 0 5px 20px}
+
+/* ===== 步骤 ===== */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:12px}
+.step{
+  border:1px solid var(--line);border-radius:14px;padding:14px;background:#FFFCF6;
+  display:flex;flex-direction:column;gap:6px;position:relative;
+}
+.step b{
+  width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:2px;
+}
+.step .t{font-size:14px;font-weight:600}
+.step .d{font-size:12.5px;color:var(--ink-soft)}
+
+/* ===== 路径示意 ===== */
+.path{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--teal-soft);border:1px dashed var(--teal);border-radius:14px;padding:14px 16px;margin-top:12px}
+.path .node{background:#fff;border:1.5px solid var(--teal);color:var(--teal-deep);border-radius:10px;padding:8px 14px;font-size:13.5px;font-weight:600}
+.path .arr{color:var(--teal);font-weight:700;font-size:16px}
+
+/* ===== 提示框 ===== */
+.note{
+  background:#FDF3E4;border-left:4px solid var(--amber);border-radius:10px;padding:10px 14px;
+  font-size:13px;color:#6B5236;margin:12px 0;
+}
+.ok{background:var(--teal-soft);border-left-color:var(--teal);color:var(--teal-deep)}
+
+/* ===== 表格 ===== */
+table{width:100%;border-collapse:collapse;margin:12px 0;table-layout:fixed;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+th{background:#F7EEE1;font-weight:600;white-space:nowrap}
+col:first-child{width:18%}
+col:nth-child(2){width:26%}
+col:nth-child(3){width:56%}
+tr:nth-child(even) td{background:#FFFCF6}
+
+/* ===== FAQ ===== */
+details{border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:10px;background:#FFFCF6}
+summary{cursor:pointer;font-size:14px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::after{content:"+";color:var(--teal);font-size:18px;font-weight:700}
+details[open] summary::after{content:"−"}
+details p{padding-top:10px;border-top:1px dashed var(--line);margin-top:10px}
+
+/* ===== 代码 ===== */
+code{background:#2E2620;color:#F5EBDD;border-radius:6px;padding:2px 8px;font-size:12.5px;font-family:ui-monospace,Menlo,monospace}
+
+/* ===== 步骤截图 ===== */
+.shot{margin:12px 0}
+.shot img{
+  width:100%;border:1px solid var(--line);border-radius:12px;display:block;
+  box-shadow:0 6px 18px rgba(190,140,70,.12);
+}
+.shot.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.shot.duo img{height:100%}
+.shot figcaption{font-size:12px;color:var(--ink-soft);margin-top:6px;text-align:center}
+
+/* ===== 页脚 ===== */
+.foot{font-size:12px;color:var(--ink-soft);text-align:center;margin-top:24px;line-height:1.8}
+
+/* ===== 底部导航与版权 ===== */
+.foot-nav{margin-top:24px;text-align:center}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:9px 18px;
+  background:#fff;color:var(--teal-deep);border:1.5px solid var(--teal);border-radius:12px;
+  font-size:13.5px;font-weight:700;text-decoration:none;font-family:inherit;
+  box-shadow:0 4px 12px rgba(20,184,166,.14);transition:transform .15s;
+}
+.back-btn:active{transform:scale(.96)}
+.site-footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:22px;letter-spacing:.5px;line-height:2}
+.coach-tip{position:relative;display:inline-block;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.coach-tip .tip{
+  visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;
+  transform:translateX(-50%) translateY(4px);background:var(--teal);color:#fff;
+  padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;white-space:nowrap;
+  letter-spacing:.5px;z-index:99;pointer-events:none;box-shadow:0 6px 18px rgba(20,184,166,.35);
+  transition:opacity .2s ease,transform .2s ease,visibility .2s;
+}
+.coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--teal)}
+.coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:720px){
+  .hero{flex-direction:column;text-align:center;padding:20px}
+  .steps{grid-template-columns:1fr}
+  .path{flex-direction:column;align-items:flex-start}
+  .path .arr{transform:rotate(90deg)}
+  th,td{padding:7px 8px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 页头 ===== -->
+  <header class="hero">
+    <img src="assets/coach.jpg" alt="SpeakStep 教练">
+    <div>
+      <h1>SpeakStep 听说 · 安装说明书与使用指南</h1>
+      <p class="sub">基于豆包「连接器 · 技能 · 伙伴 → 上传技能」部署路径，含技能安装、工作台使用与常见问题</p>
+    </div>
+  </header>
+
+  <!-- ===== 导航 ===== -->
+  <nav class="nav">
+    <a href="#path">部署路径</a>
+    <a href="#install">安装步骤</a>
+    <a href="#verify">生效验证</a>
+    <a href="#usage">使用指南</a>
+    <a href="#faq">常见问题</a>
+  </nav>
+
+  <!-- ===== 一、部署路径 ===== -->
+  <section class="sec" id="path">
+    <div class="sec-h"><span class="no">1</span><h2>部署路径</h2><span>一句话记住：豆包 → 连接器 · 技能 · 伙伴 → 上传技能</span></div>
+    <p>SpeakStep 以<strong>豆包技能（Skill）</strong>形式部署。安装后，教练能力在豆包对话中全局生效，无需重复配置。</p>
+    <div class="path">
+      <span class="node">打开豆包</span><span class="arr">→</span>
+      <span class="node">连接器 · 技能 · 伙伴</span><span class="arr">→</span>
+      <span class="node">上传技能</span><span class="arr">→</span>
+      <span class="node">选择 speakstep-english-coach 文件夹</span><span class="arr">→</span>
+      <span class="node">确认启用</span>
+    </div>
+    <figure class="shot">
+      <img src="assets/step1-entry.png" alt="进入连接器·技能·伙伴">
+      <figcaption>第 1 步：豆包左侧菜单进入「连接器 · 技能 · 伙伴」</figcaption>
+    </figure>
+    <div class="note">不同客户端版本的入口文字可能略有差异：找不到时可在豆包内搜索「技能」或「上传技能」定位入口。</div>
+  </section>
+
+  <!-- ===== 二、安装步骤 ===== -->
+  <section class="sec" id="install">
+    <div class="sec-h"><span class="no">2</span><h2>安装步骤</h2><span>收到 SpeakStep-Release.zip 后按以下顺序操作</span></div>
+
+    <h3>第 0 步 · 解压安装包</h3>
+    <p>解压 <code>speakstep-english-coach.rar</code>（技能，用于上传）</p>
+
+    <h3>第 1 步 · 进入上传入口</h3>
+    <p>打开豆包，进入「<strong>连接器 · 技能 · 伙伴</strong>」，点击「<strong>上传技能</strong>」。</p>
+
+    <h3>第 2 步 · 选择技能文件夹</h3>
+    <div class="steps">
+      <div class="step"><b>1</b><span class="t">选文件夹</span><span class="d">选择 <code>speakstep-english-coach</code> 文件夹（内含 SKILL.md）</span></div>
+      <div class="step"><b>2</b><span class="t">或传压缩包</span><span class="d">若平台只接受压缩包，可直接上传技能文件夹打包成的 rar</span></div>
+      <div class="step"><b>3</b><span class="t">补充信息</span><span class="d">按界面要求填写名称与描述（见下表参考值）</span></div>
+      <div class="step"><b>4</b><span class="t">确认上传</span><span class="d">等待上传完成，技能出现在技能列表中</span></div>
+    </div>
+    <figure class="shot duo">
+      <div><img src="assets/step2-upload.png" alt="添加 → 上传技能" style="margin-bottom:0"></div>
+      <div><img src="assets/step3-drag.png" alt="拖拽 rar 文件" style="margin-bottom:0"></div>
+    </figure>
+
+    <p style="margin-top:12px">名称与描述参考：</p>
+    <table>
+      <colgroup><col style="width:22%"><col style="width:78%"></colgroup>
+      <tr><th>字段</th><th>参考填写</th></tr>
+      <tr><td>技能名称</td><td>SpeakStep 英语听说小教练</td></tr>
+      <tr><td>一句话介绍</td><td>面向小学和初中生的英语听说教练：短时高频、适龄主题、难度自适应，活动不等于掌握——能听懂、能说出、换个场景还能用。</td></tr>
+    </table>
+
+    <h3>第 3 步 · 确认启用</h3>
+    <p>上传成功后，在技能列表确认该技能处于<strong>启用</strong>状态。部分版本需要手动打开开关。</p>
+    <figure class="shot duo">
+      <div><img src="assets/step4-installed.png" alt="点我安装的查看" style="margin-bottom:0"></div>
+      <div><img src="assets/step5-on.png" alt="确认开关开启" style="margin-bottom:0"></div>
+    </figure>
+    <figcaption style="font-size:12px;color:var(--ink-soft);margin:6px 0 0;text-align:center">第 3 步：点「我安装的」→ 找到 SpeakStep → 打开右侧开关</figcaption>
+  </section>
+
+  <!-- ===== 三、生效验证 ===== -->
+  <section class="sec" id="verify">
+    <div class="sec-h"><span class="no">3</span><h2>生效验证</h2><span>60 秒功能验证，比看角色名更可靠</span></div>
+    <div class="ok note">新开一个豆包对话，发送：<br><code>开始一个小学五年级、动物主题、5 分钟的英语听说练习。请一次只给一个任务，不要一次讲很多。</code></div>
+    <figure class="shot">
+      <img src="assets/step6-try.png" alt="在对话中试用">
+      <figcaption>也可在技能详情页直接点「在对话中试用」，验证教练角色开场</figcaption>
+    </figure>
+    <p>然后逐项确认：</p>
+    <ul>
+      <li>只给一个简短任务，没有长篇课程；</li>
+      <li>先让孩子回答，不连续输出下一轮；</li>
+      <li>孩子回答后只纠正 1-2 个重点，不推翻重来；</li>
+      <li>不编造发音分数；</li>
+      <li>说「结束练习」能收到简短小结。</li>
+    </ul>
+    <p>以上都符合，即安装成功。也可以从练习台复制一张练习单直接粘贴发送，教练会按单执行。</p>
+  </section>
+
+  <!-- ===== 四、使用指南 ===== -->
+  <section class="sec" id="usage">
+    <div class="sec-h"><span class="no">4</span><h2>使用指南</h2><span>先装技能；日常可直接开口练，需要指定内容再用练习台</span></div>
+
+    <h3>4.1 技能与练习台的分工</h3>
+    <table>
+      <colgroup><col><col><col></colgroup>
+      <tr><th>组件</th><th>负责</th><th>怎么用</th></tr>
+      <tr><td>技能 Skill</td><td>怎么教：教学原则、难度调整、反馈节奏、复习与安全</td><td>安装后全局生效；日常直接对豆包说「开始英语练习」即可开练</td></tr>
+      <tr><td>练习台 Workbench</td><td>今天练什么：水平、内容来源、重点、时长</td><td>可选；想指定教材、主题或训练目标时，用它生成练习单再粘贴</td></tr>
+    </table>
+    <p>练习台不是使用技能的前置条件，装上技能就能用；练习台的价值在于"指定内容"。</p>
+
+    <h3>4.2 练习台三步</h3>
+    <div class="steps">
+      <div class="step"><b>1</b><span class="t">选怎么开始</span><span class="d">快速开练（马上开口）或按教材练（结合课本/备考）</span></div>
+      <div class="step"><b>2</b><span class="t">填水平与内容</span><span class="d">年级、称呼（选填）、内容来源与主题；教材模式选坐标</span></div>
+      <div class="step"><b>3</b><span class="t">定重点与时长</span><span class="d">选"今天重点练什么"与 5/10/15 分钟，右上角有「快速开练」一键方案</span></div>
+    </div>
+    <div class="note">生成练习单 → 点击「复制练习单」→ 粘贴到豆包对话发送。练习单只写"谁来练、练什么、练多久"，技术规则由技能自动处理。</div>
+
+    <h3>4.3 设置项</h3>
+    <table>
+      <colgroup><col><col><col></colgroup>
+      <tr><th>设置</th><th>作用</th><th>说明</th></tr>
+      <tr><td>怎么开始</td><td>入口模式</td><td>快速开练：主题内容，马上开口；按教材练：校内教材或剑桥考试</td></tr>
+      <tr><td>谁来练</td><td>难度依据</td><td>年级 + 表达情况（刚开始/能说简单句/能说几句）；称呼选填，默认"同学"，不用真名</td></tr>
+      <tr><td>内容来源</td><td>今天练什么</td><td>快速开练：兴趣主题 / 生活任务 / 世界见闻 / 自由主题；按教材练：校内（教材坐标）或剑桥（考试 + Part）</td></tr>
+      <tr><td>今天重点</td><td>一次一个重点</td><td>听说综合（默认）/ 听懂关键信息 / 开口完成对话 / 听完简单复述 / 表达自己的想法</td></tr>
+      <tr><td>练多久</td><td>练习时长</td><td>5 / 10 / 15 分钟，短时高频</td></tr>
+      <tr><td>高级设置</td><td>折叠区</td><td>反馈语言、加入一句跟读、结束小结、目标表达（均选填，默认合理）</td></tr>
+    </table>
+
+    <h3>4.4 双模式实测结论（v1.3）</h3>
+    <p>经实测，豆包存在两条互不冲突的承载路径，工作台"在哪里练"按此选择：</p>
+    <table>
+      <colgroup><col><col><col></colgroup>
+      <tr><th></th><th>电脑 · 工作任务云电脑</th><th>手机 · 语音通话</th></tr>
+      <tr><td>SKILL 规则</td><td>完整生效</td><td>不加载</td></tr>
+      <tr><td>发音反馈</td><td>语音转文字，走跟读自查</td><td>平台原生可纠音（重音/尾音/节奏）</td></tr>
+      <tr><td>练习单</td><td>精简单（规则在技能）</td><td>自包含单（规则写入提示词末尾）</td></tr>
+      <tr><td>操作</td><td>云电脑任务粘贴练习单</td><td>手机登录同对话，切"对话"模式开语音通话后粘贴</td></tr>
+    </table>
+    <div class="note">手机端与电脑端可各自选模式使用，不冲突。手机通话若想获得完整教学规则，仍需在电脑云电脑对话中进行。</div>
+    <figure class="shot duo">
+      <div><img src="assets/step7-cloud.png" alt="电脑端选工作任务·云电脑" style="margin-bottom:0"></div>
+      <div><img src="assets/step8-phone.png" alt="手机端切对话模式" style="margin-bottom:0"></div>
+    </figure>
+    <figcaption style="font-size:12px;color:var(--ink-soft);margin:6px 0 0;text-align:center">左：电脑端底部模式选「工作任务 · 云电脑」；右：手机端底部模式切「对话」后开语音通话</figcaption>
+
+    <h3>4.5 对话中的听说交互</h3>
+    <ul>
+      <li><strong>模式 A · 豆包语音对话（手机端推荐）</strong>：进入语音通话后直接听、直接说，不需要频繁点击朗读；平台可做发音纠正。</li>
+      <li><strong>模式 B · 文字对话 + 朗读（电脑端推荐）</strong>：云电脑加载技能后完整教学规则生效；点击豆包消息的「朗读」按钮播放英语。</li>
+      <li><strong>听力首轮</strong>：教练先说材料、不主动给全文；孩子回答后再提供关键词、选项或文本核对。</li>
+      <li><strong>跟读自查</strong>：孩子按教练示范自行比较清晰度与节奏（重音、尾音、连贯度）；普通对话不编造分数，通话模式可给具体听感反馈。</li>
+      <li><strong>反馈节奏</strong>：一次只给一个任务，先让孩子回答，再简短反馈；英语为主，必要时中文提示。</li>
+      <li><strong>练习结束</strong>：教练用称呼给出简短小结（练习证据 + 需要复习 + 下次建议），可自行保存。</li>
+    </ul>
+
+  </section>
+
+  <!-- ===== 五、常见问题 ===== -->
+  <section class="sec" id="faq">
+    <div class="sec-h"><span class="no">5</span><h2>常见问题</h2><span>安装与使用中的高频疑问</span></div>
+
+    <details>
+      <summary>上传技能时提示格式不支持，怎么办？</summary>
+      <p>确认选择的是包含 <code>SKILL.md</code> 的文件夹；若平台只支持压缩包，把该文件夹打包成 zip 再上传。个别版本要求名称不含空格，可写 <code>SpeakStep-English-Coach</code>。</p>
+    </details>
+    <details>
+      <summary>教材版本不在工作台列表里，能练吗？</summary>
+      <p>能。工作台选「其他」，粘贴练习单后在对话里告诉教练教材名与年级，教练会按坐标匹配。也可直接在对话中说「换到第 X 单元」调整进度。</p>
+    </details>
+    <details>
+      <summary>能评测孩子的发音吗？</summary>
+      <p>当前对话环境语音转文字发送，拿不到音频，无法真实评测发音，教练不会编造分数。跟读练习让孩子按教练示范自行比较清晰度与节奏（重音、尾音、连贯度），教练记录自查证据。如需音素级机器评分，需另行接入口语评测 API（需音频与后端），可单独评估。</p>
+    </details>
+    <details>
+      <summary>孩子隐私如何保障？</summary>
+      <p>技能不索取真实姓名、住址、学校全称、电话等隐私；称呼用昵称即可。技能不会记录访问码、token 或对孩子的负面标签。</p>
+    </details>
+    <details>
+      <summary>工作台打开后图片裂了 / 页面空白？</summary>
+      <p>工作台依赖同目录 <code>assets/</code> 文件夹：保持 <code>index.html</code> 与 <code>assets</code> 在同一文件夹内，用浏览器（Chrome / Edge / Safari）打开。转发时请连同 assets 一起发送。</p>
+    </details>
+    <details>
+      <summary>怎么确认技能真的生效了？</summary>
+      <p>按「生效验证」做 60 秒功能验证：发送"开始一个小学五年级、动物主题、5 分钟的英语听说练习。请一次只给一个任务，不要一次讲很多"，看教练是否一次只给一个任务、先让孩子回答、不连续输出长段、不编造发音分数。</p>
+    </details>
+
+  </section>
+
+  <!-- ===== 底部导航与版权 ===== -->
+  <nav class="foot-nav">
+    <a class="back-btn" href="../../ai_learn.html">← 返回 AI学</a>
+  </nav>
+
+  <footer class="site-footer">
+    © 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span>
+  </footer>
+
+</div>
+</body>
+</html>
