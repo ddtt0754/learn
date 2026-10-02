@@ -94,7 +94,7 @@ a{color:inherit;text-decoration:none}
 .hero{
   position:relative;min-height:100svh;min-height:100vh;
   display:flex;flex-direction:column;justify-content:center;
-  text-align:center;padding:64px 0 72px;
+  text-align:center;padding:24px 0 112px;   /* 上小下大：在保持总内边距 136px 不变的前提下，使首屏内容整体上移 40px */
 }
 .hero-badge{
   display:inline-flex;align-items:center;gap:7px;align-self:center;
@@ -427,7 +427,7 @@ a{color:inherit;text-decoration:none}
   .ai-card{padding:20px 16px}
   .people{grid-template-columns:1fr 1fr;gap:12px}
   .sec{padding:78px 0}
-  .hero{padding:74px 0 80px}
+  .hero{padding:34px 0 120px}   /* 同上：总内边距 154px 不变，内容上移 40px */
   .info-list{grid-template-columns:1fr 1fr}
 }
 </style>
@@ -626,12 +626,8 @@ a{color:inherit;text-decoration:none}
     <div class="cta-card rv d2">
       <div class="qr-wrap" id="qrBox" role="button" tabindex="0" aria-label="扫码咨询预约">
         <div class="qr-inner">
-          <!-- ⬇️ 替换为真实咨询二维码：把下面整个 .placeholder 换成 <img src="assets/qr.png" alt="咨询二维码"> -->
-          <div class="placeholder">
-            <span class="big">🔳</span>
-            <span class="sm">二维码预留位</span>
-            <span class="sm" style="font-weight:500">替换为咨询 / 预约 / 社群码</span>
-          </div>
+          <!-- 门店咨询二维码：同目录 qcode.jpg，换图直接覆盖同名文件即可 -->
+          <img src="qcode.jpg" alt="豆豆智学中心 · 两英AI自习室 咨询预约二维码" width="742" height="745">
         </div>
         <span class="qr-pulse" aria-hidden="true"></span>
       </div>
