@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SpeakStep 听说练习台</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2314B8A6'/%3E%3Cpath d='M14 32c0 9 7 16 16 16s16-7 16-16-7-16-16-16S14 23 14 32z' fill='%23FFF6EC'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23F97316'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231FA873'/%3E%3Cpath d='M14 32c0 9 7 16 16 16s16-7 16-16-7-16-16-16S14 23 14 32z' fill='%23F5F7FA'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%231FA873'/%3E%3C/svg%3E">
 <style>
 :root{
-  --cream:#FFF6EC; --card:#FFF; --ink:#3B2E24; --ink-soft:#8A7A6D;
-  --orange:#F97316; --orange-deep:#EA580C; --teal:#14B8A6; --teal-deep:#0F766E;
-  --teal-soft:#E6F7F4; --green:#22C55E; --line:#F0E6D8; --shadow:0 10px 30px rgba(190,140,70,.12);
+  --cream:#f5f7fa; --card:#FFF; --ink:#1e293b; --ink-soft:#64748b;
+  --orange:#1fa873; --orange-deep:#0f6b4c; --teal:#1fa873; --teal-deep:#0f6b4c;
+  --teal-soft:#e8f7f0; --green:#1fa873; --line:#eef2f7; --shadow:0 10px 30px rgba(15,23,42,.05);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -42,12 +42,12 @@ body{
 .card-h span{font-size:12px;color:var(--ink-soft)}
 
 /* ===== 分段与选择 ===== */
-.seg{display:inline-flex;background:#F7EEE1;border-radius:12px;padding:4px;gap:4px}
+.seg{display:inline-flex;background:#f1f5f9;border-radius:12px;padding:4px;gap:4px}
 .seg button{
   border:0;background:transparent;padding:8px 16px;border-radius:9px;font-size:14px;cursor:pointer;
   color:var(--ink-soft);font-family:inherit;transition:all .15s;
 }
-.seg button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(190,140,70,.15);font-weight:600}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(15,23,42,.06);font-weight:600}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{
   border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:999px;
@@ -62,7 +62,7 @@ body{
 select{
   appearance:none;-webkit-appearance:none;border:1.5px solid var(--line);background:#fff;
   border-radius:10px;padding:9px 34px 9px 12px;font-size:14px;color:var(--ink);cursor:pointer;
-  font-family:inherit;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7A6D' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  font-family:inherit;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748B' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 12px center;
 }
 select:focus{outline:none;border-color:var(--teal)}
@@ -94,7 +94,7 @@ details.adv .f-row:last-child{margin-bottom:0}
 
 /* ===== 提示词 ===== */
 .prompt-box{
-  background:#2E2620;border-radius:14px;padding:16px 18px;color:#F5EBDD;font-size:13.5px;
+  background:#1f2937;border-radius:14px;padding:16px 18px;color:#e2e8f0;font-size:13.5px;
   line-height:1.8;white-space:pre-wrap;min-height:210px;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;
 }
 .btn{
@@ -117,11 +117,11 @@ details.adv .f-row:last-child{margin-bottom:0}
 .foot{font-size:12px;color:var(--ink-soft);text-align:center;margin-top:22px;line-height:1.8}
 
 /* ===== 快速开练抽屉 ===== */
-.mask{position:fixed;inset:0;background:rgba(59,46,36,.4);display:none;z-index:50}
+.mask{position:fixed;inset:0;background:rgba(15,23,42,.40);display:none;z-index:50}
 .mask.on{display:block}
 .drawer{
   position:fixed;top:0;right:0;width:400px;max-width:92vw;height:100%;z-index:51;
-  background:var(--card);box-shadow:-10px 0 40px rgba(59,46,36,.18);padding:24px 22px;
+  background:var(--card);box-shadow:-10px 0 40px rgba(15,23,42,.18);padding:24px 22px;
   opacity:0;visibility:hidden;pointer-events:none;
   transition:opacity .25s ease;overflow-y:auto;
 }
@@ -136,12 +136,12 @@ details.adv .f-row:last-child{margin-bottom:0}
 .qp b{display:block;font-size:14.5px;color:var(--ink);margin-bottom:3px}
 .qp span{font-size:12.5px;color:var(--ink-soft)}
 .qp small{display:block;font-size:11.5px;color:var(--teal-deep);margin-top:6px}
-.close-x{position:absolute;top:18px;right:18px;border:0;background:#F7EEE1;border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;color:var(--ink-soft);font-family:inherit}
+.close-x{position:absolute;top:18px;right:18px;border:0;background:#f1f5f9;border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;color:var(--ink-soft);font-family:inherit}
 
 /* ===== Toast ===== */
 .toast{
   position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);z-index:60;
-  background:#2E2620;color:#F5EBDD;font-size:13.5px;border-radius:12px;padding:12px 20px;
+  background:#1f2937;color:#e2e8f0;font-size:13.5px;border-radius:12px;padding:12px 20px;
   opacity:0;pointer-events:none;transition:all .25s ease;max-width:86vw;
 }
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -158,7 +158,7 @@ a.btn{text-decoration:none}
   display:inline-flex;align-items:center;gap:6px;padding:9px 18px;
   background:#fff;color:var(--teal-deep);border:1.5px solid var(--teal);border-radius:12px;
   font-size:13.5px;font-weight:700;text-decoration:none;font-family:inherit;
-  box-shadow:0 4px 12px rgba(20,184,166,.14);transition:transform .15s;
+  box-shadow:0 4px 12px rgba(31,168,115,.14);transition:transform .15s;
 }
 .back-btn:active{transform:scale(.96)}
 .site-footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:22px;letter-spacing:.5px;line-height:2}
@@ -167,7 +167,7 @@ a.btn{text-decoration:none}
   visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;
   transform:translateX(-50%) translateY(4px);background:var(--teal);color:#fff;
   padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;white-space:nowrap;
-  letter-spacing:.5px;z-index:99;pointer-events:none;box-shadow:0 6px 18px rgba(20,184,166,.35);
+  letter-spacing:.5px;z-index:99;pointer-events:none;box-shadow:0 6px 18px rgba(31,168,115,.35);
   transition:opacity .2s ease,transform .2s ease,visibility .2s;
 }
 .coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--teal)}
@@ -186,9 +186,70 @@ a.btn{text-decoration:none}
   .wrap{padding:14px 14px 30px}
   .top h1{font-size:18px}
 }
+
+/* ========== 手机号验证锁屏 ========== */
+.lock-overlay {
+  position: fixed; z-index: 9999;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: 100dvh;
+  background: rgba(15,23,42,.78);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  touch-action: none; overscroll-behavior: none;
+  font-family: -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.lock-overlay.hidden { display: none; }
+.lock-card {
+  background: #fff; border-radius: 20px; padding: 32px 28px 24px;
+  width: 340px; max-width: 92vw; text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,.25); animation: lockIn .35s ease;
+}
+@keyframes lockIn { from { opacity:0; transform: translateY(20px) scale(.96); } to { opacity:1; transform: translateY(0) scale(1); } }
+.lock-card .lock-icon { font-size: 48px; margin-bottom: 6px; }
+.lock-card h2 { font-size: 18px; font-weight: 800; color: #1e293b; margin-bottom: 6px; }
+.lock-card .lock-desc { font-size: 12px; color: #94a3b8; margin-bottom: 18px; line-height: 1.6; }
+.lock-input-row { display: flex; gap: 8px; }
+.lock-input-row input {
+  flex: 1; padding: 12px 14px; border: 2px solid #e2e8f0; border-radius: 12px;
+  font-size: 16px; outline: none; text-align: center; letter-spacing: 2px;
+  font-family: inherit; transition: border-color .2s;
+}
+.lock-input-row input:focus { border-color: #3b82f6; }
+.lock-input-row input.error { border-color: #ef4444; background: #fef2f2; animation: shake .4s; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.lock-input-row button {
+  padding: 12px 22px; background: linear-gradient(135deg,#35d29a,#2f9df0);
+  color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: transform .15s;
+}
+.lock-input-row button:hover { transform: scale(1.03); }
+.lock-input-row button:active { transform: scale(.97); }
+.lock-input-row button:disabled { opacity: .5; cursor: not-allowed; }
+.lock-loading { display: none; margin-top: 10px; font-size: 12px; color: #64748b; }
+.lock-loading.show { display: block; }
+.lock-error { display: none; margin-top: 10px; padding: 8px 12px; background: #fef2f2;
+  color: #dc2626; border-radius: 8px; font-size: 12px; font-weight: 600; }
+.lock-error.show { display: block; }
+.lock-hint { margin-top: 12px; font-size: 11px; color: #94a3b8; line-height: 1.6; }
 </style>
 </head>
 <body>
+<!-- 手机号验证锁屏 -->
+<div class="lock-overlay" id="lockOverlay">
+  <div class="lock-card">
+    <div class="lock-icon">🔐</div>
+    <h2>请输入手机号验证</h2>
+    <div class="lock-desc">首次访问需验证手机号<br>验证通过后可 7 天内免登录</div>
+    <div class="lock-input-row">
+      <input type="tel" id="phoneInput" placeholder="输入 11 位手机号" maxlength="11" inputmode="numeric">
+      <button id="verifyBtn" onclick="verifyPhone()">验证</button>
+    </div>
+    <div class="lock-loading" id="lockLoading">⏳ 正在验证…</div>
+    <div class="lock-error" id="lockError"></div>
+    <div class="lock-hint">仅限已登记手机号访问<br>如有疑问请联系两英豆豆教练</div>
+  </div>
+</div>
 <div class="wrap">
 
   <!-- ===== 顶栏 ===== -->
@@ -918,6 +979,161 @@ $('sampleBtn').addEventListener('click', () => {
 /* ===== 初始 ===== */
 fillQuick();
 render();
+</script>
+<script>
+(function(){
+  var overlay = document.getElementById('lockOverlay');
+  var phoneInput = document.getElementById('phoneInput');
+  var errEl = document.getElementById('lockError');
+  var loadEl = document.getElementById('lockLoading');
+  var btnEl = document.getElementById('verifyBtn');
+
+  var VALID_MS = 7 * 24 * 60 * 60 * 1000;
+  var relockTimer = null;
+
+  if (phoneInput) {
+    phoneInput.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') verifyPhone();
+    });
+  }
+  window.verifyPhone = verifyPhone;
+
+  var session = null;
+  try { session = JSON.parse(localStorage.getItem('phone_session')); } catch(e) {}
+  if (session && session.expires && Date.now() < session.expires) {
+    if (overlay) overlay.classList.add('hidden');
+    scheduleRelock(session.expires);
+    return;
+  }
+
+  if (overlay) overlay.classList.remove('hidden');
+  if (phoneInput) setTimeout(function(){
+    try { phoneInput.focus({ preventScroll: true }); } catch(e) { phoneInput.focus(); }
+  }, 350);
+  pinOverlay();
+
+  function sha256(str){
+    var encoder = new TextEncoder();
+    return crypto.subtle.digest('SHA-256', encoder.encode(str))
+      .then(function(buf){
+        return Array.from(new Uint8Array(buf))
+          .map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+      });
+  }
+
+  function verifyPhone(){
+    var phone = phoneInput.value.replace(/\s+/g, '');
+    if (!phone) { showErr('请输入手机号'); shake(); return; }
+    if (!/^1\d{10}$/.test(phone)) { showErr('请输入正确的 11 位手机号'); shake(); return; }
+
+    btnEl.disabled = true;
+    loadEl.classList.add('show');
+    errEl.classList.remove('show');
+    phoneInput.classList.remove('error');
+
+    var FALLBACK_HASHES = [
+      '413b7b3d5700ad8a6b296c9d0e7107dbd7280a985c1c695db8646c278e510224',
+      '679d49b6e57d426b2af961461512559700b9e4c01aa723f0b71682c5f07b31c3',
+      'df225757a3ffcac2bd9643323af99631a53300b439da8ff4a8a41f889ce39704',
+      'f33f356f0975feb01468d154687a812a113ffa87ac5091ecc99637a552f033e9',
+    ];
+
+    function check(phoneHash, hashes){
+      var matched = hashes.some(function(h){ return h === phoneHash; });
+      loadEl.classList.remove('show');
+      btnEl.disabled = false;
+      if (matched) {
+        unlock(phone);
+      } else {
+        showErr('输入有误，请重新输入');
+        shake();
+      }
+    }
+
+    sha256(phone).then(function(phoneHash){
+      fetch('../jiesuo.html').then(function(r){ return r.text(); }).then(function(text){
+        var hashes = text.trim().split(/[\n\r]+/).filter(function(h){ return h.trim(); });
+        check(phoneHash, hashes);
+      }).catch(function(){
+        check(phoneHash, FALLBACK_HASHES);
+      });
+    }).catch(function(){
+      loadEl.classList.remove('show');
+      btnEl.disabled = false;
+      showErr('设备不支持，请更换浏览器');
+    });
+  };
+
+  function unlock(phone){
+    var now = Date.now();
+    var expires = now + VALID_MS;
+    localStorage.setItem('phone_session', JSON.stringify({
+      phone: phone,
+      loginAt: now,
+      expires: expires
+    }));
+    if (overlay) {
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity .4s';
+      setTimeout(function(){ overlay.classList.add('hidden'); overlay.style.opacity = '1'; clearPin(); }, 400);
+    }
+    scheduleRelock(expires);
+  }
+
+  function relock(){
+    relockTimer = null;
+    try { localStorage.removeItem('phone_session'); } catch(e) {}
+    if (!overlay) return;
+    phoneInput.value = '';
+    errEl.classList.remove('show');
+    overlay.classList.remove('hidden');
+    overlay.style.opacity = '1';
+    overlay.style.transition = 'none';
+    pinOverlay();
+    if (phoneInput) { try { phoneInput.focus({ preventScroll: true }); } catch(e) { phoneInput.focus(); } }
+  }
+
+  function scheduleRelock(expires){
+    if (relockTimer) { clearTimeout(relockTimer); relockTimer = null; }
+    var remain = expires - Date.now();
+    if (remain <= 0) { relock(); return; }
+    relockTimer = setTimeout(relock, remain);
+  }
+
+  function showErr(msg){
+    errEl.textContent = msg;
+    errEl.classList.add('show');
+    setTimeout(function(){ errEl.classList.remove('show'); }, 3000);
+  }
+
+  function shake(){
+    phoneInput.classList.add('error');
+    setTimeout(function(){ phoneInput.classList.remove('error'); }, 400);
+  }
+
+  function pinOverlay(){
+    if (!overlay || !window.visualViewport) return;
+    var vv = window.visualViewport;
+    overlay.style.width     = vv.width  + 'px';
+    overlay.style.height    = vv.height + 'px';
+    overlay.style.transform = 'translate(' + vv.offsetLeft + 'px,' + vv.offsetTop + 'px)';
+  }
+  function clearPin(){
+    if (!overlay) return;
+    overlay.style.width = '';
+    overlay.style.height = '';
+    overlay.style.transform = '';
+  }
+  function isLocked(){
+    return !!(overlay && !overlay.classList.contains('hidden'));
+  }
+  if (window.visualViewport) {
+    var onViewportChange = function(){ if (isLocked()) pinOverlay(); };
+    window.visualViewport.addEventListener('resize', onViewportChange);
+    window.visualViewport.addEventListener('scroll', onViewportChange);
+    window.addEventListener('orientationchange', function(){ setTimeout(onViewportChange, 250); });
+  }
+})();
 </script>
 </body>
 </html>

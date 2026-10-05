@@ -20,10 +20,10 @@ body{
   align-items:center;
   padding:28px 20px 48px;
 }
-.wrap{width:100%;max-width:600px;}
+.wrap{width:100%;max-width:720px;}
 
 /* 顶部返回 */
-.back-bar{width:100%;max-width:600px;margin-top:22px;text-align:center;}
+.back-bar{width:100%;max-width:720px;margin-top:22px;text-align:center;}
 .back-btn{
   display:inline-flex;align-items:center;gap:6px;
   padding:9px 18px;border:none;border-radius:12px;
@@ -153,7 +153,7 @@ body{
 <div class="wrap">
   <div class="head">
     <h1 class="title">AI学</h1>
-    <p class="subtitle">AI 网址导航 <b>·</b> 好用的 AI 学习站</p>
+    <p class="subtitle">AI 不是代替思考，而是把重复消耗交给工具，把时间留给深度思考</p>
   </div>
 
   <div class="cards" id="cards"></div>
@@ -173,11 +173,13 @@ body{
  * ===================================================================== */
 var SITES = [
   { ico:'🧰', name:'学科AI万能提问模板', desc:'401 条可复制提示词 · 小学 1-6 年级 × 语数英 · 初中 7-9 年级 × 9 科', url:'dd-prompt/index.html', live:true, inner:true },
-  { ico:'🌐', name:'OpenMAIC · 互动课堂', desc:'清华开源·一键生成沉浸式 AI 课堂', url:'https://openmaic.io/zh/',            live:true },
-  { ico:'💡', name:'AI生成GGB', desc:'可视化教学平台', url:'https://www.ggbzls.cn/', live:true },
-  { ico:'🧑‍🏫', name:'AI 智能辅导', desc:'不懂就问，AI 随时答疑讲解',  url:'../dd-teacher/index.html', live:true },
+  { ico:'🌐', name:'OpenMAIC · 互动课堂', desc:'清华开源·一键生成沉浸式 AI 课堂', url:'openmaic.html', live:true, inner:true },
+  { ico:'💡', name:'可视化互动工具', desc:'AI生成GGB，可视化教学平台', url:'qkhd.html', live:true, inner:true },
+  { ico:'🧑‍🏫', name:'AI智能辅导', desc:'不懂就问，AI随时答疑讲解',  url:'../dd-teacher/index.html', live:true , inner:true},
   { ico:'🗣️', name:'英语听说 · SpeakStep', desc:'一分钟生成听说练习单，复制到豆包让孩子马上开口', url:'SpeakStep/index.html', live:true, inner:true },
-  { ico:'🎓', name:'费曼讲台 · TeachStep', desc:'让孩子当小老师讲出来，讲完回收证据才算会', url:'TeachStep/index.html', live:true, inner:true }
+  { ico:'🎓', name:'费曼讲台 · TeachStep', desc:'让孩子当小老师讲出来，讲完回收证据才算会', url:'TeachStep/index.html', live:true, inner:true },
+  { ico:'🧠', name:'记忆台 · MemStep', desc:'练记忆法、生成记忆卡，把知识讲进长期记忆', url:'MemStep/index.html', live:true, inner:true },
+  { ico:'🧩', name:'全科智学系统', desc:'9大学科导学 · 最小干预 · 证据化学习库', url:'quanke.html', live:true, inner:true }
 ];
 /* ===================================================================== */
 
@@ -201,7 +203,7 @@ SITES.forEach(function(s){
 </script>
 
 <a class="back-bar" href="index.html">
-  <button class="back-btn" type="button">← 返回主页</button>
+  <button class="back-btn" type="button">← 返回首页</button>
 </a>
 <script>
 (function(){

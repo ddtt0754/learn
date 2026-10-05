@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>机位服务诊断 · 豆豆智学</title>
+<style>
+:root{
+  --g1:#35d29a;--g2:#2f9df0;--grad:linear-gradient(135deg,#35d29a,#2f9df0);
+  --accent:#2ebd85;--accent-deep:#1fa873;--accent-bg:#e8f7f0;
+  --bg:#f5f7fa;--panel:#fff;--text:#1e293b;--text2:#64748b;--faint:#94a3b8;
+  --line:#e6edf4;--line2:#dbe4ee;
+  --ok:#16a34a;--ok-bg:#e7f7ee;--off:#c0392b;--off-bg:#fdecea;--warn:#b45309;
+  --pill:999px;--font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.65;padding:22px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:20px;margin:0 0 4px;font-weight:800;letter-spacing:-.2px}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{color:var(--text2);font-size:12.5px;margin:0 0 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,.05);margin-bottom:16px}
+label{display:block;font-size:12px;font-weight:700;color:var(--text2);margin:0 0 6px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+input{font-family:var(--mono);font-size:15px;padding:10px 12px;border:1.5px solid var(--line2);border-radius:12px;outline:0;width:200px}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,189,133,.13)}
+input.sm{width:96px}
+button{font-family:inherit;font-size:13px;font-weight:700;padding:10px 18px;border:0;border-radius:var(--pill);cursor:pointer;
+  background:var(--grad);color:#fff;box-shadow:0 4px 14px rgba(47,157,240,.26)}
+button:disabled{opacity:.5;pointer-events:none}
+button.ghost{background:#fff;color:var(--text2);border:1px solid var(--line2);box-shadow:none}
+button.ghost:hover{color:var(--text)}
+.hint{font-size:11.5px;color:var(--faint);margin:8px 0 0;line-height:1.6}
+.hint b{color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;color:var(--faint);font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+td.mono{font-family:var(--mono);font-size:12px}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:var(--pill);white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.err{background:var(--off-bg);color:var(--off)}
+.tag.unk{background:#f1f5f9;color:#64748b}
+.tag.warn{background:#fef4e6;color:var(--warn)}
+.big{font-size:15px;font-weight:800;font-family:var(--mono)}
+.verdict{margin-top:14px;padding:14px 16px;border-radius:14px;background:var(--accent-bg);border:1px solid rgba(46,189,133,.25)}
+.verdict b{color:var(--accent-deep)}
+.verdict .k{font-family:var(--mono);font-weight:700}
+#log{font-family:var(--mono);font-size:11.5px;background:#0f172a;color:#cbd5e1;padding:12px 14px;border-radius:12px;
+  max-height:230px;overflow:auto;white-space:pre-wrap;margin:14px 0 0;line-height:1.55}
+.foot{text-align:center;color:var(--faint);font-size:11px;margin:22px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>机位服务诊断 <em>· 判定探测方式</em></h1>
+  <p class="sub">填一台<b>确认已开机且服务在跑</b>的机位 IP，本页会用四种方式分别探测，告诉你服务到底返回了什么、以及哪种探测法能认出它。</p>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>机位 IP</label>
+        <input id="ip" value="192.168.1." placeholder="192.168.1.100">
+      </div>
+      <div>
+        <label>端口</label>
+        <input id="port" class="sm" type="number" value="5178">
+      </div>
+      <button id="go">开始诊断</button>
+      <button id="demo" class="ghost">用本机试跑</button>
+    </div>
+    <p class="hint" id="hint">提示：先在学生机上把服务跑起来，再用<b>本机浏览器</b>打开本页。本页需通过 <b>http://</b> 或 <b>file://</b> 打开均可。</p>
+    <pre id="log">等待开始…</pre>
+  </div>
+
+  <div class="card">
+    <div style="font-weight:800;font-size:13px;margin:0 0 10px">四种探测方式的对照</div>
+    <table>
+      <thead><tr><th>方式</th><th>判定依据</th><th>结果</th><th>说明</th></tr></thead>
+      <tbody id="tb">
+        <tr><td>① 图片法<br><span style="color:var(--faint);font-size:11px">new Image()</span></td><td>响应体能解码为图片</td><td>—</td><td>现用方案</td></tr>
+        <tr><td>② no-cors fetch</td><td>HTTP 请求是否得到响应</td><td>—</td><td>候选方案</td></tr>
+        <tr><td>③ XHR</td><td>请求状态码</td><td>—</td><td>受 CORS 限制</td></tr>
+        <tr><td>④ TCP 画像<br><span style="color:var(--faint);font-size:11px">连一下看延迟</span></td><td>连接是否被立即拒绝</td><td>—</td><td>区分端口开关</td></tr>
+      </tbody>
+    </table>
+    <div id="verdict"></div>
+  </div>
+
+  <p class="foot">© 2026 两英豆豆教练 · 微信号 ddtt0754 · 本页仅用于诊断，不保存任何数据</p>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $ = function(id){ return document.getElementById(id); };
+var logLines = [];
+function log(s){ logLines.push(s); $('log').textContent = logLines.join('\n'); }
+function setRow(i, verdict, cls, note){
+  var tr = $('tb').children[i];
+  tr.children[2].innerHTML = '<span class="tag ' + cls + '">' + verdict + '</span>';
+  if (note) tr.children[3].textContent = note;
+}
+function reset(){
+  logLines = []; $('log').textContent = '探测中…';
+  $('verdict').innerHTML = '';
+  for (var i = 0; i < 4; i++){
+    $('tb').children[i].children[2].textContent = '…';
+  }
+}
+function esc(s){ return String(s).replace(/[<>&]/g, function(c){ return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]; }); }
+
+function head(t){ log(''); log('━━ ' + t + ' ━━'); }
+
+/* ① 图片法 */
+function probeImg(url, cb){
+  var img = new Image(), done = false, t0 = Date.now();
+  var tm = setTimeout(function(){ if(!done){ done=true; cb('timeout', Date.now()-t0, '3s 无响应'); } }, 3000);
+  img.addEventListener('load', function(){
+    if(done)return; done=true; clearTimeout(tm);
+    cb('load', Date.now()-t0, 'naturalWidth=' + img.naturalWidth + ' naturalHeight=' + img.naturalHeight);
+  });
+  img.addEventListener('error', function(){
+    if(done)return; done=true; clearTimeout(tm);
+    cb('error', Date.now()-t0, '响应体不是可解码的图片');
+  });
+  img.src = url + (url.indexOf('?')>-1?'&':'?') + '_t=' + Date.now();
+}
+
+/* ② no-cors fetch */
+function probeFetch(url, cb){
+  var t0 = Date.now(), ac = null, to = false;
+  try { ac = new AbortController(); } catch(e){}
+  var tm = setTimeout(function(){ to = true; if(ac) ac.abort(); }, 3000);
+  fetch(url + (url.indexOf('?')>-1?'&':'?') + '_t=' + Date.now(),
+        { mode:'no-cors', cache:'no-store', signal: ac ? ac.signal : undefined })
+    .then(function(){ clearTimeout(tm); cb('resolved', Date.now()-t0, 'HTTP 有响应（内容不可读，属正常）'); })
+    .catch(function(e){ clearTimeout(tm);
+      cb(to ? 'timeout' : 'rejected', Date.now()-t0, 'name=' + (e&&e.name) + ' / ' + (e&&e.message)); });
+}
+
+/* ③ XHR */
+function probeXhr(url, cb){
+  var t0 = Date.now(); var x = new XMLHttpRequest();
+  var done = false;
+  var tm = setTimeout(function(){ if(!done){ done=true; try{x.abort();}catch(e){} cb('timeout', Date.now()-t0, '3s 无响应'); } }, 3000);
+  try {
+    x.open('GET', url + (url.indexOf('?')>-1?'&':'?') + '_t=' + Date.now(), true);
+    x.onreadystatechange = function(){
+      if (done) return;
+      if (x.readyState === 4){
+        done = true; clearTimeout(tm);
+        cb('status', Date.now()-t0, 'status=' + x.status + ' ' + (x.statusText||''));
+      }
+    };
+    x.onerror = function(){ if(!done){ done=true; clearTimeout(tm); cb('network-error', Date.now()-t0, '网络层失败或被 CORS 拦截'); } };
+    x.send();
+  } catch(e){ done = true; clearTimeout(tm); cb('throw', Date.now()-t0, String(e)); }
+}
+
+/* ④ TCP 画像：连两次看延迟分布 */
+function probeTiming(url, cb){
+  var t0 = Date.now(), ac = null, to = false;
+  try { ac = new AbortController(); } catch(e){}
+  var tm = setTimeout(function(){ to = true; if(ac) ac.abort(); }, 3000);
+  fetch(url + (url.indexOf('?')>-1?'&':'?') + '_r=' + Math.random(),
+        { mode:'no-cors', cache:'no-store', signal: ac ? ac.signal : undefined })
+    .then(function(){ clearTimeout(tm); cb('alive', Date.now()-t0, ''); })
+    .catch(function(){ clearTimeout(tm); cb(to ? 'timeout' : 'fastfail', Date.now()-t0, to ? '耗满超时' : '即时失败（通常＝端口未开或被拒）'); });
+}
+
+function run(){
+  var ip = $('ip').value.trim();
+  var port = parseInt($('port').value, 10);
+  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)){ log('⚠ IP 格式不正确：' + ip); return; }
+  if (!(port >= 1 && port <= 65535)){ log('⚠ 端口不合法'); return; }
+  var url = 'http://' + ip + ':' + port + '/';
+  $('go').disabled = true;
+  reset();
+  log('目标：' + url);
+  log('本页来源：' + window.location.protocol + '//' + (window.location.host || '(file)'));
+
+  var results = {};
+
+  function step2(){
+    head('② no-cors fetch');
+    probeFetch(url, function(v, ms, note){
+      results.fetch = v;
+      log('结果：' + v + '  [' + ms + 'ms]  ' + note);
+      setRow(1, v === 'resolved' ? '判「服务在线」' : (v === 'timeout' ? '判「超时·未知」' : '判「连接失败」'),
+             v === 'resolved' ? 'ok' : (v === 'timeout' ? 'warn' : 'err'),
+             v === 'resolved' ? '任何内容都算在线 ✓' : note);
+      step3();
+    });
+  }
+  function step3(){
+    head('③ XMLHttpRequest');
+    probeXhr(url, function(v, ms, note){
+      results.xhr = v;
+      log('结果：' + v + '  [' + ms + 'ms]  ' + note);
+      setRow(2, v === 'status' && note.indexOf('status=2') > -1 ? 'status=' + note.split('status=')[1].split(' ')[0] : v,
+             (v === 'status' && note.indexOf('status=2') > -1) ? 'ok' : (v === 'timeout' ? 'warn' : 'err'), note);
+      step4();
+    });
+  }
+  function step4(){
+    head('④ TCP 画像（延迟）');
+    probeTiming(url, function(v, ms, note){
+      results.timing = v; results.ms = ms;
+      log('结果：' + v + '  [' + ms + 'ms]  ' + note);
+      setRow(3, v === 'alive' ? '连接成功' : (v === 'fastfail' ? '即时失败' : '耗满超时'),
+             v === 'alive' ? 'ok' : (v === 'fastfail' ? 'err' : 'warn'), note);
+      verdict();
+    });
+  }
+
+  /* ① 先跑图片法 */
+  head('① 图片探针（现用方案）');
+  probeImg(url, function(v, ms, note){
+    results.img = v;
+    log('结果：' + v + '  [' + ms + 'ms]  ' + note);
+    setRow(0, v === 'load' ? '判「在线」' : (v === 'error' ? '判「离线」✗' : '判「超时」'),
+           v === 'load' ? 'ok' : (v === 'error' ? 'err' : 'warn'), note);
+    step2();
+  });
+}
+
+function verdict(){
+  var v = $('verdict');
+  var imgOk = false, fetchOk = false;
+  // 从日志里回收结论
+  var txt = logLines.join('\n');
+  imgOk = /① 图片探针[\s\S]*?结果：load/.test(txt);
+  fetchOk = /② no-cors fetch[\s\S]*?结果：resolved/.test(txt);
+  var html = '';
+  if (fetchOk && !imgOk){
+    html = '<b>结论：服务在跑，但返回的不是图片 —— 图片探针会把它误判为「离线」。</b><br>'
+         + '这正是工作台显示离线的根因。修复方向：改用 <span class="k">fetch(mode:\'no-cors\')</span> 判活，'
+         + '任何内容（HTML / JSON / 空体）都能正确识别为在线。';
+  } else if (fetchOk && imgOk){
+    html = '<b>结论：服务的根路径恰好返回图片，图片探针可用。</b><br>'
+         + '但为稳妥（换服务后可能变成 HTML），仍建议改用 <span class="k">fetch</span> 判活。';
+  } else if (!fetchOk && !imgOk){
+    html = '<b>结论：两种探测都没拿到响应。</b><br>'
+         + '说明该机位此刻确实不可达，或端口未开、或被代理拦截。'
+         + '请确认：① 服务真的在跑；② 端口号填对；③ 浏览器没开代理（局域网地址需加入直连例外）。';
+  } else {
+    html = '<b>结论：图片能过但 fetch 没过 —— 这很少见，通常是混合内容或代理策略所致。</b>';
+  }
+  v.className = 'verdict';
+  v.innerHTML = html;
+}
+
+$('go').addEventListener('click', run);
+$('demo').addEventListener('click', function(){
+  $('ip').value = '127.0.0.1';
+  $('port').value = 8080;
+  log('已填入 127.0.0.1:8080（需本机该端口有服务才能测出结果）');
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#f5f7fa">
+<meta name="description" content="豆豆全科智学系统 V2.0.5 功能速览：9 大学科导学、最小干预 D0–D4、E1–E9 错因归因、九类学习库档案、6 页导学工作台。本地数据、离线可用。">
+<title>豆豆全科智学系统 · 功能速览 - 豆豆智学中心</title>
+<style>
+:root{
+  --bg:#f5f7fa;
+  --text:#1e293b;
+  --text2:#64748b;
+  --grad:linear-gradient(135deg,#35d29a,#2f9df0);
+  --teal:#35d29a;
+  --teal-deep:#1fa873;
+  --teal-soft:#e8f7f0;
+  --ink-soft:#94a3b8;
+  --line:#eef2f7;
+  --shadow:0 6px 16px rgba(15,23,42,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;-webkit-text-size-adjust:100%;}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.7;
+  min-height:100vh;min-height:100dvh;
+  display:flex;justify-content:center;
+  padding:30px 20px 44px;
+}
+.wrap{width:100%;max-width:720px;}
+
+/* ===== 首屏 ===== */
+.head{text-align:center;margin-bottom:26px;}
+.title{
+  font-size:clamp(1.6rem,7.5vw,2.5rem);font-weight:900;letter-spacing:.08em;line-height:1.3;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.subtitle{font-size:.92rem;color:var(--text2);margin-top:10px;font-weight:500;}
+.subtitle b{margin:0 5px;color:var(--teal-deep);}
+.lead{
+  margin-top:16px;display:inline-block;padding:8px 18px;border-radius:999px;
+  background:#fff;border:2px solid var(--line);box-shadow:var(--shadow);
+  font-size:.92rem;font-weight:700;color:var(--teal-deep);
+}
+
+/* ===== 通用卡片 ===== */
+.card{
+  background:#fff;border:2px solid var(--line);border-radius:18px;
+  padding:20px;box-shadow:var(--shadow);margin-bottom:14px;
+}
+.card h2{font-size:1.02rem;font-weight:800;margin-bottom:10px;line-height:1.5;}
+.card p{font-size:.875rem;color:var(--text2);}
+.card p + p{margin-top:9px;}
+.card p b{color:var(--text);}
+.card .quote{
+  margin-top:12px;padding:11px 14px;border-radius:12px;background:var(--teal-soft);
+  font-size:.85rem;color:#0f6b4c;font-weight:600;line-height:1.65;
+}
+
+/* ===== 小节标题 ===== */
+.sec-t{
+  display:flex;align-items:center;gap:9px;
+  font-size:1rem;font-weight:800;margin:26px 0 12px;
+}
+.sec-t::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--grad);flex:none;}
+.sec-t span{font-size:.75rem;font-weight:600;color:var(--ink-soft);letter-spacing:.04em;}
+
+/* ===== 三大模块 ===== */
+.mod{
+  display:flex;gap:14px;background:#fff;border:2px solid var(--line);border-radius:16px;
+  padding:16px 18px;margin-bottom:11px;box-shadow:var(--shadow);
+}
+.mod .ic{
+  width:44px;height:44px;flex:none;border-radius:13px;background:var(--teal-soft);
+  display:flex;align-items:center;justify-content:center;font-size:21px;
+}
+.mod h3{font-size:.95rem;font-weight:800;margin-bottom:4px;}
+.mod h3 em{font-style:normal;font-size:.74rem;font-weight:600;color:var(--teal-deep);letter-spacing:.02em;}
+.mod p{font-size:.83rem;color:var(--text2);line-height:1.7;}
+.mod p b{color:var(--text);}
+
+/* ===== 关键数字 ===== */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.stat{
+  background:#fff;border:2px solid var(--line);border-radius:14px;
+  padding:14px 6px 12px;text-align:center;box-shadow:var(--shadow);
+}
+.stat .n{
+  font-size:1.12rem;font-weight:900;color:var(--teal-deep);line-height:1.25;
+  font-variant-numeric:tabular-nums;
+}
+.stat .t{font-size:.68rem;color:var(--text2);margin-top:4px;line-height:1.45;}
+
+/* ===== 每日闭环 ===== */
+.flow{counter-reset:fl;display:flex;flex-direction:column;gap:9px;}
+.fstep{
+  display:flex;gap:11px;align-items:flex-start;
+  background:#fff;border:2px solid var(--line);border-radius:14px;
+  padding:13px 16px;box-shadow:var(--shadow);
+}
+.fstep .n{
+  counter-increment:fl;flex:none;width:26px;height:26px;border-radius:50%;
+  background:var(--grad);color:#fff;font-size:.8rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;margin-top:1px;
+}
+.fstep .n::before{content:counter(fl);}
+.fstep b{font-size:.87rem;font-weight:800;}
+.fstep p{font-size:.79rem;color:var(--text2);line-height:1.65;margin-top:2px;}
+
+/* ===== 清单 ===== */
+.list{display:flex;flex-direction:column;gap:9px;}
+.li{display:flex;gap:10px;font-size:.845rem;color:var(--text2);line-height:1.7;}
+.li .m{flex:none;color:var(--teal-deep);font-weight:900;}
+.li b{color:var(--text);}
+
+/* ===== 结语 ===== */
+.closing{
+  margin-top:20px;text-align:center;padding:24px 20px;border-radius:18px;
+  background:linear-gradient(150deg,rgba(53,210,154,.12),rgba(47,157,240,.08));
+  border:2px solid #dff3ea;
+}
+.closing h3{font-size:1.05rem;font-weight:900;color:#0f6b4c;margin-bottom:8px;}
+.closing p{font-size:.84rem;color:var(--text2);line-height:1.75;}
+
+/* ===== 来源说明 ===== */
+.src{
+  margin-top:18px;text-align:center;font-size:.72rem;
+  color:var(--ink-soft);line-height:1.75;
+}
+
+/* ===== 底部导航与版权 ===== */
+.foot-nav{margin-top:24px;text-align:center}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:9px 18px;
+  background:#fff;color:var(--teal-deep);border:1.5px solid var(--teal);border-radius:12px;
+  font-size:13.5px;font-weight:700;text-decoration:none;font-family:inherit;
+  box-shadow:0 4px 12px rgba(53,210,154,.16);transition:transform .15s;
+}
+.back-btn:active{transform:scale(.96)}
+.site-footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:22px;letter-spacing:.5px;line-height:2}
+.coach-tip{position:relative;display:inline-block;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.coach-tip .tip{
+  visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;
+  transform:translateX(-50%) translateY(4px);background:var(--teal);color:#fff;
+  padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;white-space:nowrap;
+  letter-spacing:.5px;z-index:99;pointer-events:none;box-shadow:0 6px 18px rgba(53,210,154,.35);
+  transition:opacity .2s ease,transform .2s ease,visibility .2s;
+}
+.coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--teal)}
+.coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== 响应式 ===== */
+@media(max-width:420px){
+  body{padding:22px 15px 36px;}
+  .card{padding:17px;}
+  .mod{padding:14px 15px;gap:12px;}
+  .mod .ic{width:40px;height:40px;font-size:19px;}
+  .stats{gap:8px;}
+  .stat{padding:12px 4px 10px;}
+  .stat .n{font-size:1rem;}
+  .fstep{padding:12px 14px;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ===== 首屏 ===== -->
+  <header class="head">
+    <h1 class="title">豆豆全科智学系统</h1>
+    <p class="subtitle">功能速览<b>·</b>9 大学科<b>·</b>K1–K12 家庭教育</p>
+    <span class="lead">让孩子自己学会 · 让家长看得见</span>
+  </header>
+
+  <!-- ===== 定位 ===== -->
+  <section class="card">
+    <h2>它不是讲题机，而是一套「智学系统」</h2>
+    <p>市面上的 AI 工具替你<b>讲题</b>；这套系统训练孩子<b>自己会</b>。它把辅导行为里的噪音——直接给答案、贴标签、假进度、无效刷题——逐一去掉，只保留能让孩子独立的那一部分。</p>
+    <p>它以「豆豆」为方法论内核，把孩子在校外的时间，变成<b>有证据的学习</b>，而不是「看起来很努力」。</p>
+    <div class="quote">一句话定位：让孩子在校外的时间产生有证据的学习。</div>
+  </section>
+
+  <!-- ===== 三大模块 ===== -->
+  <h2 class="sec-t">三大核心模块<span>内核 · 底座 · 操作面</span></h2>
+
+  <div class="mod">
+    <div class="ic">🧭</div>
+    <div>
+      <h3>豆豆方法论 <em>（内核）</em></h3>
+      <p><b>最小干预导学 D0–D4</b>：卡住时只给当前卡点所需的最小提示，复述与输出优先，绝不直接喂答案。错因按 <b>E1–E9</b> 归因到可训练的环节，系统词表里没有「粗心」二字。</p>
+    </div>
+  </div>
+
+  <div class="mod">
+    <div class="ic">🗂️</div>
+    <div>
+      <h3>家庭学习库 <em>（数据底座）</em></h3>
+      <p>本地九类档案：画像 / 错题 / 会话 / 证据 / 复习 / 看板 / 订正 / 天赋 / 人生设计。<b>活动 ≠ 证据 ≠ 掌握</b>——只有达标复测（≥80%）才可能形成证据，孩子无法「假装会了」。</p>
+    </div>
+  </div>
+
+  <div class="mod">
+    <div class="ic">🖥️</div>
+    <div>
+      <h3>导学工作台 <em>（操作面）</em></h3>
+      <p>本地运行的 6 页工作台：今日 / 任务 / 训练 / 档案 / 记录 / 系统。<b>点选即生成导学提示词</b>，复制到对话执行后自动归档，工作台与对话形成闭环。</p>
+    </div>
+  </div>
+
+  <!-- ===== 关键数字 ===== -->
+  <h2 class="sec-t">关键能力<span>可复测的功能事实</span></h2>
+  <div class="stats">
+    <div class="stat"><div class="n">9</div><div class="t">学科导学</div></div>
+    <div class="stat"><div class="n">10 题</div><div class="t">每次标准题量</div></div>
+    <div class="stat"><div class="n">9 类</div><div class="t">学习库档案</div></div>
+    <div class="stat"><div class="n">D0–D4</div><div class="t">最小干预深度</div></div>
+    <div class="stat"><div class="n">E1–E9</div><div class="t">错因归因编码</div></div>
+    <div class="stat"><div class="n">6 页</div><div class="t">导学工作台</div></div>
+    <div class="stat"><div class="n">359</div><div class="t">单元测试通过</div></div>
+    <div class="stat"><div class="n">95</div><div class="t">端到端用例</div></div>
+    <div class="stat"><div class="n">67</div><div class="t">专家包校验</div></div>
+  </div>
+
+  <!-- ===== 每日闭环 ===== -->
+  <h2 class="sec-t">每日学习闭环<span>20–40 分钟</span></h2>
+  <div class="flow">
+    <div class="fstep">
+      <div class="n"></div>
+      <div><b>看「今日」</b><p>复习时间轴告诉你今天该复习什么：绿色=已全部完成，红色=有未完成，蓝色=未来已安排。</p></div>
+    </div>
+    <div class="fstep">
+      <div class="n"></div>
+      <div><b>训练页发起</b><p>选学科 → 章节 → 课，点「＋」发起预习 / 复测 / 变式 / 错题订正。</p></div>
+    </div>
+    <div class="fstep">
+      <div class="n"></div>
+      <div><b>对话中完成</b><p>出题 → 作答 → 判分 → 归档。一道一道出，整科做完才统一判分，中途不透露对错。</p></div>
+    </div>
+    <div class="fstep">
+      <div class="n"></div>
+      <div><b>自动归档</b><p>每次导学结束自动写入错题本、会话与证据，工作台数据随之更新。</p></div>
+    </div>
+    <div class="fstep">
+      <div class="n"></div>
+      <div><b>为未来排计划</b><p>把建议复习窗口与待订正错题排进未来日期；单项仅可排一次，逾期自动回到候选池。</p></div>
+    </div>
+  </div>
+
+  <!-- ===== 数据与红线 ===== -->
+  <h2 class="sec-t">数据与安全<span>设计即承诺</span></h2>
+  <div class="list">
+    <div class="li"><span class="m">·</span><div><b>本地存储</b>：学习库全部为本机 Markdown / JSON 文件，无账号、无云端，不上传任何学习数据。</div></div>
+    <div class="li"><span class="m">·</span><div><b>只看证据</b>：永不生成「掌握」结论，绝不给孩子贴能力标签。</div></div>
+    <div class="li"><span class="m">·</span><div><b>不编造记录</b>：无证据不写证据；演示数据一律带标记，与真实数据严格分开。</div></div>
+    <div class="li"><span class="m">·</span><div><b>试卷只链不存</b>：平台卷仅登记元数据与解析文本，不转存平台内容。</div></div>
+    <div class="li"><span class="m">·</span><div><b>多孩隔离</b>：每个孩子独立子目录，档案互不读写、快照互不污染。</div></div>
+  </div>
+
+  <!-- ===== 结语 ===== -->
+  <div class="closing">
+    <h3>豆豆智学中心学员免费使用！</h3>
+    <p>本系统需本地安装使用，有需要部署的请联系豆豆教练。</p>
+  </div>
+
+  <!-- ===== 底部导航与版权 ===== -->
+  <nav class="foot-nav">
+    <a class="back-btn" href="ai_learn.html">← 返回 AI学</a>
+  </nav>
+
+  <footer class="site-footer">
+    © 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span>
+  </footer>
+
+</div>
+
+</body>
+</html>

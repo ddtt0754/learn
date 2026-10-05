@@ -43,7 +43,7 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 18px; backdrop-filter: blur(6px);
   }
-  .title { flex: 1; min-width: 0; font-size: 16px; font-weight: 700; letter-spacing: .5px; white-space: nowrap; overflow: hidden; }
+  .title { flex: 1; min-width: 0; font-size: 16px; font-weight: 700; letter-spacing: .5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .title small { display: block; font-size: 10px; font-weight: 500; opacity: .85; letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* ===== 右上角：打开 DeepSeek 文字链接 ===== */
@@ -56,6 +56,25 @@
     touch-action: manipulation; user-select: none; -webkit-user-select: none;
   }
   .ds-link:active { transform: scale(.95); background: rgba(255,255,255,.34); }
+
+  /* ===== 右上角：返回 ===== */
+  .btn-back {
+    flex: 0 0 auto;
+    color: #fff; text-decoration: none; font-size: 12.5px; font-weight: 700;
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.55);
+    padding: 6px 12px; border-radius: 999px; letter-spacing: .5px; white-space: nowrap;
+    transition: background .2s, transform .12s;
+    touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  }
+  .btn-back:active { transform: scale(.95); background: rgba(255,255,255,.34); }
+
+  /* ===== 窄屏：顶栏瘦身，为「返回」腾出空间（不动大屏观感） ===== */
+  @media (max-width: 430px) {
+    .topbar { padding: 10px 11px; gap: 6px; }
+    .title { font-size: clamp(13px, 3.7vw, 15px); }
+    .title small { font-size: 9.5px; }
+    .ds-link, .btn-back { font-size: 11.5px; padding: 5px 9px; letter-spacing: 0; }
+  }
 
   /* ===== 引导语提示条 ===== */
   .hintbar {
@@ -156,6 +175,7 @@
     <div class="logo" id="logo">🧠</div>
     <div class="title"><span id="titleMain">苏格拉底提问模式</span><small>====豆豆智学中心====</small></div>
     <a class="ds-link" href="https://chat.deepseek.com/" target="_blank" rel="noopener">打开DeepSeek ↗</a>
+    <a class="btn-back" href="../ai/ai_learn.html" title="返回 AI学">← 返回</a>
   </div>
 
   <div class="hintbar" id="hintbar" title="点击复制完整引导语">
