@@ -141,7 +141,7 @@ body{
   touch-action:manipulation;text-decoration:none}
 .back-btn:active{transform:scale(.95)}
 
-/* ---------- 宽屏：容器 820px 下卡片恒为两列，八张卡 4×2 铺满（避免末行落单） ---------- */
+/* ---------- 宽屏：容器 820px 下卡片恒为两列，十张卡 5×2 铺满（避免末行落单） ---------- */
 
 @media(max-width:400px){
   .hero{padding:20px 14px 18px}
@@ -237,11 +237,25 @@ var APPS = [
     cta:'应用宝下载 ↗'
   },
   {
+    ico:'🔢', name:'OKmath全科启蒙', plat:'Android',
+    desc:'专注 3-6 岁儿童数学启蒙游戏 · 覆盖全部数学基础学习 · 在趣味场景游戏中建立数字认知与数学观念',
+    url:'https://sj.qq.com/appdetail/com.cxy61.openkidsmath?&from_wxz=1',
+    tags:['数学启蒙','动手创造'], meta:['v2.27','2026.9.14 更新','免费下载'],
+    cta:'应用宝下载 ↗'
+  },
+  {
     ico:'🤖', name:'豆包爱学', plat:'Android · iOS',
     desc:'豆包旗下 AI 教育应用 · AI 老师分步讲解 · 拍题答疑 · 全科作业批改',
     url:'https://sj.qq.com/appdetail/com.aitutor.hippo',
     tags:['AI 辅导','作业批改'], meta:['手机应用','2026.9.21 更新','免费下载'],
     cta:'应用宝下载 ↗'
+  },
+  {
+    ico:'💻', name:'豆包桌面版', plat:'Windows · macOS',
+    desc:'桌面端全能 AI 助手 · 写文档 / 做表格 / 画 PPT / 生成图片视频 · 还能操作电脑与浏览器完成任务',
+    url:'https://www.doubao.com/download/desktop',
+    tags:['AI 辅导','效率办公'], meta:['桌面客户端','多端互通','免费使用'],
+    cta:'官网下载 ↗'
   },
   {
     ico:'🧮', name:'菁优网', plat:'Android · iOS',
