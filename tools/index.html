@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#0f766e">
-<title>全科互动工具箱 · 豆豆智学系统</title>
+<meta name="description" content="AI+ 教育工具箱 —— 万师严选的 AI 应用合集，覆盖 AI 备课、AI 出题、AI 做课件、AI 批改等教学全流程。">
+<link rel="preconnect" href="https://www.zxxk.com">
+<title>AI教育工具箱 · 豆豆智学系统</title>
 <style>
 :root{
   --bg:#f5f7fa;
@@ -38,12 +40,21 @@ body{
   overflow:hidden;
   box-shadow:0 2px 12px rgba(15,23,42,.14);
   z-index:5;
+  animation:dropIn .5s cubic-bezier(.22,.9,.3,1) both;
 }
 /* 底边品牌亮色细线 */
 .topbar::after{
   content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
   background:var(--grad);opacity:.95;
 }
+/* 细线上掠过的微光 */
+.topbar::before{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:3px;z-index:2;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);
+  transform:translateX(-100%);
+  animation:sweep 4.8s ease-in-out 1.4s infinite;
+}
+@keyframes sweep{0%{transform:translateX(-100%)}55%,100%{transform:translateX(100%)}}
 /* 双圆装饰 */
 .topbar .deco{position:absolute;border-radius:50%;background:rgba(255,255,255,.10);pointer-events:none;}
 .topbar .deco.a{width:122px;height:122px;right:-34px;top:-58px;}
@@ -75,24 +86,77 @@ body{
 .btn-home:active{transform:scale(.95);}
 
 /* ==================== 内嵌区 ==================== */
-.stage{position:relative;flex:1 1 auto;min-height:0;background:#fff;}
+.stage{
+  position:relative;flex:1 1 auto;min-height:0;background:#fff;
+  animation:fadeIn .55s ease .1s both;
+}
 .stage iframe{display:block;width:100%;height:100%;border:0;background:#fff;}
 
 /* 载入态 */
 .loader{
   position:absolute;inset:0;z-index:2;background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
-  transition:opacity .45s ease,visibility .45s ease;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  overflow:hidden;
+  transition:opacity .5s ease,visibility .5s ease;
 }
 .loader.hide{opacity:0;visibility:hidden;}
-.spin{
-  width:44px;height:44px;border-radius:50%;
-  border:4px solid #e2e8f0;border-top-color:var(--accent);border-right-color:#2f9df0;
-  animation:spin .85s linear infinite;
+
+/* 超大幽灵「AI」字——AI 工具箱的主题底纹 */
+.ghost{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  font-size:clamp(200px,46vw,420px);line-height:1;font-weight:900;
+  letter-spacing:-.04em;
+  color:rgba(31,168,115,.075);
+  pointer-events:none;user-select:none;
 }
-@keyframes spin{to{transform:rotate(360deg);}}
-.loader .lt{font-size:12.5px;color:var(--text2);letter-spacing:.06em;font-weight:600;}
-.loader .lh{
+
+/* 应用格子骨架 + 依次点亮（一支支工具被唤醒） */
+.tiles{
+  position:relative;width:168px;height:112px;
+  border-radius:14px;background:#fff;border:1px solid var(--line);
+  padding:18px 0 0;
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+  box-shadow:0 14px 34px -12px rgba(15,23,42,.20),0 2px 6px rgba(15,23,42,.05);
+}
+.tiles .row{display:flex;gap:9px;justify-content:center;}
+.tiles .row b{
+  display:block;width:30px;height:30px;border-radius:9px;
+  background:#eef3f8;border:1px solid #dbe5f0;
+  box-shadow:inset 0 -2px 0 rgba(15,23,42,.05);
+}
+.tiles .row:nth-child(1) b:nth-child(1){animation:pop 2.4s ease-in-out 0s infinite;}
+.tiles .row:nth-child(1) b:nth-child(2){animation:pop 2.4s ease-in-out .18s infinite;}
+.tiles .row:nth-child(1) b:nth-child(3){animation:pop 2.4s ease-in-out .36s infinite;}
+.tiles .row:nth-child(2) b:nth-child(1){animation:pop 2.4s ease-in-out .54s infinite;}
+.tiles .row:nth-child(2) b:nth-child(2){animation:pop 2.4s ease-in-out .72s infinite;}
+.tiles .row:nth-child(2) b:nth-child(3){animation:pop 2.4s ease-in-out .9s infinite;}
+@keyframes pop{
+  0%,12%{
+    background:var(--grad);border-color:transparent;
+    transform:translateY(-2px) scale(1.06);
+    box-shadow:0 0 0 4px rgba(47,157,240,.13),0 0 14px rgba(47,157,240,.42);
+  }
+  26%,100%{
+    background:#eef3f8;border-color:#dbe5f0;transform:none;
+    box-shadow:inset 0 -2px 0 rgba(15,23,42,.05);
+  }
+}
+
+/* 文案行 + 声波条 */
+.lt{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:12.5px;color:var(--text2);letter-spacing:.06em;font-weight:600;
+}
+.eq{display:inline-flex;align-items:flex-end;gap:3px;height:13px;}
+.eq b{width:3px;height:13px;border-radius:2px;background:var(--accent);
+  transform-origin:bottom;animation:eq .92s ease-in-out infinite alternate;}
+.eq b:nth-child(2){background:#2f9df0;animation-delay:.16s}
+.eq b:nth-child(3){background:#35d29a;animation-delay:.32s}
+.eq b:nth-child(4){background:#2f9df0;animation-delay:.48s}
+@keyframes eq{from{transform:scaleY(.28)}to{transform:scaleY(1)}}
+
+.lh{
   margin-top:4px;padding:0 24px;text-align:center;
   font-size:11.5px;line-height:1.75;color:var(--text2);
   opacity:0;transition:opacity .4s ease;
@@ -106,6 +170,7 @@ body{
   padding:7px 14px calc(7px + env(safe-area-inset-bottom,0px));
   font-size:11.5px;line-height:1.6;color:var(--text2);
   background:#fff;border-top:1px solid var(--line);
+  animation:riseIn .5s cubic-bezier(.22,.9,.3,1) .18s both;
 }
 .site-footer a{color:var(--accent2);font-weight:700;text-decoration:none;}
 .site-footer a:active{opacity:.7;}
@@ -122,9 +187,29 @@ body{
 .coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{
   visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ==================== 动效 ==================== */
+@keyframes dropIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes riseIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* 顶栏「标题 + 一个按钮」，窄屏先收品牌前缀，再收按钮 */
+@media (max-width:520px){
+  .bt-brand{display:none;}
+}
 @media (max-width:340px){
   .bar-title{font-size:13px;}
   .btn-home{font-size:12px;padding:7px 11px;}
+  .tiles{width:146px;height:100px;padding:16px 0 0;gap:8px;}
+  .tiles .row{gap:8px;}
+  .tiles .row b{width:26px;height:26px;border-radius:8px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .topbar,.stage,.site-footer{animation:none;}
+  .topbar::before{display:none;}
+  .tiles .row b{animation:none;}
+  .tiles .row:nth-child(1) b:nth-child(1){background:var(--grad);border-color:transparent;}
+  .eq b{animation:none;}
 }
 </style>
 </head>
@@ -133,32 +218,36 @@ body{
 <header class="topbar">
   <span class="deco a"></span><span class="deco b"></span>
   <div class="bar-inner">
-    <h1 class="bar-title">豆豆智学系统--全科互动工具箱</h1>
-    <a class="btn-home" href="../../index.html">🏠 返回首页</a>
+    <h1 class="bar-title"><span class="bt-brand">豆豆智学系统--</span>AI教育工具箱</h1>
+    <a class="btn-home" href="../index.html"><span class="ico" aria-hidden="true">🏠</span>返回首页</a>
   </div>
 </header>
 
 <main class="stage">
   <div class="loader" id="loader">
-    <div class="spin"></div>
-    <div class="lt">正在载入互动工具箱…</div>
-    <div class="lh">若长时间空白，可能是网络较慢或该站限制了内嵌，<br>请点击页脚 <a href="https://www.8858598.com/index.php?c=category&amp;id=28" target="_blank" rel="noopener">🔗 新窗口打开</a></div>
+    <span class="ghost" aria-hidden="true">AI</span>
+    <div class="tiles" aria-hidden="true">
+      <i class="row"><b></b><b></b><b></b></i>
+      <i class="row"><b></b><b></b><b></b></i>
+    </div>
+    <div class="lt"><span class="eq" aria-hidden="true"><b></b><b></b><b></b><b></b></span>正在打开AI教育工具箱…</div>
+    <div class="lh">若长时间空白，可能是网络较慢或该站限制了内嵌，<br>请点击页脚 <a href="https://www.zxxk.com/aitools/" target="_blank" rel="noopener">🔗 新窗口打开</a></div>
   </div>
-  <iframe id="toolFrame"
-          src="https://www.8858598.com/index.php?c=category&amp;id=28"
-          title="全科互动工具箱"
-          allow="fullscreen; clipboard-read; clipboard-write"
+  <iframe id="zxFrame"
+          src="https://www.zxxk.com/aitools/"
+          title="AI教育工具箱"
+          allow="fullscreen; clipboard-read; clipboard-write; autoplay"
           allowfullscreen
           referrerpolicy="no-referrer-when-downgrade"></iframe>
 </main>
 
 <footer class="site-footer">
-  &copy; 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span>&nbsp;·&nbsp;<a href="https://www.8858598.com/index.php?c=category&amp;id=28" target="_blank" rel="noopener">🔗 新窗口打开</a>
+  &copy; 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span>&nbsp;·&nbsp;<a href="https://www.zxxk.com/aitools/" target="_blank" rel="noopener">🔗 新窗口打开</a>
 </footer>
 
 <script>
 (function(){
-  var frame  = document.getElementById('toolFrame');
+  var frame  = document.getElementById('zxFrame');
   var loader = document.getElementById('loader');
   var done   = false;
 
@@ -166,7 +255,7 @@ body{
     if (done) return;
     done = true;
     loader.classList.add('hide');
-    setTimeout(function(){ loader.style.display = 'none'; }, 500);
+    setTimeout(function(){ loader.style.display = 'none'; }, 550);
   }
 
   if (frame) frame.addEventListener('load', hide);
