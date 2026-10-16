@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>SHA-256 哈希工具 · 两英豆豆教练</title>
+<title>哈希工具 · 两英豆豆教练</title>
 <style>
   :root{
     --g1:#35d29a; --g2:#2f9df0;
@@ -12,7 +12,7 @@
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
     background:var(--bg);color:var(--ink);padding:18px 14px 40px;line-height:1.6}
-  .wrap{max-width:480px;margin:0 auto}
+  .wrap{max-width:900px;margin:0 auto}
   .hdr{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-radius:20px;
     padding:22px 22px 24px;position:relative;overflow:hidden;box-shadow:0 10px 28px rgba(47,157,240,.28)}
   .hdr::before,.hdr::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.18)}
@@ -28,25 +28,31 @@
     font-size:1rem;color:var(--ink);outline:none;transition:.2s;background:#fbfdff;font-family:inherit}
   input:focus,textarea:focus{border-color:var(--g2);background:#fff;box-shadow:0 0 0 4px rgba(47,157,240,.12)}
   textarea{resize:vertical;min-height:110px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
+  .modes{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .modes button{flex:1 1 140px;border:1.5px solid var(--line);background:#fbfdff;color:var(--sub);
+    border-radius:999px;padding:9px 6px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit}
+  .modes button.on{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-color:transparent;
+    box-shadow:0 4px 12px rgba(47,157,240,.28)}
   .hashbox{margin-top:12px;background:#0f2233;color:#7fe9c4;border-radius:12px;padding:14px;
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.82rem;word-break:break-all;
     min-height:48px;display:flex;align-items:center}
   .hashbox.empty{color:#5b7186;background:#f1f5f9}
+  .hashbox.err{color:#ffb4b4;background:#2b1520}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;
     font-size:.98rem;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--g1),var(--g2));
     border-radius:999px;padding:12px 20px;margin-top:12px;box-shadow:0 6px 16px rgba(47,157,240,.32);
     transition:transform .08s,opacity .2s;width:100%}
   .btn:active{transform:scale(.97)}
   .btn.ghost{background:#fff;color:var(--g2);border:1.5px solid var(--g2);box-shadow:none}
-  .row{display:flex;gap:10px}
-  .row .btn{margin-top:12px}
-  .meta{font-size:.76rem;color:var(--sub);margin-top:10px;line-height:1.5}
-  .ok{color:#1fae7a!important;font-weight:600}
+  .btn:disabled{opacity:.55;cursor:wait}
+  .meta{font-size:.76rem;color:var(--sub);margin-top:10px;line-height:1.5;word-break:break-all}
+  .meta b{color:var(--ink)}
   .out{margin-top:12px;background:#0f2233;color:#cfe; border-radius:12px;padding:14px;
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;word-break:break-all;
     max-height:240px;overflow:auto;white-space:pre-wrap}
   .note{font-size:.8rem;color:var(--sub);line-height:1.7}
   .note code{background:#eef4fb;color:#1769aa;padding:1px 6px;border-radius:6px;font-size:.78rem}
+  .note b{color:var(--ink)}
   .foot{text-align:center;color:var(--sub);font-size:.74rem;margin-top:22px}
 </style>
 </head>
@@ -54,14 +60,19 @@
 <div class="wrap">
 
   <div class="hdr">
-    <h1>🔐 SHA-256 哈希工具</h1>
-    <p>输入手机号，自动生成哈希 · 规范：UTF-8 字符串 / 无盐 / 自动去空格</p>
+    <h1>🔐 哈希工具</h1>
+    <p>SHA-256（无盐）· 双层 bcrypt(SHA-256) · 纯 bcrypt(原文) —— 口令按锁屏页规范处理：UTF-8 / 无盐 / 自动去空格</p>
   </div>
 
   <!-- 单人模式 -->
   <div class="card">
-    <h2><span class="dot"></span>单个手机号</h2>
-    <input id="phone" type="tel" inputmode="numeric" placeholder="例如 13513513513" autocomplete="off">
+    <h2><span class="dot"></span>单个生成</h2>
+    <div class="modes">
+      <button id="modeSha" class="on" type="button">SHA-256（无盐）</button>
+      <button id="modeDual" type="button">双层 bcrypt(SHA-256)</button>
+      <button id="modePure" type="button">纯 bcrypt(原文)</button>
+    </div>
+    <input id="phone" type="text" placeholder="输入手机号或学号" autocomplete="off">
     <div id="hashBox" class="hashbox empty">输入后自动生成哈希…</div>
     <button id="copyBtn" class="btn">📋 复制哈希</button>
     <div id="meta" class="meta">—</div>
@@ -69,8 +80,8 @@
 
   <!-- 批量模式 -->
   <div class="card">
-    <h2><span class="dot"></span>批量生成（每行一个号码）</h2>
-    <textarea id="bulk" placeholder="13510110193&#10;13333333333&#10;13513513555"></textarea>
+    <h2><span class="dot"></span>批量生成（每行一条）</h2>
+    <textarea id="bulk" placeholder="13333333333&#10;13513513555"></textarea>
     <button id="bulkBtn" class="btn ghost">⚡ 生成全部哈希</button>
     <div id="bulkOut" class="out" style="display:none"></div>
     <button id="copyAllBtn" class="btn" style="display:none">📋 复制全部哈希</button>
@@ -81,18 +92,32 @@
   <div class="card">
     <h2><span class="dot"></span>规范说明</h2>
     <p class="note">
-      本工具生成的哈希与 <code>jiesuo.html</code> 及锁屏页 <code>index.html</code> 的校验方式<b>完全一致</b>：<br>
-      ① 手机号按<b>字符串</b>处理（非整数）；② 以 <b>UTF-8</b> 编码为字节；③ <b>无盐</b>；④ 自动去除首尾及中间空格。<br>
-      即等价于 <code>sha256("13510110193".encode("utf-8"))</code>。<br>
-      生成的哈希可直接追加到 <code>jiesuo.html</code> 一行，或同步到锁屏页的 <code>FALLBACK_HASHES</code> 数组。
+      <b>① SHA-256（无盐）</b> —— 锁屏页联网验号时浏览器上传给 FC 的那串值：先把口令按规范处理（按<b>字符串</b>处理 / <b>UTF-8</b> 编码 / <b>无盐</b> / 去除<b>所有空格</b>）再算 SHA-256，得 64 位十六进制。即等价于 <code>sha256("13513513513".encode("utf-8"))</code>；锁屏页 <code>index.html</code> 内嵌的 <code>FALLBACK_HASHES</code> 离线兜底名单用的就是这一档。<br>
+      <b>② 双层 bcrypt(SHA-256)</b>（联网验号配套）—— 先按 ① 算出 SHA-256 hex，再对 hex 做 <code>bcrypt(cost=10)</code>。飞书「智学系统用户表」的注册码列存此值；FC 端收到浏览器上传的 SHA-256 hex 后执行 <code>bcrypt.compareSync(hex, 存储值)</code> 比对。<br>
+      <b>③ 纯 bcrypt(原文)</b> —— 原文不做任何修改直接 bcrypt，适合密码类字段（如智学系统会员表「密码哈希」列）。<br>
+      ②③ 的 bcrypt 内嵌随机盐，同一原文每次生成的哈希都不同，<b>全部都能通过校验，任选其一</b>即可；哈希以 <code>$2a$10$</code> 开头、总长 60 字符。① 是确定性摘要，同一输入永远得到同一结果。
     </p>
   </div>
 
-  <div class="foot">© 两英豆豆教练 · SHA-256 工具</div>
+  <div class="foot">© 两英豆豆教练 · 哈希工具</div>
 </div>
 
+<!-- bcryptjs 主加载源（本地）→ CDN 兜底链 -->
+<script src="bcrypt.min.js"></script>
 <script>
-/* ===== 纯 JS SHA-256（兜底，非 https 环境也能用） ===== */
+  if (!(window.dcodeIO && window.dcodeIO.bcrypt)) document.write('<script src="https://cdn.bootcdn.net/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"><\/script>');
+</script>
+<script>
+  if (!(window.dcodeIO && window.dcodeIO.bcrypt)) document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"><\/script>');
+</script>
+
+<script>
+/* ===== bcrypt 实例获取（仅 ②③ 档需要；① SHA-256 档不依赖） ===== */
+var BCRYPT = (window.dcodeIO && window.dcodeIO.bcrypt) || (window.bcrypt && window.bcrypt.hashSync ? window.bcrypt : null);
+var COST = 10;
+var mode = 'sha'; // sha = sha256hex(原文去空格) | dual = bcrypt(sha256hex) | pure = bcrypt(原文)
+
+/* ===== 纯 JS SHA-256（① 档主算法，亦是 ② 档前置步骤；https 环境优先原生） ===== */
 function sha256Fallback(msg){
   function r(x,n){return (x>>>n)|(x<<(32-n));}
   var utf8 = unescape(encodeURIComponent(msg));
@@ -138,8 +163,6 @@ function sha256Fallback(msg){
   }
   return H.map(function(x){return ('00000000'+x.toString(16)).slice(-8);}).join('');
 }
-
-/* 优先用浏览器原生 crypto.subtle，否则用兜底实现；结果一致 */
 async function sha256Hex(str){
   if (window.crypto && crypto.subtle){
     try{
@@ -150,8 +173,28 @@ async function sha256Hex(str){
   return sha256Fallback(str);
 }
 
-/* 与锁屏页一致：去空格 */
+/* 与锁屏页一致：去所有空格（②③ 中仅 ② 使用；纯 bcrypt 模式不改原文） */
 function norm(s){ return (s||'').replace(/\s+/g,''); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ===== 生成 ===== */
+async function genHash(raw){
+  if (mode === 'sha'){
+    var hex0 = await sha256Hex(norm(raw));
+    return { hash: hex0, shaHex: hex0, normed: norm(raw) };
+  }
+  if (!BCRYPT) throw new Error('bcrypt 库未加载');
+  if (mode === 'dual'){
+    var hex = await sha256Hex(norm(raw));
+    return { hash: BCRYPT.hashSync(hex, COST), shaHex: hex, normed: norm(raw) };
+  }
+  return { hash: BCRYPT.hashSync(raw, COST), shaHex: null, normed: raw };
+}
+function modeLabel(m){
+  if (m === 'sha')  return 'SHA-256（无盐）';
+  if (m === 'dual') return 'bcrypt(SHA-256(号码))';
+  return 'bcrypt(原文)';
+}
 
 /* ===== 复制 ===== */
 async function copyText(t){
@@ -165,20 +208,47 @@ async function copyText(t){
   }
 }
 
-/* ===== 单人模式 ===== */
-var phoneEl=document.getElementById('phone');
+/* ===== 模式切换 ===== */
+var modeShaBtn=document.getElementById('modeSha');
+var modeDualBtn=document.getElementById('modeDual');
+var modePureBtn=document.getElementById('modePure');
+modeShaBtn.addEventListener('click', function(){ setMode('sha'); });
+modeDualBtn.addEventListener('click', function(){ setMode('dual'); });
+modePureBtn.addEventListener('click', function(){ setMode('pure'); });
+function setMode(m){
+  mode = m;
+  modeShaBtn.className  = m==='sha'  ? 'on' : '';
+  modeDualBtn.className = m==='dual' ? 'on' : '';
+  modePureBtn.className = m==='pure' ? 'on' : '';
+  phoneEl.input.placeholder = m==='pure' ? '纯模式：输入任意原文' : '输入手机号或学号';
+  // 触发重新生成
+  if (phoneEl.input.value) phoneEl.input.dispatchEvent(new Event('input'));
+  if (bulkEl.value.trim()) bulkMeta.textContent = '原文已切换模式，请重新「生成全部哈希」';
+}
+
+/* ===== 单个生成 ===== */
+var phoneEl={input:document.getElementById('phone')};
 var hashBox=document.getElementById('hashBox');
 var metaEl=document.getElementById('meta');
-phoneEl.addEventListener('input', function(){
-  var raw=phoneEl.value, n=norm(raw);
-  if(!n){ hashBox.className='hashbox empty'; hashBox.textContent='输入后自动生成哈希…'; metaEl.textContent='—'; return; }
-  sha256Hex(n).then(function(h){
-    hashBox.className='hashbox'; hashBox.textContent=h;
-    metaEl.innerHTML='已规范化：<b>'+n+'</b>（'+n.length+' 位） · 编码 UTF-8 · 无盐';
+phoneEl.input.addEventListener('input', function(){
+  var raw=phoneEl.input.value;
+  if(!raw){ hashBox.className='hashbox empty'; hashBox.textContent='输入后自动生成哈希…'; metaEl.textContent='—'; return; }
+  if(mode!=='sha' && !BCRYPT){ hashBox.className='hashbox err'; hashBox.textContent='⚠️ bcrypt 库加载失败，请检查网络后刷新'; metaEl.textContent='—'; return; }
+  genHash(raw).then(function(r){
+    hashBox.className='hashbox'; hashBox.textContent=r.hash;
+    if (mode==='sha'){
+      metaEl.innerHTML='已规范化：<b>'+esc(r.normed)+'</b>（'+r.normed.length+' 位） · UTF-8 编码 · 无盐 · 64 位 hex';
+    } else if (mode==='dual'){
+      metaEl.innerHTML='已规范化：<b>'+esc(r.normed)+'</b>（'+r.normed.length+' 位） · SHA-256：<b>'+r.shaHex.slice(0,16)+'…</b> → bcrypt(cost '+COST+') · 盐随机';
+    } else {
+      metaEl.innerHTML='原文长度 <b>'+r.normed.length+'</b> 字符（未做修改） · bcrypt(cost '+COST+') · 盐随机';
+    }
+  }).catch(function(e){
+    hashBox.className='hashbox err'; hashBox.textContent='⚠️ '+(e&&e.message?e.message:'生成失败'); metaEl.textContent='—';
   });
 });
 document.getElementById('copyBtn').addEventListener('click', function(){
-  if(hashBox.className.indexOf('empty')>=0) return;
+  if(hashBox.className.indexOf('empty')>=0 || hashBox.className.indexOf('err')>=0) return;
   copyText(hashBox.textContent).then(function(ok){
     var b=document.getElementById('copyBtn');
     b.textContent = ok ? '✅ 已复制' : '⚠️ 复制失败，请手动选';
@@ -186,22 +256,35 @@ document.getElementById('copyBtn').addEventListener('click', function(){
   });
 });
 
-/* ===== 批量模式 ===== */
+/* ===== 批量生成 ===== */
 var bulkEl=document.getElementById('bulk');
 var bulkOut=document.getElementById('bulkOut');
 var copyAllBtn=document.getElementById('copyAllBtn');
 var bulkMeta=document.getElementById('bulkMeta');
-document.getElementById('bulkBtn').addEventListener('click', function(){
-  var lines=bulkEl.value.split(/\r?\n/).map(function(l){return norm(l);}).filter(function(l){return l;});
-  if(!lines.length){ bulkMeta.textContent='请先输入至少一个号码'; return; }
-  Promise.all(lines.map(function(n){ return sha256Hex(n).then(function(h){ return n+'  '+h; }); }))
-    .then(function(rows){
-      var text=rows.join('\n');
-      bulkOut.style.display='block'; bulkOut.textContent=text;
-      copyAllBtn.style.display='inline-flex';
-      bulkMeta.innerHTML='共 <b>'+lines.length+'</b> 个号码 · 已逐行生成（号码 + 空格 + 哈希）';
-      copyAllBtn._text=text;
-    });
+var bulkBtn=document.getElementById('bulkBtn');
+bulkBtn.addEventListener('click', async function(){
+  var lines=bulkEl.value.split(/\r?\n/).map(function(l){ return mode==='pure' ? l.replace(/\r/g,'') : norm(l); }).filter(function(l){ return mode==='pure' ? l.length>0 : l; });
+  if(!lines.length){ bulkMeta.textContent='请先输入至少一条内容'; return; }
+  if(mode!=='sha' && !BCRYPT){ bulkMeta.textContent='⚠️ bcrypt 库加载失败，请检查网络后刷新'; return; }
+  bulkBtn.disabled=true;
+  var rows=[];
+  for (var i=0;i<lines.length;i++){
+    bulkBtn.textContent='⏳ 生成中…（'+(i+1)+'/'+lines.length+'）';
+    try{
+      var r=await genHash(lines[i]);
+      rows.push(lines[i]+'  '+r.hash);
+    }catch(e){
+      rows.push(lines[i]+'  ⚠️ 生成失败');
+    }
+    await new Promise(function(res){ setTimeout(res,0); }); // 让 UI 刷新
+  }
+  var text=rows.join('\n');
+  bulkOut.style.display='block'; bulkOut.textContent=text;
+  copyAllBtn.style.display='inline-flex';
+  bulkMeta.innerHTML='共 <b>'+lines.length+'</b> 条 · '+modeLabel(mode)+(mode==='sha'?'':' · cost '+COST)+' · 逐行「原文 + 空格 + 哈希」';
+  copyAllBtn._text=text;
+  bulkBtn.disabled=false;
+  bulkBtn.textContent='⚡ 生成全部哈希';
 });
 copyAllBtn.addEventListener('click', function(){
   copyText(copyAllBtn._text||'').then(function(ok){
