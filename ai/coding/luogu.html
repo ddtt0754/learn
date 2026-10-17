@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="description" content="豆豆智学系统 · 洛谷题库 —— 按难度、算法标签与来源检索 17000+ 道题目，从入门到提高，刷题练算法。">
+<title>洛谷题库 · 学算法</title>
+<style>
+:root{
+  --bg:#eef3f8;
+  --text:#1e293b;
+  --text2:#64748b;
+  --line:#e3eaf3;
+  /* 品牌渐变（亮版，仅作装饰色带） */
+  --grad:linear-gradient(135deg,#35d29a,#2f9df0);
+  /* 承载白字的加深版（白字对比度 ≈5.3:1） */
+  --grad-deep:linear-gradient(135deg,#0f766e,#1f6fb2);
+  --accent:#1fa873;
+  --accent2:#0f766e;
+  --bar-h:56px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--text);
+  display:flex;flex-direction:column;
+  height:100vh;height:100dvh;overflow:hidden;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ==================== 顶栏 ==================== */
+.topbar{
+  position:relative;flex:0 0 auto;
+  background:var(--grad-deep);
+  padding:0 14px;
+  padding-top:env(safe-area-inset-top,0px);
+  overflow:hidden;
+  box-shadow:0 2px 12px rgba(15,23,42,.14);
+  z-index:5;
+  animation:dropIn .5s cubic-bezier(.22,.9,.3,1) both;
+}
+/* 底边品牌亮色细线 */
+.topbar::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+  background:var(--grad);opacity:.95;
+}
+/* 细线上掠过的微光 */
+.topbar::before{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:3px;z-index:2;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);
+  transform:translateX(-100%);
+  animation:sweep 4.8s ease-in-out 1.4s infinite;
+}
+@keyframes sweep{0%{transform:translateX(-100%)}55%,100%{transform:translateX(100%)}}
+/* 双圆装饰 */
+.topbar .deco{position:absolute;border-radius:50%;background:rgba(255,255,255,.10);pointer-events:none;}
+.topbar .deco.a{width:122px;height:122px;right:-34px;top:-58px;}
+.topbar .deco.b{width:66px;height:66px;right:58px;bottom:-40px;background:rgba(255,255,255,.07);}
+.bar-inner{
+  position:relative;z-index:1;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  min-height:var(--bar-h);
+}
+.bar-title{
+  flex:1 1 auto;min-width:0;
+  font-size:clamp(12.5px,3.4vw,17px);
+  font-weight:800;letter-spacing:.02em;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 2px rgba(15,23,42,.18);
+}
+.btn-home{
+  flex:0 0 auto;text-decoration:none;
+  display:inline-flex;align-items:center;gap:5px;
+  background:#fff;color:var(--accent2);
+  font-size:13px;font-weight:800;letter-spacing:.02em;
+  padding:8px 14px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(15,23,42,.18);
+  transition:transform .15s ease,box-shadow .2s ease,background .2s ease;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;white-space:nowrap;
+}
+.btn-home:hover{background:#f0fffa;box-shadow:0 5px 16px rgba(15,23,42,.24);}
+.btn-home:active{transform:scale(.95);}
+
+/* 右侧按钮组：工具入口（次要 · 玻璃态）+ 返回首页（主要 · 实心白） */
+.bar-actions{flex:0 0 auto;display:flex;align-items:center;gap:8px;}
+.btn-tool{
+  flex:0 0 auto;text-decoration:none;
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.55);
+  color:#fff;
+  font-size:13px;font-weight:800;letter-spacing:.02em;
+  padding:7px 13px;border-radius:999px;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  transition:transform .15s ease,background .2s ease,border-color .2s ease;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;white-space:nowrap;
+}
+.btn-tool:hover{background:rgba(255,255,255,.30);border-color:#fff;}
+.btn-tool:active{transform:scale(.95);}
+
+/* ==================== 内嵌区 ==================== */
+.stage{
+  position:relative;flex:1 1 auto;min-height:0;background:#fff;
+  animation:fadeIn .55s ease .1s both;
+}
+.stage iframe{display:block;width:100%;height:100%;border:0;background:#fff;}
+
+/* 载入态 */
+.loader{
+  position:absolute;inset:0;z-index:2;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  overflow:hidden;
+  transition:opacity .5s ease,visibility .5s ease;
+}
+.loader.hide{opacity:0;visibility:hidden;}
+
+/* 超大幽灵「题」字——题库主题底纹 */
+.ghost{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  font-family:"Songti SC","STSong","SimSun","Noto Serif SC",serif;
+  font-size:clamp(200px,46vw,420px);line-height:1;font-weight:900;
+  color:rgba(31,168,115,.075);letter-spacing:-.02em;
+  pointer-events:none;user-select:none;
+}
+
+/* 键盘键帽骨架 + 敲击脉冲 */
+.kbd{
+  position:relative;width:186px;height:124px;
+  border-radius:14px;background:#fff;border:1px solid var(--line);
+  padding:18px 18px 0;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  box-shadow:0 14px 34px -12px rgba(15,23,42,.20),0 2px 6px rgba(15,23,42,.05);
+}
+.kbd .row{display:flex;gap:5px;justify-content:center;}
+.kbd .row b{
+  display:block;width:20px;height:22px;border-radius:6px;
+  background:#eef3f8;border:1px solid #dbe5f0;
+  box-shadow:inset 0 -2px 0 rgba(15,23,42,.05);
+}
+/* 三个键依次闪亮，模拟连续敲击的节奏 */
+.kbd .row:nth-child(1) b:nth-child(3){animation:tap 1.8s ease-in-out infinite;}
+.kbd .row:nth-child(2) b:nth-child(2){animation:tap 1.8s ease-in-out .3s infinite;}
+.kbd .row:nth-child(3) b:nth-child(4){animation:tap 1.8s ease-in-out .6s infinite;}
+@keyframes tap{
+  0%,10%{
+    background:var(--grad);border-color:transparent;
+    transform:translateY(2px);
+    box-shadow:0 0 0 4px rgba(47,157,240,.14),0 0 12px rgba(47,157,240,.45);
+  }
+  22%,100%{
+    background:#eef3f8;border-color:#dbe5f0;transform:none;
+    box-shadow:inset 0 -2px 0 rgba(15,23,42,.05);
+  }
+}
+
+/* 文案行 + 声波条 */
+.lt{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:12.5px;color:var(--text2);letter-spacing:.06em;font-weight:600;
+}
+.eq{display:inline-flex;align-items:flex-end;gap:3px;height:13px;}
+.eq b{width:3px;height:13px;border-radius:2px;background:var(--accent);
+  transform-origin:bottom;animation:eq .92s ease-in-out infinite alternate;}
+.eq b:nth-child(2){background:#2f9df0;animation-delay:.16s}
+.eq b:nth-child(3){background:#35d29a;animation-delay:.32s}
+.eq b:nth-child(4){background:#2f9df0;animation-delay:.48s}
+@keyframes eq{from{transform:scaleY(.28)}to{transform:scaleY(1)}}
+
+.lh{
+  margin-top:4px;padding:0 24px;text-align:center;
+  font-size:11.5px;line-height:1.75;color:var(--text2);
+  opacity:0;transition:opacity .4s ease;
+}
+.loader.slow .lh{opacity:1;}
+.loader .lh a{color:var(--accent2);font-weight:700;text-decoration:none;border-bottom:1px dashed var(--accent2);}
+
+/* ==================== 页脚 ==================== */
+.site-footer{
+  flex:0 0 auto;text-align:center;
+  padding:7px 14px calc(7px + env(safe-area-inset-bottom,0px));
+  font-size:11.5px;line-height:1.6;color:var(--text2);
+  background:#fff;border-top:1px solid var(--line);
+  animation:riseIn .5s cubic-bezier(.22,.9,.3,1) .18s both;
+}
+.site-footer a{color:var(--accent2);font-weight:700;text-decoration:none;}
+.site-footer a:active{opacity:.7;}
+
+/* 署名气泡 */
+.coach-tip{position:relative;display:inline-block;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.coach-tip .tip{visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;
+  transform:translateX(-50%) translateY(4px);background:linear-gradient(135deg,#35d29a,#2f9df0);
+  color:#fff;padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;white-space:nowrap;
+  letter-spacing:.5px;z-index:99;pointer-events:none;box-shadow:0 6px 18px rgba(47,157,240,.35);
+  transition:opacity .2s ease,transform .2s ease,visibility .2s}
+.coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:#2f9df0}
+.coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{
+  visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ==================== 动效 ==================== */
+@keyframes dropIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes riseIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* 顶栏现有「标题 + 两个按钮」，窄屏需让位：先收品牌前缀，再收按钮 */
+@media (max-width:520px){
+  .bt-brand{display:none;}
+}
+@media (max-width:360px){
+  .bar-actions{gap:6px;}
+  .btn-tool,.btn-home{font-size:12px;padding:7px 10px;}
+  .btn-tool{padding:6px 10px;}   /* 自带 1px 边框，内距减 1px 以对齐高度 */
+}
+
+@media (max-width:340px){
+  .bar-title{font-size:13px;}
+  .btn-home{font-size:12px;padding:7px 11px;}
+  .kbd{width:160px;height:110px;padding:15px 15px 0;gap:8px;}
+  .kbd .row{gap:4px;}
+  .kbd .row b{width:17px;height:19px;border-radius:5px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .topbar,.stage,.site-footer{animation:none;}
+  .topbar::before{display:none;}
+  .kbd .row b{animation:none;}
+  .kbd .row:nth-child(1) b:nth-child(3){background:var(--grad);border-color:transparent;}
+  .eq b{animation:none;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="deco a"></span><span class="deco b"></span>
+  <div class="bar-inner">
+    <h1 class="bar-title"><span class="bt-brand">刷题-</span>洛谷题库</h1>
+    <div class="bar-actions">
+      <a class="btn-home" href="index.html"><span class="ico" aria-hidden="true">🏠</span>返回主页</a>
+    </div>
+  </div>
+</header>
+
+<main class="stage">
+  <div class="loader" id="loader">
+    <span class="ghost" aria-hidden="true">题</span>
+    <div class="kbd" aria-hidden="true">
+      <i class="row"><b></b><b></b><b></b><b></b><b></b><b></b></i>
+      <i class="row"><b></b><b></b><b></b><b></b><b></b></i>
+      <i class="row"><b></b><b></b><b></b><b></b></i>
+    </div>
+    <div class="lt"><span class="eq" aria-hidden="true"><b></b><b></b><b></b><b></b></span>正在打开洛谷题库…</div>
+    <div class="lh">首次加载可能需要几秒。<br>若长时间没有反应，请
+      <a href="https://www.luogu.com.cn/problem/list" target="_blank" rel="noopener">在新窗口打开</a>。</div>
+  </div>
+  <iframe id="lgFrame"
+          src="https://www.luogu.com.cn/problem/list"
+          title="洛谷题库"
+          loading="eager"
+          allow="fullscreen; clipboard-read; clipboard-write; autoplay"
+          allowfullscreen
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+</main>
+
+<footer class="site-footer">
+  &copy; 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span>&nbsp;·&nbsp;<a href="https://www.luogu.com.cn/problem/list" target="_blank" rel="noopener">🔗 新窗口打开</a>
+</footer>
+
+<script>
+(function(){
+  var frame  = document.getElementById('lgFrame');
+  var loader = document.getElementById('loader');
+  var done   = false;
+
+  function hide(){
+    if (done) return;
+    done = true;
+    loader.classList.add('hide');
+    setTimeout(function(){ loader.style.display = 'none'; }, 550);
+  }
+
+  if (frame){
+    frame.addEventListener('load', hide);
+    /* 若被浏览器策略拦截（极少数情况），error 也会触发，同样收起载入层 */
+    frame.addEventListener('error', hide);
+  }
+
+  /* 跨域页读不到内部状态：超时未 load 则给出「新窗口打开」兜底提示 */
+  setTimeout(function(){ if (!done) loader.classList.add('slow'); }, 9000);
+  setTimeout(hide, 20000);
+})();
+</script>
+</body>
+</html>
