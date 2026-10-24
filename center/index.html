@@ -73,8 +73,24 @@ a{color:inherit;text-decoration:none}
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* ===== 背景层：星辰闪烁（星点由脚本生成，各自独立相位） ===== */
+.bg-fx .stars{position:absolute;inset:0}
+.bg-fx .star{
+  position:absolute;width:var(--st-s);height:var(--st-s);border-radius:50%;
+  background:#eaf9ff;opacity:0;
+  animation:twinkle var(--st-d) ease-in-out var(--st-dl) infinite alternate;
+}
+.bg-fx .star.big{box-shadow:0 0 4px rgba(150,232,255,.9),0 0 9px rgba(56,224,208,.42)}
+@keyframes twinkle{
+  from{opacity:.06;transform:scale(.84)}
+  to{opacity:var(--st-o);transform:scale(1.1)}
+}
+@media (prefers-reduced-motion:reduce){
+  .bg-fx .star{animation:none;opacity:var(--st-o);transform:none}
+}
+
 /* ===== 版心 ===== */
-.page{position:relative;z-index:1;width:100%;max-width:var(--maxw);margin:0 auto;padding:0 20px calc(84px + env(safe-area-inset-bottom))}
+.page{position:relative;z-index:1;width:100%;max-width:var(--maxw);margin:0 auto;padding:0 20px calc(140px + env(safe-area-inset-bottom))}
 
 /* ===== 通用：滚动渐入 ===== */
 .rv{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
@@ -96,6 +112,12 @@ a{color:inherit;text-decoration:none}
   display:flex;flex-direction:column;justify-content:center;
   text-align:center;padding:24px 0 112px;   /* 上小下大：在保持总内边距 136px 不变的前提下，使首屏内容整体上移 40px */
 }
+/* 首屏 · 流萤光尘（canvas 粒子：向上飘升 + 亮度呼吸；滚离首屏自动暂停） */
+.hero{isolation:isolate}
+.hero-fx{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block}
+.hero > .hero-badge,.hero > h1,.hero > .hero-sub,.hero > .hero-slogan,.hero > .hero-arc{position:relative;z-index:1}
+.hero > .scroll-cue{z-index:2}
+
 .hero-badge{
   display:inline-flex;align-items:center;gap:7px;align-self:center;
   padding:6px 15px;border-radius:999px;
@@ -358,6 +380,27 @@ a{color:inherit;text-decoration:none}
 .perk .pd{font-size:10.5px;color:var(--ink-3);margin-top:4px;letter-spacing:.04em}
 
 /* ===== 底部固定引导条 ===== */
+/* 左下 · VIP 资料群飘浮按钮（参考 resources.html 的 .vip-fab：改到左下、适配深色底、链接改 resources.html） */
+.vip-fab{
+  position:fixed;left:14px;bottom:calc(82px + env(safe-area-inset-bottom));z-index:41;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:96px;padding:9px 13px;border-radius:16px;text-align:center;
+  background:var(--grad);color:#04121C;text-decoration:none;
+  line-height:1.3;letter-spacing:.02em;
+  box-shadow:0 5px 18px rgba(56,224,208,.34);
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .18s var(--ease),box-shadow .18s var(--ease);
+  animation:vipPulse 2.6s ease-in-out infinite;
+}
+.vip-fab b{display:block;font-size:14px;font-weight:900;letter-spacing:.02em}
+.vip-fab span{display:block;font-size:11px;font-weight:700;opacity:.84;letter-spacing:.08em}
+.vip-fab:active{transform:scale(.94);box-shadow:0 2px 8px rgba(56,224,208,.42)}
+@keyframes vipPulse{
+  0%,100%{box-shadow:0 5px 18px rgba(56,224,208,.34)}
+  50%{box-shadow:0 5px 26px rgba(46,155,255,.62)}
+}
+@media (prefers-reduced-motion:reduce){.vip-fab{animation:none}}
+
 .fixed-bar{
   position:fixed;left:0;right:0;bottom:0;z-index:40;
   padding:11px 16px calc(11px + env(safe-area-inset-bottom));
@@ -440,6 +483,7 @@ a{color:inherit;text-decoration:none}
   <div class="glow g2"></div>
   <div class="glow g3"></div>
   <div class="grid"></div>
+  <div class="stars" id="bgStars"></div>
   <div class="grain"></div>
 </div>
 
@@ -449,6 +493,7 @@ a{color:inherit;text-decoration:none}
        第一屏 · 首屏海报
        ============================================================ -->
   <header class="hero">
+    <canvas class="hero-fx" id="heroFx" aria-hidden="true"></canvas>
     <span class="hero-badge rv"><i></i>AI赋能 · 沉浸式安静自习</span>
 
     <h1 class="rv d1">
@@ -509,40 +554,40 @@ a{color:inherit;text-decoration:none}
   </section>
 
   <!-- ============================================================
-       第三屏 · 核心 AI 特色
+       第三屏 · 智能学习空间
        ============================================================ -->
   <section class="sec" id="ai">
-    <span class="sec-tag rv">智能赋能</span>
-    <h2 class="rv d1">不止是<span class="hl">自习室</span></h2>
-    <p class="sec-lead rv d2">用智能科技接管琐碎，把注意力全部留给学习本身。</p>
+    <span class="sec-tag rv">豆豆智学中心</span>
+    <h2 class="rv d1">智能学习空间 · <span class="hl">一站式文化场域</span></h2>
+    <p class="sec-lead rv d2">集图书阅读、沉浸式学习、讲座活动与文创礼品于一体，让学习换一种舒服的姿势。</p>
 
     <div class="ai-grid">
       <article class="ai-card rv">
         <span class="sheen" aria-hidden="true"></span>
-        <div class="ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V10M9 20V4M15 20v-7M21 20V8"/></svg></div>
-        <h3>AI 学情分析</h3>
-        <p>智能记录<span class="k">学习时长</span>与<span class="k">专注状态</span>，生成专属学习报告，精准把控学习节奏，告别盲目刷题。</p>
+        <div class="ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.2C10.5 5.4 8.4 4.5 5 4.5v13.2c3.4 0 5.5.9 7 2.8 1.5-1.9 3.6-2.8 7-2.8V4.5c-3.4 0-5.5.9-7 2.7z"/><path d="M12 7.2v13.3"/></svg></div>
+        <h3>图书阅读空间</h3>
+        <p>精选适龄书库与安静阅读区，培养持续阅读的习惯。</p>
       </article>
 
       <article class="ai-card rv d1">
         <span class="sheen" aria-hidden="true"></span>
-        <div class="ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-1 4 8.5 8.5 0 0 1-7.5 4.5 8.4 8.4 0 0 1-4-1L3 21l2-5.5a8.4 8.4 0 0 1-1-4A8.5 8.5 0 0 1 8.5 4a8.4 8.4 0 0 1 4-1 8.5 8.5 0 0 1 8.5 8.5z"/><path d="M9.5 11h.01M12.5 11h.01M15.5 11h.01"/></svg></div>
-        <h3>AI 答疑辅助</h3>
-        <p>覆盖<span class="k">多学科知识点</span>，实时答疑解惑，碎片化解决学习难题，不用卡在一道题上耗掉整个晚上。</p>
+        <div class="ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="3.6"/></svg></div>
+        <h3>沉静式学习空间</h3>
+        <p>专注氛围 + <span class="k">伴学督导</span>，把碎片时间变成有效积累。</p>
       </article>
 
       <article class="ai-card rv d2">
         <span class="sheen" aria-hidden="true"></span>
-        <div class="ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/><circle cx="12" cy="12" r="3.6"/></svg></div>
-        <h3>智能环境调控</h3>
-        <p>AI 智能控光、控温、降噪，随时段自动调节<span class="k">适宜学习环境</span>，护眼舒适，久坐不累。</p>
+        <div class="ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9.2" y="3" width="5.6" height="10.5" rx="2.8"/><path d="M5.6 11.4a6.4 6.4 0 0 0 12.8 0"/><path d="M12 17.8V21"/><path d="M9.2 21h5.6"/></svg></div>
+        <h3>讲座活动</h3>
+        <p>定期学习方法讲座与分享会，<span class="k">拓宽视野</span>、激发动力。</p>
       </article>
 
       <article class="ai-card rv d3">
         <span class="sheen" aria-hidden="true"></span>
-        <div class="ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"/><path d="M20 12a8 8 0 1 1-3.1-6.3"/><path d="M20 4v5h-5"/></svg></div>
-        <h3>智能考勤督导</h3>
-        <p>自主打卡记录<span class="k">学习轨迹</span>，把自律变成看得见的积累，助力长期坚持高效学习。</p>
+        <div class="ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5.2 12.5V20a.6.6 0 0 0 .6.6h12.4a.6.6 0 0 0 .6-.6v-7.5"/><path d="M12 8.5V20.6"/><path d="M12 8.5C11 6.2 9.6 5 8.2 5.4c-1.2.4-1.1 1.9.5 2.6.6.3 1.8.5 3.3.5z"/><path d="M12 8.5c1-2.3 2.4-3.5 3.8-3.1 1.2.4 1.1 1.9-.5 2.6-.6.3-1.8.5-3.3.5z"/></svg></div>
+        <h3>文创礼品</h3>
+        <p><span class="k">豆豆文创礼品</span>，让陪伴的仪式感融入日常学习。</p>
       </article>
     </div>
   </section>
@@ -557,7 +602,8 @@ a{color:inherit;text-decoration:none}
     <div class="tabs rv d2" id="sceneTabs">
       <button class="tab on" data-i="0" type="button">静音自习区</button>
       <button class="tab" data-i="1" type="button">轻声背书区</button>
-      <button class="tab" data-i="2" type="button">休闲饮水区</button>
+      <button class="tab" data-i="2" type="button">图书阅读区</button>
+      <button class="tab" data-i="3" type="button">休闲饮水区</button>
     </div>
 
     <div class="slider rv d2">
@@ -570,6 +616,11 @@ a{color:inherit;text-decoration:none}
         <figure class="slide">
           <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5A5.5 5.5 0 0 1 17.5 12v3.5H6.5V12A5.5 5.5 0 0 1 12 6.5z"/><path d="M12 3v3.5"/><path d="M9.5 19h5"/></svg></div>
           <div class="ph-t">轻声背书区实拍</div>
+          <div class="ph-d">此处预留门店实拍图位 · 替换后即自动轮播</div>
+        </figure>
+        <figure class="slide">
+          <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.6C10.4 5 8.5 4.3 5 4.3v13.4c3.5 0 5.4.7 7 2.3 1.6-1.6 3.5-2.3 7-2.3V4.3c-3.5 0-5.4.7-7 2.3z"/><path d="M12 6.6V20"/></svg></div>
+          <div class="ph-t">图书阅读区实拍</div>
           <div class="ph-d">此处预留门店实拍图位 · 替换后即自动轮播</div>
         </figure>
         <figure class="slide">
@@ -588,7 +639,7 @@ a{color:inherit;text-decoration:none}
       </div>
       <div class="adv-item rv d1">
         <span class="num">02</span>
-        <div><h4>硬件配置</h4><p>超大护眼台灯、人体工学座椅、宽敞书桌、高速 WiFi、独立插座，<b>硬件齐全</b>，适配长时间学习。</p></div>
+        <div><h4>硬件配置</h4><p>无影吊灯护眼台灯、人体工学座椅、宽敞书桌、高速 WiFi、独立插座，<b>硬件齐全</b>，适配长时间学习。</p></div>
       </div>
       <div class="adv-item rv d2">
         <span class="num">03</span>
@@ -659,6 +710,11 @@ a{color:inherit;text-decoration:none}
   </p>
 
 </div>
+
+<!-- ===== 左下 · VIP 资料群飘浮按钮 ===== -->
+<a class="vip-fab" href="resources.html" aria-label="99元加入VIP资料群">
+  <b>99元加入</b><span>VIP资料群</span>
+</a>
 
 <!-- ===== 底部固定引导条 ===== -->
 <div class="fixed-bar">
@@ -806,6 +862,147 @@ a{color:inherit;text-decoration:none}
       toast('下滑扫码咨询，或加微信 ddtt0754');
     });
   }
+})();
+</script>
+<script>
+/* ===== 背景星辰：随机分布 + 独立相位闪烁（装饰层，失败不影响页面） ===== */
+(function(){
+  var box = document.getElementById('bgStars');
+  if(!box) return;
+  var narrow = window.innerWidth < 640;
+  var N = narrow ? 42 : 76;
+  var frag = document.createDocumentFragment();
+  for(var i = 0; i < N; i++){
+    var r = Math.random();
+    var el = document.createElement('i');
+    var size = r > .88 ? 2.4 : (r > .6 ? 1.6 : 1);
+    el.className = r > .88 ? 'star big' : 'star';
+    el.style.left = (Math.random() * 100).toFixed(2) + '%';
+    el.style.top  = (Math.random() * 100).toFixed(2) + '%';
+    el.style.setProperty('--st-s', size + 'px');
+    el.style.setProperty('--st-d', (2.4 + Math.random() * 3.6).toFixed(2) + 's');
+    el.style.setProperty('--st-dl', (-Math.random() * 6).toFixed(2) + 's');
+    el.style.setProperty('--st-o', (0.45 + Math.random() * 0.5).toFixed(2));
+    frag.appendChild(el);
+  }
+  box.appendChild(frag);
+})();
+</script>
+<script>
+/* ===== 首屏流萤光尘：canvas 粒子（向上飘升 + 亮度呼吸），离开首屏自动暂停 ===== */
+(function(){
+  var cv = document.getElementById('heroFx');
+  if(!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  if(!ctx) return;
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = 0, H = 0, ps = [], raf = 0, on = false;
+
+  function sprite(rgb){
+    var s = document.createElement('canvas');
+    s.width = s.height = 64;
+    var g = s.getContext('2d');
+    var gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(' + rgb + ',1)');
+    gr.addColorStop(.32, 'rgba(' + rgb + ',.5)');
+    gr.addColorStop(1, 'rgba(' + rgb + ',0)');
+    g.fillStyle = gr;
+    g.fillRect(0, 0, 64, 64);
+    return s;
+  }
+  var SPR = [sprite('234,249,255'), sprite('56,224,208'), sprite('120,200,255')];
+
+  function spawn(init){
+    var c = Math.random();
+    return {
+      x: Math.random() * W,
+      y: init ? Math.random() * H : H + 8 + Math.random() * 30,
+      r: .8 + Math.random() * 1.9,
+      vy: .16 + Math.random() * .48,
+      vx: (Math.random() - .5) * .16,
+      a: .28 + Math.random() * .58,
+      ph: Math.random() * 6.2832,
+      sp: .5 + Math.random() * 1.5,
+      k: c > .78 ? 1 : (c > .52 ? 2 : 0),
+      d: Math.random() > .88 ? 1.9 : 1
+    };
+  }
+  function build(){
+    ps = [];
+    var n = Math.min(58, Math.max(16, Math.round(W / 20)));
+    for(var i = 0; i < n; i++) ps.push(spawn(true));
+  }
+  function size(){
+    var r = cv.getBoundingClientRect();
+    W = Math.max(1, Math.round(r.width));
+    H = Math.max(1, Math.round(r.height));
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function paint(t){
+    ctx.clearRect(0, 0, W, H);
+    for(var i = 0; i < ps.length; i++){
+      var p = ps[i];
+      var tw = .42 + .58 * Math.sin(t / 640 * p.sp + p.ph);
+      if(tw < 0) tw = 0;
+      var fade = 1;
+      if(p.y > H - 70) fade = Math.max(0, (H - p.y) / 70);
+      if(p.y < 60) fade *= Math.max(0, p.y / 60);
+      var al = p.a * tw * fade;
+      if(al > .004){
+        var rad = p.r * 3.4 * p.d;
+        ctx.globalAlpha = al > 1 ? 1 : al;
+        ctx.drawImage(SPR[p.k], p.x - rad, p.y - rad, rad * 2, rad * 2);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  function step(t){
+    for(var i = 0; i < ps.length; i++){
+      var p = ps[i];
+      p.y -= p.vy;
+      p.x += p.vx;
+      if(p.y < -20 || p.x < -30 || p.x > W + 30) ps[i] = spawn(false);
+    }
+    paint(t);
+    raf = requestAnimationFrame(step);
+  }
+  function start(){
+    if(on || reduce) return;
+    on = true;
+    raf = requestAnimationFrame(step);
+  }
+  function stop(){
+    if(!on) return;
+    on = false;
+    if(raf){ cancelAnimationFrame(raf); raf = 0; }
+  }
+  function reset(){
+    size(); build();
+    ctx.clearRect(0, 0, W, H);
+    paint(0);
+  }
+
+  reset();
+  if(reduce) return;
+
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){
+      for(var i = 0; i < es.length; i++){ es[i].isIntersecting ? start() : stop(); }
+    }, { threshold: .02 }).observe(cv);
+  } else {
+    start();
+  }
+  document.addEventListener('visibilitychange', function(){
+    document.hidden ? stop() : start();
+  });
+  var rt = 0;
+  window.addEventListener('resize', function(){
+    clearTimeout(rt);
+    rt = setTimeout(reset, 220);
+  });
 })();
 </script>
 </body>
