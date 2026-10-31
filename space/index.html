@@ -370,6 +370,7 @@ a{color:inherit;text-decoration:none}
 .info-item .k{font-size:12px;color:var(--ink-3);letter-spacing:.08em;font-weight:700}
 .info-item .v{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.7}
 .info-item .v small{display:block;font-size:11.5px;font-weight:500;color:var(--ink-3);margin-top:2px;letter-spacing:.02em}
+<<<<<<< HEAD
 .info-item .v .nb{white-space:nowrap}
 /* 地址块 · 可点击复制（交互态） */
 .info-item.act{cursor:pointer;transition:border-color .2s var(--ease),background .2s var(--ease),transform .16s var(--ease)}
@@ -377,6 +378,8 @@ a{color:inherit;text-decoration:none}
 .info-item.act:active{transform:scale(.985);border-color:rgba(56,224,208,.5)}
 .info-item.act:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .info-item.act .k::after{content:"复制";margin-left:7px;padding:1px 7px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--cyan);background:var(--cyan-soft);border:1px solid rgba(56,224,208,.3);vertical-align:1px}
+=======
+>>>>>>> 4e8a682b4b7e7edddedd0a7ddc8f8523dc3c3a98
 
 .perks{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .perk{
@@ -479,9 +482,12 @@ a{color:inherit;text-decoration:none}
   .sec{padding:78px 0}
   .hero{padding:34px 0 120px}   /* 同上：总内边距 154px 不变，内容上移 40px */
   .info-list{grid-template-columns:1fr 1fr}
+<<<<<<< HEAD
   /* 两栏下栏宽仅约 300px：让标签独占一行，把整行宽度让给地址，避免「…华庭A / 区」孤字折行 */
   .info-item.act .k{display:block}
   .info-item.act .k::after{margin-left:0}
+=======
+>>>>>>> 4e8a682b4b7e7edddedd0a7ddc8f8523dc3c3a98
 }
 </style>
 </head>
@@ -696,11 +702,17 @@ a{color:inherit;text-decoration:none}
       <div class="qr-hint">长按二维码可放大查看 · 了解优惠详情</div>
 
       <div class="info-list">
+<<<<<<< HEAD
         <div class="info-item act" id="addrItem" role="button" tabindex="0"
              data-addr="两英镇墙新新世纪华庭A区南九栋松鼠AI体验中心"
              aria-label="复制门店地址：两英镇墙新新世纪华庭A区南九栋松鼠AI体验中心">
           <span class="ic">📍</span>
           <span><span class="k">门店地址</span><span class="v">两英镇墙新新世纪华庭A区南九栋<span class="nb">松鼠AI体验中心</span><small>点击复制，粘贴到高德 / 百度 / 腾讯地图搜索</small></span></span>
+=======
+        <div class="info-item">
+          <span class="ic">📍</span>
+          <span><span class="k">门店地址</span><span class="v">两英镇墙新新世纪华庭A区<small>精准门店定位待补充 · 点击可导航</small></span></span>
+>>>>>>> 4e8a682b4b7e7edddedd0a7ddc8f8523dc3c3a98
         </div>
         <div class="info-item">
           <span class="ic">💬</span>
@@ -864,6 +876,7 @@ a{color:inherit;text-decoration:none}
       toast('下滑扫码咨询，或加微信 19867824476');
     });
   }
+<<<<<<< HEAD
 
   /* ===== 门店地址：点击复制，提示粘贴到地图搜索 ===== */
   var addrItem = document.getElementById('addrItem');
@@ -921,6 +934,8 @@ a{color:inherit;text-decoration:none}
       if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); copyAddr(); }
     });
   }
+=======
+>>>>>>> 4e8a682b4b7e7edddedd0a7ddc8f8523dc3c3a98
 })();
 </script>
 <script>
