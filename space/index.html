@@ -272,6 +272,10 @@ a{color:inherit;text-decoration:none}
 .slide .ph-t{font-size:12.5px;color:var(--cyan);font-weight:800;letter-spacing:.1em}
 .slide .ph-d{font-size:11.5px;color:var(--ink-3);text-align:center;padding:0 28px;line-height:1.7}
 .slides{aspect-ratio:16/10}
+/* 实拍图铺满轮播框：原图 4:3、桌面框 16:10，靠 cover 居中裁掉上下各约 8% */
+.slide>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+/* 激活页是 position:relative 的流内元素，高度 auto 时百分比高度解析为 0，需显式撑满 */
+.slide.on{height:100%}
 @media (max-width:400px){.slides{aspect-ratio:4/3}}
 
 .sl-dots{display:flex;gap:7px;justify-content:center;margin-top:14px}
@@ -480,8 +484,8 @@ a{color:inherit;text-decoration:none}
   .hero{padding:34px 0 120px}   /* 同上：总内边距 154px 不变，内容上移 40px */
   .info-list{grid-template-columns:1fr 1fr}
   /* 两栏下栏宽仅约 300px：让标签独占一行，把整行宽度让给地址，避免「…华庭A / 区」孤字折行 */
-  .info-item.act .k{display:block}
-  .info-item.act .k::after{margin-left:0}
+  #addrItem .k{display:block}
+  #addrItem .k::after{margin-left:0}
 }
 </style>
 </head>
@@ -613,30 +617,24 @@ a{color:inherit;text-decoration:none}
       <button class="tab on" data-i="0" type="button">静音自习区</button>
       <button class="tab" data-i="1" type="button">轻声背书区</button>
       <!-- <button class="tab" data-i="2" type="button">图书阅读区</button> -->
-      <button class="tab" data-i="3" type="button">休闲饮水区</button>
+      <button class="tab" data-i="2" type="button">休闲饮食区</button>
     </div>
 
     <div class="slider rv d2">
       <div class="slides" id="slides">
         <figure class="slide on">
-          <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.5" stroke-linecap="round"><path d="M4 19V7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v12"/><path d="M17 19V9h3v10"/><path d="M3 19h18"/></svg></div>
-          <div class="ph-t">静音自习区实拍</div>
-          <div class="ph-d">此处预留门店实拍图位 · 替换后即自动轮播</div>
+          <img src="img/ZXQ.jpg" alt="静音自习区实拍 · 独立隔断自习位" decoding="async">
         </figure>
         <figure class="slide">
-          <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5A5.5 5.5 0 0 1 17.5 12v3.5H6.5V12A5.5 5.5 0 0 1 12 6.5z"/><path d="M12 3v3.5"/><path d="M9.5 19h5"/></svg></div>
-          <div class="ph-t">轻声背书区实拍</div>
-          <div class="ph-d">此处预留门店实拍图位 · 替换后即自动轮播</div>
+          <img src="img/BSQ.jpg" alt="轻声背书区实拍 · 靠墙背诵学习桌" decoding="async">
         </figure>
-        <figure class="slide">
+<!--         <figure class="slide">
           <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.6C10.4 5 8.5 4.3 5 4.3v13.4c3.5 0 5.4.7 7 2.3 1.6-1.6 3.5-2.3 7-2.3V4.3c-3.5 0-5.4.7-7 2.3z"/><path d="M12 6.6V20"/></svg></div>
           <div class="ph-t">图书阅读区实拍</div>
           <div class="ph-d">此处预留门店实拍图位 · 替换后即自动轮播</div>
-        </figure>
+        </figure> -->
         <figure class="slide">
-          <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="#38E0D0" stroke-width="1.5" stroke-linecap="round"><path d="M6 3v7a3 3 0 0 0 6 0V3"/><path d="M9 10v11"/><path d="M17 3v18"/><path d="M15 8h4"/></svg></div>
-          <div class="ph-t">休闲饮水区实拍</div>
-          <div class="ph-d">此处预留门店实拍图位 · 替换后即自动轮播</div>
+          <img src="img/YSQ.jpg" alt="休闲饮食区实拍 · 休息区与学习流程墙" decoding="async">
         </figure>
       </div>
       <div class="sl-dots" id="slDots"></div>
@@ -645,7 +643,7 @@ a{color:inherit;text-decoration:none}
     <div class="adv">
       <div class="adv-item rv">
         <span class="num">01</span>
-        <div><h4>分区布局</h4><p>区分静音自习区、轻声背书区、休闲饮水区，<b>动静分离、互不干扰</b>，满足多元学习需求。</p></div>
+        <div><h4>分区布局</h4><p>区分静音自习区、轻声背书区、休闲饮食区，<b>动静分离、互不干扰</b>，满足多元学习需求。</p></div>
       </div>
       <div class="adv-item rv d1">
         <span class="num">02</span>
@@ -688,7 +686,7 @@ a{color:inherit;text-decoration:none}
       <div class="qr-wrap" id="qrBox" role="button" tabindex="0" aria-label="扫码咨询预约">
         <div class="qr-inner">
           <!-- 门店咨询二维码：同目录 qcode.jpg，换图直接覆盖同名文件即可 -->
-          <img src="qcode.jpg" alt="松鼠智学中心 · 两英AI自习室 咨询预约二维码" width="742" height="745">
+          <img src="img/qcode.jpg" alt="松鼠智学中心 · 两英AI自习室 咨询预约二维码" width="742" height="745">
         </div>
         <span class="qr-pulse" aria-hidden="true"></span>
       </div>
@@ -702,9 +700,11 @@ a{color:inherit;text-decoration:none}
           <span class="ic">📍</span>
           <span><span class="k">门店地址</span><span class="v">两英镇墙新新世纪华庭A区南九栋<span class="nb">松鼠AI体验中心</span><small>点击复制，粘贴到高德 / 百度 / 腾讯地图搜索</small></span></span>
         </div>
-        <div class="info-item">
+        <div class="info-item act" id="phoneItem" role="button" tabindex="0"
+             data-phone="19867824476"
+             aria-label="复制手机号：19867824476">
           <span class="ic">💬</span>
-          <span><span class="k">官方咨询</span><span class="v">手机/微信19867824476<small>添加请备注「自习室」</small></span></span>
+          <span><span class="k">官方咨询</span><span class="v"><span class="nb">手机/微信19867824476</span><small>点击复制手机号 · 微信添加请备注「自习室」或「AI学」</small></span></span>
         </div>
       </div>
 
@@ -727,6 +727,8 @@ a{color:inherit;text-decoration:none}
   <button class="fb-btn" id="fbBtn" type="button">立即咨询</button>
 </div>
 
+<!-- ===== 左下 · 报名漂浮按钮（样式见 .vip-fab；点击自动下滑至页底，落地 #cta 咨询报名区） ===== -->
+<a class="vip-fab" id="vipFab" href="#cta" aria-label="AI绘画与AI漫剧课程报名，点击下滑至页底咨询"><b>AI绘画（12节）+ AI漫剧（12节）课程报名 →</b></a>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -865,60 +867,75 @@ a{color:inherit;text-decoration:none}
     });
   }
 
-  /* ===== 门店地址：点击复制，提示粘贴到地图搜索 ===== */
-  var addrItem = document.getElementById('addrItem');
-  if(addrItem){
-    var ADDR_MSG = '已复制地址，请粘贴到地图里搜索';
+  /* ===== 点击复制：门店地址 / 官方手机号 ===== */
 
-    /* 兜底复制：微信 / 非安全上下文下 clipboard API 不可用，退回 execCommand */
-    function legacyCopy(txt){
-      var ta = null;
-      try{
-        ta = document.createElement('textarea');
-        ta.value = txt;
-        ta.setAttribute('readonly', '');
-        ta.contentEditable = 'true';
-        ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;' +
-                           'opacity:0;font-size:16px;-webkit-user-select:text;';
-        document.body.appendChild(ta);
-        /* iOS Safari 要求先建立 Range 选区 */
-        if(ta.setSelectionRange){ ta.setSelectionRange(0, txt.length); }
-        var range = document.createRange();
-        range.selectNodeContents(ta);
-        var sel = window.getSelection();
-        if(sel){ sel.removeAllRanges(); sel.addRange(range); }
-        var ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        return ok;
-      }catch(e){
-        if(ta && ta.parentNode){ ta.parentNode.removeChild(ta); }
-        return false;
-      }
+  /* 兜底复制：微信 / 非安全上下文下 clipboard API 不可用，退回 execCommand */
+  function legacyCopy(txt){
+    var ta = null;
+    try{
+      ta = document.createElement('textarea');
+      ta.value = txt;
+      ta.setAttribute('readonly', '');
+      ta.contentEditable = 'true';
+      ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;' +
+                         'opacity:0;font-size:16px;-webkit-user-select:text;';
+      document.body.appendChild(ta);
+      /* iOS Safari 要求先建立 Range 选区 */
+      if(ta.setSelectionRange){ ta.setSelectionRange(0, txt.length); }
+      var range = document.createRange();
+      range.selectNodeContents(ta);
+      var sel = window.getSelection();
+      if(sel){ sel.removeAllRanges(); sel.addRange(range); }
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    }catch(e){
+      if(ta && ta.parentNode){ ta.parentNode.removeChild(ta); }
+      return false;
     }
+  }
 
-    function copyThenNotify(txt){
-      var done = function(ok){
-        toast(ok ? ADDR_MSG : '复制失败，请长按地址手动复制');
-      };
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(txt).then(
-          function(){ done(true); },
-          function(){ done(legacyCopy(txt)); }
-        );
-      }else{
-        done(legacyCopy(txt));
-      }
+  function copyThenNotify(txt, okMsg, failMsg){
+    var done = function(ok){ toast(ok ? okMsg : failMsg); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(
+        function(){ done(true); },
+        function(){ done(legacyCopy(txt)); }
+      );
+    }else{
+      done(legacyCopy(txt));
     }
+  }
 
-    function copyAddr(){
-      var txt = addrItem.getAttribute('data-addr') || '';
+  /* 把一个 .info-item 绑成「点击 / 回车 / 空格 -> 复制并提示」 */
+  function bindCopy(id, attr, okMsg, failMsg){
+    var el = document.getElementById(id);
+    if(!el) return;
+    function run(){
+      var txt = el.getAttribute(attr) || '';
       if(!txt) return;
-      copyThenNotify(txt);
+      copyThenNotify(txt, okMsg, failMsg);
     }
+    el.addEventListener('click', run);
+    el.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); run(); }
+    });
+  }
 
-    addrItem.addEventListener('click', copyAddr);
-    addrItem.addEventListener('keydown', function(e){
-      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); copyAddr(); }
+  bindCopy('addrItem', 'data-addr', '已复制地址，请粘贴到地图里搜索', '复制失败，请长按地址手动复制');
+  bindCopy('phoneItem', 'data-phone', '复制手机号成功', '复制失败，请长按手机号手动复制');
+
+  /* ===== 左下飘浮按钮：点击自动下滑到页底（咨询 / 报名区） ===== */
+  var vipFab = document.getElementById('vipFab');
+  if(vipFab){
+    vipFab.addEventListener('click', function(e){
+      e.preventDefault();
+      var doc = document.documentElement;
+      var h = Math.max(document.body ? document.body.scrollHeight : 0, doc.scrollHeight);
+      var y = h - window.innerHeight;
+      if(y < 0){ y = 0; }
+      try{ window.scrollTo({ top:y, behavior:'smooth' }); }
+      catch(err){ window.scrollTo(0, y); }
     });
   }
 })();
