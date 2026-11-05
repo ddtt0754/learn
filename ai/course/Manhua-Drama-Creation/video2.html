@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>第2节 · 剧本生成的方法 · AI 漫剧创作实操课</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#1fa873;--green:#2ebd85;--grad:linear-gradient(135deg,#35d29a 0%,#2f9df0 100%);
+  --ink:#e8f1f6;--ink2:#9fb3c0;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;
+  background:radial-gradient(120% 90% at 50% 0%,#16233a 0%,#0b1220 58%,#080d16 100%);
+  color:var(--ink);display:flex;flex-direction:column;height:100vh;height:100dvh;
+}
+
+/* 顶部标题条 */
+.v-header{
+  flex:none;display:flex;align-items:center;gap:10px;padding:11px 14px;
+  background:var(--grad);color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.32);
+}
+.v-header .no{
+  flex:none;font-size:11px;font-weight:800;letter-spacing:.08em;
+  padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.34);
+}
+.v-header .tt{flex:1;min-width:0;font-size:14.5px;font-weight:800;letter-spacing:.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-header .sheet-btn{
+  flex:none;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;
+  font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;
+  transition:background .16s,transform .12s;
+}
+.v-header .sheet-btn:hover{background:rgba(255,255,255,.3)}
+.v-header .sheet-btn:active{transform:scale(.96)}
+
+/* 分段切换 */
+.v-tabs{
+  flex:none;display:flex;gap:8px;padding:10px 14px 0;overflow-x:auto;scrollbar-width:none;
+}
+.v-tabs::-webkit-scrollbar{display:none}
+.v-tab{
+  flex:1 1 0;min-width:0;display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--ink2);
+  font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left;
+  transition:background .18s,border-color .18s,color .18s;
+}
+.v-tab .tn{
+  flex:none;width:20px;height:20px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;background:rgba(255,255,255,.14);color:#fff;
+}
+.v-tab .tx{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-tab .dur{flex:none;font-size:11px;font-weight:700;color:#7f95a3;font-variant-numeric:tabular-nums}
+.v-tab.on{background:rgba(56,224,208,.12);border-color:rgba(56,224,208,.55);color:#fff}
+.v-tab.on .tn{background:var(--grad);color:#04121c}
+.v-tab.on .dur{color:#6fd8cd}
+
+/* 视频舞台 */
+.v-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:12px 14px}
+.v-stage video{
+  display:block;max-width:100%;max-height:100%;width:auto;height:auto;aspect-ratio:16/9;
+  background:#000;border-radius:14px;box-shadow:0 22px 56px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08);
+  outline:none;
+}
+
+/* 控制条 */
+.v-controls{
+  flex:none;display:flex;flex-wrap:wrap;gap:7px;justify-content:center;align-items:center;
+  padding:10px 14px calc(11px + env(safe-area-inset-bottom));
+  background:rgba(8,13,22,.92);border-top:1px solid rgba(255,255,255,.07);
+}
+.vc-btn{
+  padding:8px 14px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.18);
+  border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;
+  display:inline-flex;align-items:center;gap:5px;transition:background .15s,transform .1s;
+  white-space:nowrap;
+}
+.vc-btn:hover{background:rgba(255,255,255,.2)}
+.vc-btn:active{transform:scale(.95)}
+.vc-btn.close{background:rgba(239,68,68,.85);border-color:transparent}
+.vc-btn.close:hover{background:#dc2626}
+.vc-btn:disabled{opacity:.36;cursor:not-allowed}
+.vc-speed{
+  color:#fff;font-size:12.5px;font-weight:800;background:rgba(0,0,0,.45);
+  border:1px solid rgba(255,255,255,.14);padding:6px 12px;border-radius:9px;
+  min-width:62px;text-align:center;font-variant-numeric:tabular-nums;
+}
+
+/* 本节要点抽屉 */
+.v-mask{
+  position:fixed;inset:0;background:rgba(4,8,14,.62);backdrop-filter:blur(2px);
+  opacity:0;visibility:hidden;transition:opacity .24s,visibility .24s;z-index:60;
+}
+.v-mask.on{opacity:1;visibility:visible}
+.v-sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:61;max-height:78%;
+  background:#101b2e;border-radius:18px 18px 0 0;border-top:1px solid rgba(255,255,255,.1);
+  box-shadow:0 -18px 46px rgba(0,0,0,.55);
+  transform:translateY(102%);transition:transform .3s cubic-bezier(.22,.72,.24,1);
+  display:flex;flex-direction:column;
+}
+.v-sheet.on{transform:translateY(0)}
+.v-sheet .sh{
+  flex:none;display:flex;align-items:center;gap:10px;padding:14px 18px 12px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.v-sheet .sh b{flex:1;font-size:14px;font-weight:800;color:#fff;letter-spacing:.02em}
+.v-sheet .sh .x{
+  flex:none;width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.06);color:#cfe0e9;font-size:15px;line-height:1;cursor:pointer;font-family:inherit;
+}
+.v-sheet .sb{flex:1;min-height:0;overflow:auto;padding:16px 18px calc(20px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+.v-sheet h4{font-size:12px;font-weight:800;letter-spacing:.1em;color:#6fd8cd;margin:0 0 8px}
+.v-sheet h4+.blk{margin-bottom:18px}
+.v-sheet .blk{font-size:13.5px;line-height:1.95;color:#cfdde5}
+.v-sheet .blk b{color:#fff;font-weight:700}
+.v-sheet .blk p{margin:0 0 6px}
+.v-sheet .blk p:last-child{margin-bottom:0}
+.v-sheet .tag{
+  display:inline-block;padding:2px 9px;border-radius:999px;background:rgba(56,224,208,.14);
+  border:1px solid rgba(56,224,208,.36);color:#7fe3d8;font-size:11px;font-weight:800;margin-bottom:10px;
+}
+
+@media (max-width:560px){
+  .v-tab{padding:8px 10px;font-size:12px}
+  .vc-btn{padding:8px 11px;font-size:12.5px}
+  .vc-speed{min-width:56px;padding:6px 9px;font-size:12px}
+  .v-stage{padding:10px}
+  .v-header .tt{font-size:13.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  .v-sheet{transition:none}
+}
+</style>
+</head>
+<body>
+
+<div class="v-header">
+  <span class="no">第 2 节</span>
+  <span class="tt">剧本生成的方法</span>
+  <button class="sheet-btn" id="btnSheet" type="button">📋 本节要点</button>
+</div>
+
+<div class="v-tabs" id="tabs"></div>
+
+<div class="v-stage">
+  <video id="player" preload="metadata" playsinline controls autoplay
+         src="../../resources/Manhua-Drama-Creation/video/第二节之剧本生成的方法.mp4"></video>
+</div>
+
+<div class="v-controls">
+  <span class="vc-speed" id="speedLabel">1.0x</span>
+  <button class="vc-btn" id="btnSlow" type="button">⏪ 变慢</button>
+  <button class="vc-btn" id="btnFast" type="button">⏩ 变快</button>
+  <button class="vc-btn" id="btnPause" type="button">⏸ 暂停</button>
+  <button class="vc-btn" id="btnPrev" type="button">◀ 上一段</button>
+  <button class="vc-btn" id="btnNext" type="button">下一段 ▶</button>
+  <button class="vc-btn close" id="btnClose" type="button">✖ 关闭</button>
+</div>
+
+<div class="v-mask" id="mask"></div>
+<div class="v-sheet" id="sheet" role="dialog" aria-modal="true" aria-label="本节要点">
+  <div class="sh">
+    <b>第 2 节 · 剧本生成的方法</b>
+    <button class="x" id="btnSheetClose" type="button" aria-label="关闭要点">✕</button>
+  </div>
+  <div class="sb">
+    <span class="tag">前期内容创作</span>
+    <h4>学习要点</h4>
+    <div class="blk">
+      <p>① 剧本是漫剧的地基：没有结构化剧本，分镜和提示词都会失控。</p>
+      <p>② 用「题材 + 主角 + 目标 + 冲突 + 结局」五要素喂给 AI，比一句话许愿稳定得多。</p>
+      <p>③ 先出故事梗概，再扩成分场剧本，最后压成能直接拆镜头的短句。</p>
+    </div>
+    <h4>练习任务</h4>
+    <div class="blk">
+      <p><b>1.</b> 选一个 60–90 秒的小故事，用五要素各写一行，控制在 5 句以内。</p>
+      <p><b>2.</b> 让 AI 按「梗概 → 分场 → 短剧本」三步生成，三版都保留做对比。</p>
+      <p><b>3.</b> 挑出 3 处写崩的地方手动改写，并把失败原因记进打卡表。</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var player  = document.getElementById('player');
+  var tabsBox = document.getElementById('tabs');
+  var speedLabel = document.getElementById('speedLabel');
+  var btnPause = document.getElementById('btnPause');
+  var btnPrev  = document.getElementById('btnPrev');
+  var btnNext  = document.getElementById('btnNext');
+
+  /* 本节视频分段：顺序即播放顺序 */
+  var CLIPS = [
+    { n:'①', title:'剧本生成的方法', file:'../../resources/Manhua-Drama-Creation/video/第二节之剧本生成的方法.mp4' }
+  ];
+  var cur = 0;
+
+  var speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+  var speedIdx = 2;
+
+  /* 渲染分段按钮 */
+  tabsBox.innerHTML = CLIPS.map(function(c, i){
+    return '<button class="v-tab' + (i === 0 ? ' on' : '') + '" type="button" data-i="' + i + '"' +
+           ' role="tab" aria-selected="' + (i === 0) + '">' +
+           '<span class="tn">' + c.n + '</span>' +
+           '<span class="tx">' + c.title + '</span>' +
+           '<span class="dur" data-dur="' + i + '"></span></button>';
+  }).join('');
+
+  var tabs = tabsBox.querySelectorAll('.v-tab');
+
+  function fmt(s){
+    if(!isFinite(s) || s <= 0) return '';
+    var m = Math.floor(s / 60), ss = Math.floor(s % 60);
+    return m + ':' + (ss < 10 ? '0' + ss : ss);
+  }
+
+  function syncSegBtns(){
+    btnPrev.disabled = cur <= 0;
+    btnNext.disabled = cur >= CLIPS.length - 1;
+  }
+
+  function go(i){
+    if(i < 0 || i >= CLIPS.length) return;
+    var wasPlaying = !player.paused;
+    cur = i;
+    for(var k = 0; k < tabs.length; k++){
+      var on = k === i;
+      tabs[k].classList.toggle('on', on);
+      tabs[k].setAttribute('aria-selected', on ? 'true' : 'false');
+    }
+    player.src = CLIPS[i].file;
+    player.load();
+    player.playbackRate = speeds[speedIdx];
+    if(wasPlaying){
+      var pr = player.play();
+      if(pr && pr.catch) pr.catch(function(){});
+    }
+    syncSegBtns();
+  }
+
+  tabsBox.addEventListener('click', function(e){
+    var t = e.target.closest('.v-tab');
+    if(t) go(parseInt(t.getAttribute('data-i'), 10));
+  });
+
+  /* 时长：读到元数据后回填按钮 */
+  player.addEventListener('loadedmetadata', function(){
+    var cell = tabsBox.querySelector('[data-dur="' + cur + '"]');
+    if(cell) cell.textContent = fmt(player.duration);
+  });
+  /* 播完自动切下一段 */
+  player.addEventListener('ended', function(){
+    if(cur < CLIPS.length - 1) go(cur + 1); else btnPause.textContent = '▶ 重播';
+  });
+
+  /* 播放状态 */
+  function togglePause(){
+    if(player.paused){
+      if(player.ended){ player.currentTime = 0; }
+      var pr = player.play();
+      if(pr && pr.catch) pr.catch(function(){});
+    }else{
+      player.pause();
+    }
+  }
+  function applySpeed(){
+    player.playbackRate = speeds[speedIdx];
+    speedLabel.textContent = speeds[speedIdx].toFixed(2).replace(/\.?0+$/, '') + 'x';
+  }
+  function speedUp(){ if(speedIdx < speeds.length - 1){ speedIdx++; applySpeed(); } }
+  function slowDown(){ if(speedIdx > 0){ speedIdx--; applySpeed(); } }
+
+  player.addEventListener('play',  function(){ btnPause.textContent = '⏸ 暂停'; });
+  player.addEventListener('pause', function(){ btnPause.textContent = '▶ 继续'; });
+
+  document.getElementById('btnPause').addEventListener('click', togglePause);
+  document.getElementById('btnFast').addEventListener('click', speedUp);
+  document.getElementById('btnSlow').addEventListener('click', slowDown);
+  document.getElementById('btnPrev').addEventListener('click', function(){ go(cur - 1); });
+  document.getElementById('btnNext').addEventListener('click', function(){ go(cur + 1); });
+
+  /* 关闭：优先关窗，其次退回课程主页 */
+  document.getElementById('btnClose').addEventListener('click', function(){
+    try{ window.close(); }catch(e){}
+    setTimeout(function(){
+      if(!window.closed){ location.href = 'index.html'; }
+    }, 220);
+  });
+
+  /* 要点抽屉 */
+  var mask = document.getElementById('mask');
+  var sheet = document.getElementById('sheet');
+  function openSheet(){ mask.classList.add('on'); sheet.classList.add('on'); }
+  function closeSheet(){ mask.classList.remove('on'); sheet.classList.remove('on'); }
+  document.getElementById('btnSheet').addEventListener('click', openSheet);
+  document.getElementById('btnSheetClose').addEventListener('click', closeSheet);
+  mask.addEventListener('click', closeSheet);
+
+  /* 键盘快捷键 */
+  document.addEventListener('keydown', function(e){
+    var tag = (e.target.tagName || '').toLowerCase();
+    if(tag === 'input' || tag === 'textarea') return;
+    if(e.key === 'Escape'){ closeSheet(); return; }
+    if(e.key === ' '){ e.preventDefault(); togglePause(); return; }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); slowDown(); return; }
+    if(e.key === 'ArrowRight'){ e.preventDefault(); speedUp(); return; }
+    if(e.key === 'ArrowUp'){ e.preventDefault(); go(cur - 1); return; }
+    if(e.key === 'ArrowDown'){ e.preventDefault(); go(cur + 1); }
+  });
+
+  applySpeed();
+  syncSegBtns();
+})();
+</script>
+</body>
+</html>

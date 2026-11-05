@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2ebd85">
+<meta name="description" content="AI 绘画系统课 · 零基础 13 节在线免费学：Checkpoint、提示词、文生图参数、LoRA、高清修复到 ControlNet 与 OpenPose，页面内直接播放。">
+<title>AI绘画系统课 · 零基础13节在线学</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#1fa873;--green:#2ebd85;--blue:#2f9df0;
+  --grad:linear-gradient(135deg,#35d29a 0%,#2f9df0 100%);
+  --bg:#f5f7fa;--text:#1e293b;--text2:#64748b;
+  --card:#fff;--line:#e6eef0;--shadow:0 8px 22px rgba(47,157,240,.10);--radius:16px;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;
+  background:linear-gradient(180deg,#eefaf4 0%,#eef4fb 100%);
+  color:var(--text);line-height:1.85;min-height:100vh;
+  display:flex;justify-content:center;padding:24px 16px calc(40px + env(safe-area-inset-bottom));
+}
+.container{width:100%;max-width:760px}
+
+/* ---------- 首屏标题卡（含 3D 调色卡） ---------- */
+.hero{
+  position:relative;border-radius:22px;padding:28px 22px 26px;color:#fff;overflow:hidden;
+  background:var(--grad);box-shadow:0 14px 30px rgba(47,157,240,.25);
+  display:flex;align-items:center;gap:18px;
+}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.14);pointer-events:none}
+.hero::before{width:130px;height:130px;top:-46px;right:-34px}
+.hero::after{width:74px;height:74px;bottom:-26px;left:-18px}
+.hero-txt{position:relative;flex:1;min-width:0}
+.hero .tag{
+  display:inline-block;padding:3px 11px;border-radius:999px;font-size:11.5px;font-weight:700;
+  letter-spacing:.06em;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.34);
+}
+.hero h1{font-size:clamp(21px,5.6vw,26px);line-height:1.35;font-weight:800;letter-spacing:1px;margin-top:10px;text-shadow:0 2px 8px rgba(0,0,0,.12)}
+.hero .sub{font-size:13.5px;margin-top:7px;letter-spacing:.06em;opacity:.96}
+.hero .meta{font-size:12px;margin-top:4px;opacity:.86;letter-spacing:.04em}
+
+/* 3D 调色卡：透视倾斜 + 颜料条 */
+.film{
+  position:relative;flex:none;width:126px;height:80px;border-radius:9px;
+  background:linear-gradient(160deg,#ffffff,#e7f6f0);
+  box-shadow:0 16px 26px rgba(15,90,120,.28),0 2px 0 rgba(255,255,255,.6) inset;
+  transform:perspective(620px) rotateY(-24deg) rotateX(9deg) rotateZ(-2deg);
+  transform-style:preserve-3d;
+}
+.film::before{
+  content:"";position:absolute;top:10px;left:10px;right:10px;height:26px;border-radius:4px;
+  background:
+    radial-gradient(circle at 26% 50%,#35d29a 0 38%,transparent 44%),
+    radial-gradient(circle at 60% 44%,#2f9df0 0 38%,transparent 44%),
+    radial-gradient(circle at 84% 56%,#7bd8f0 0 30%,transparent 36%),
+    linear-gradient(160deg,#eefaf4,#e3f1fb);
+  box-shadow:0 3px 8px rgba(15,90,120,.18);
+}
+.film::after{
+  content:"";position:absolute;bottom:8px;left:12px;right:12px;height:8px;border-radius:4px;
+  background:linear-gradient(90deg,#35d29a,#2f9df0);opacity:.55;
+}
+.film i{
+  position:absolute;top:42px;bottom:20px;border-radius:3px;
+  background:linear-gradient(160deg,#35d29a,#2f9df0);opacity:.85;
+}
+.film i:nth-child(1){left:12px;width:26px}
+.film i:nth-child(2){left:44px;width:26px;opacity:.62}
+.film i:nth-child(3){left:76px;width:34px;opacity:.44}
+
+/* ---------- 学习主线（单行流程链，窄屏自然折行） ---------- */
+.track{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:3px 7px;
+  margin-top:14px;padding:11px 13px;border-radius:13px;
+  background:rgba(255,255,255,.8);border:1px solid var(--line);
+  box-shadow:0 4px 12px rgba(47,157,240,.05);
+}
+.track .t{font-size:11.5px;font-weight:700;color:#4a6270;letter-spacing:.02em;white-space:nowrap}
+.track .ar{font-size:11px;color:#b9ccd5;line-height:1}
+
+/* ---------- 通用卡片 ---------- */
+.sec{background:#fff;border-radius:var(--radius);padding:18px 18px 14px;margin-top:16px;box-shadow:var(--shadow)}
+.sec-head{display:flex;align-items:center;gap:8px;padding-bottom:11px;border-bottom:2px solid #eaf4ef;margin-bottom:4px}
+.sec-head .dot{width:8px;height:8px;border-radius:50%;background:var(--grad);flex:none}
+.sec-head h2{font-size:16.5px;color:#2f6ba3;font-weight:800;letter-spacing:.02em}
+.sec-head .cnt{margin-left:auto;font-size:11.5px;color:#8aa09a;font-weight:600}
+
+/* 阶段小标题 */
+.stage{display:flex;align-items:center;gap:8px;margin:16px 2px 4px}
+.stage:first-of-type{margin-top:10px}
+.stage .bar{width:3px;height:14px;border-radius:2px;background:var(--grad);flex:none}
+.stage b{font-size:13px;color:#3d5a66;font-weight:800;letter-spacing:.02em}
+.stage em{font-style:normal;font-size:11px;color:#a3b4bd;font-weight:600}
+
+/* 课程行 */
+.lesson{
+  display:flex;align-items:center;gap:13px;padding:12px 13px;margin:8px 2px;border-radius:13px;
+  background:#f8fbfa;border:1.5px solid #e8f2ee;
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease,border-color .16s ease;
+}
+.lesson.on{cursor:pointer}
+.lesson.on:hover{background:#eefaf4;border-color:#bfe8d6;box-shadow:0 10px 20px -10px rgba(46,158,107,.5);transform:translateY(-3px)}
+.lesson.on:active{transform:translateY(-1px) scale(.997)}
+.lesson .idx{
+  flex:none;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:14.5px;font-weight:800;color:#fff;background:var(--grad);
+  box-shadow:0 5px 12px rgba(47,157,240,.28);
+}
+.lesson .info{flex:1;min-width:0}
+.lesson .lt{font-size:15px;font-weight:700;color:#26333c;line-height:1.5;text-wrap:pretty}
+.lesson .ls{font-size:11.5px;color:#8aa09a;margin-top:2px;line-height:1.6;text-wrap:pretty}
+.lesson .play{
+  flex:none;display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:999px;
+  background:#fff;color:#1fa873;border:1.5px solid var(--green);font-size:12.5px;font-weight:800;white-space:nowrap;
+}
+.lesson.on:hover .play{background:var(--grad);color:#fff;border-color:transparent}
+
+/* 来源卡片 */
+.file{
+  display:flex;align-items:center;gap:13px;padding:14px;border-radius:13px;text-decoration:none;
+  background:linear-gradient(135deg,#f2fbf7,#f1f7ff);border:1.5px dashed #bfe0d3;color:inherit;
+  transition:transform .16s,box-shadow .16s;
+}
+.file:hover{transform:translateY(-2px);box-shadow:0 10px 22px -12px rgba(47,157,240,.55)}
+.file .fi{
+  flex:none;width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  background:var(--grad);color:#fff;font-size:18px;
+}
+.file .ft{flex:1;min-width:0}
+.file .ft b{display:block;font-size:14px;color:#26333c;font-weight:800}
+.file .ft span{display:block;font-size:11.5px;color:#8aa09a;margin-top:2px}
+.file .fw{flex:none;font-size:12px;font-weight:800;color:var(--primary);white-space:nowrap}
+
+.tips{margin:12px 2px 2px;font-size:12px;color:var(--text2);line-height:1.95}
+.tips li{list-style:none;padding-left:16px;position:relative}
+.tips li::before{content:"";position:absolute;left:4px;top:10px;width:5px;height:5px;border-radius:50%;background:#bfe0d3}
+
+.src-note{margin-top:10px;font-size:11px;color:#a3b4bd;line-height:1.8}
+
+/* 返回 + 页脚 */
+.back-wrap{text-align:center;margin:24px 0 4px}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:11px 26px;background:#fff;color:#1fa873;
+  border:1.5px solid var(--green);border-radius:14px;font-size:14px;font-weight:800;text-decoration:none;
+  box-shadow:0 4px 12px rgba(46,158,107,.12);transition:transform .15s;
+}
+.back-btn:active{transform:scale(.97)}
+footer{text-align:center;font-size:12px;color:#a8bcb4;margin-top:24px;letter-spacing:.04em;line-height:2}
+
+/* 教练微信号提示 */
+.coach-tip{position:relative;display:inline-block;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.coach-tip .tip{
+  visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;transform:translateX(-50%) translateY(4px);
+  background:var(--grad);color:#fff;padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;
+  white-space:nowrap;letter-spacing:.04em;z-index:99;pointer-events:none;
+  box-shadow:0 6px 18px rgba(47,157,240,.35);transition:opacity .2s,transform .2s,visibility .2s;
+}
+.coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#2f9df0}
+.coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- 弹窗播放器（B 站官方源内嵌） ---------- */
+.pl-mask{
+  position:fixed;inset:0;z-index:100;background:rgba(6,12,20,.68);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s;
+}
+.pl-mask.on{opacity:1;visibility:visible}
+.pl-box{
+  width:min(920px,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden;
+  background:#0e1726;border-radius:18px;border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 30px 80px rgba(0,0,0,.55);
+  transform:translateY(14px) scale(.985);transition:transform .22s;
+}
+.pl-mask.on .pl-box{transform:none}
+.pl-head{flex:none;display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--grad);color:#fff}
+.pl-head .no{
+  flex:none;font-size:11px;font-weight:800;letter-spacing:.08em;padding:3px 9px;border-radius:999px;
+  background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.34);white-space:nowrap;
+}
+.pl-head .tt{flex:1;min-width:0;font-size:14px;font-weight:800;letter-spacing:.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-head .x{
+  flex:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-family:inherit;
+  border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.18);color:#fff;
+  font-size:14px;line-height:1;transition:background .15s;
+}
+.pl-head .x:hover{background:rgba(255,255,255,.32)}
+.pl-stage{flex:none;width:100%;aspect-ratio:16/9;background:#000}
+.pl-stage iframe{display:block;width:100%;height:100%;border:0}
+.pl-foot{
+  flex:none;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;
+  padding:10px 14px calc(11px + env(safe-area-inset-bottom));
+  background:rgba(8,13,22,.95);border-top:1px solid rgba(255,255,255,.07);
+}
+.pl-foot .desc{flex:1;min-width:200px;font-size:12px;color:#9fb3c0;line-height:1.7;margin:0}
+.pl-btns{display:flex;gap:8px;flex:none}
+.pl-btn{
+  padding:8px 13px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;
+  background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.18);
+  display:inline-flex;align-items:center;gap:5px;text-decoration:none;white-space:nowrap;
+  transition:background .15s,transform .1s;
+}
+.pl-btn:hover{background:rgba(255,255,255,.2)}
+.pl-btn:active{transform:scale(.95)}
+.pl-btn:disabled{opacity:.36;cursor:not-allowed}
+
+@media (max-width:520px){
+  body{padding:18px 14px calc(32px + env(safe-area-inset-bottom))}
+  .hero{padding:24px 18px;gap:12px}
+  .film{width:82px;height:54px;transform:perspective(520px) rotateY(-20deg) rotateX(8deg)}
+  .film i:nth-child(1){left:8px;width:17px}
+  .film i:nth-child(2){left:29px;width:17px}
+  .film i:nth-child(3){left:50px;width:22px}
+  .lesson{padding:11px 12px;gap:11px}
+  .lesson .lt{font-size:14px}
+  .lesson .idx{width:33px;height:33px;font-size:13.5px}
+  .track{padding:10px 11px;gap:2px 6px}
+  .track .t{font-size:11px}
+  .pl-mask{padding:8px}
+  .pl-box{border-radius:14px}
+  .pl-head{padding:10px 12px}
+  .pl-foot{gap:7px;padding:9px 11px calc(10px + env(safe-area-inset-bottom))}
+  .pl-foot .desc{min-width:100%}
+  .pl-btns{width:100%;justify-content:space-between}
+  .pl-btn{padding:7px 11px;font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  .lesson,.file{transition:none}
+  .lesson.on:hover,.file:hover{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <div class="hero-txt">
+      <span class="tag">AI绘画 · 零基础13节</span>
+      <h1>AI绘画系统课</h1>
+      <p class="sub">从看懂模型，到精准出图</p>
+    </div>
+    <div class="film" aria-hidden="true"><i></i><i></i><i></i></div>
+  </header>
+
+  <div class="track" id="track"></div>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>课程目录</h2>
+      <span class="cnt" id="cnt"></span>
+    </div>
+    <div id="list"></div>
+    <p class="src-note">* 课程内嵌自 B 站「哩布哩布AI」官方账号免费公开教程，点击课程行直接在页面内播放；教程持续更新，以官方发布为准。</p>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>配套练习</h2>
+    </div>
+    <a class="file" href="https://www.liblib.art/" target="_blank" rel="noopener">
+      <span class="fi">🎨</span>
+      <span class="ft">
+        <b>LiblibAI 在线 WebUI</b>
+        <span>注册即免费用 · 边看边练，无需安装任何软件</span>
+      </span>
+      <span class="fw">去练习 ↗</span>
+    </a>
+    <ul class="tips">
+      <li>点击任意一节课，弹窗内直接播放（B 站官方源），不离开本页；右上 ✕ 或点空白处关闭</li>
+      <li>建议按主线顺序学：模型 → 提示词 → 参数 → LoRA → 画质 → ControlNet</li>
+      <li>每学一节就去在线 WebUI 复现一遍，出图效果记得存档对比</li>
+      <li>学完 13 节可产出：一套自己的模型组合 + 提示词模板 + ControlNet 精准控图流程</li>
+    </ul>
+  </section>
+
+  <div class="back-wrap">
+    <a href="../../learn_ai.html" class="back-btn">🏠 返回课程中心</a>
+  </div>
+
+  <footer>
+    © 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span>
+  </footer>
+</div>
+
+<!-- 弹窗播放器：内嵌 B 站官方外链播放器 -->
+<div class="pl-mask" id="plMask" role="dialog" aria-modal="true" aria-label="课程视频播放器">
+  <div class="pl-box">
+    <div class="pl-head">
+      <span class="no" id="plNo"></span>
+      <b class="tt" id="plTitle"></b>
+      <button class="x" id="plClose" type="button" aria-label="关闭播放器">✕</button>
+    </div>
+    <div class="pl-stage" id="plStage"></div>
+    <div class="pl-foot">
+      <p class="desc" id="plDesc"></p>
+      <div class="pl-btns">
+        <button class="pl-btn" id="plPrev" type="button">← 上一节</button>
+        <button class="pl-btn" id="plNext" type="button">下一节 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 课程数据：全部为 LiblibAI 官方在线教程，点击即跳转官方页面播放 ===== */
+var STAGES = [
+  { name:'模型基础', n:'01-03' },
+  { name:'提示词', n:'04-05' },
+  { name:'文生图参数', n:'06' },
+  { name:'LoRA 进阶', n:'07-09' },
+  { name:'画质修复', n:'10-11' },
+  { name:'ControlNet', n:'12-13' }
+];
+
+/* B 站官方外链播放器（哩布哩布AI 官方账号，合集4782889） */
+var BVPLAYER = 'https://player.bilibili.com/player.html?bvid=';
+var PRELUDE = { bv:'BV195KLegEvE', dur:'03:19' };
+var LESSONS = [
+  { no:1, stage:'模型基础', bv:'BV1LGKLekEFb', dur:'04:03', title:'Checkpoint 是什么？', brief:'认识 WebUI 第一个必填项，理解大模型对出图的作用' },
+  { no:2, stage:'模型基础', bv:'BV1RGKLerEXN', dur:'02:36', title:'优质 Checkpoint 如何找', brief:'挑选好用大模型的 6 大技巧，不再盲目试错' },
+  { no:3, stage:'模型基础', bv:'BV1G7KLeuEan', dur:'02:41', title:'Checkpoint 调用技巧', brief:'在线 WebUI 中调用与管理模型，出图效率翻倍' },
+  { no:4, stage:'提示词', bv:'BV16cA6eLE24', dur:'04:46', title:'正向提示词 3 大技巧', brief:'提示词形式、写作公式与 AI 辅助直出，告别瞎试关键词' },
+  { no:5, stage:'提示词', bv:'BV1d9PxeiEad', dur:'04:00', title:'负向提示词 6 大技巧', brief:'常用负向词、权重符号用法与 3 项快捷操作' },
+  { no:6, stage:'文生图参数', bv:'BV1fS98YbEoT', dur:'04:50', title:'文生图 6 大参数详解', brief:'采样方法、步数、宽高、数量、引导系数与随机种子' },
+  { no:7, stage:'LoRA 进阶', bv:'BV1nzQwY1EUU', dur:'02:29', title:'LoRA 超详细使用攻略', brief:'用 LoRA 生成特定主体、风格与元素，少写复杂提示词' },
+  { no:8, stage:'LoRA 进阶', bv:'BV1KKXTYqEcx', dur:'03:28', title:'LoRA 管理与触发词', brief:'在线管理模型文件，触发词与配套大模型一目了然' },
+  { no:9, stage:'LoRA 进阶', bv:'BV14soyY9EXd', dur:'04:02', title:'多 LoRA 叠用进阶', brief:'组合多个 LoRA 打造专属风格与复杂精致画面' },
+  { no:10, stage:'画质修复', bv:'BV1urZbYDEHy', dur:'04:44', title:'3 种高清放大技巧', brief:'WebUI 常用放大方式，画质直达 4K 超清' },
+  { no:11, stage:'画质修复', bv:'BV1wkR1Y5EwL', dur:'04:22', title:'面部修复 3 大技巧', brief:'全身像脸部崩坏？三种修复方式一次学会' },
+  { no:12, stage:'ControlNet', bv:'BV1owdVY5ETK', dur:'01:57', title:'从 0 认识 ControlNet', brief:'用 ControlNet 精准控制构图、姿态与画面结构' },
+  { no:13, stage:'ControlNet', bv:'BV1a65YzNEMu', dur:'04:14', title:'OpenPose 手把手教程', brief:'用 OpenPose 精准控制人物姿势，姿态不再崩' }
+];
+
+/* 播放清单：先导片 + 13 节 */
+var PLAYLIST = [
+  { prelude:true, bv:PRELUDE.bv, dur:PRELUDE.dur, title:'课程先导片 · 3 分钟速览',
+    brief:'AI 绘画应用现状与 WebUI 基础概念，先看再学' }
+].concat(LESSONS);
+
+(function(){
+  var esc = function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+
+  /* 学习主线：一行流程链 */
+  document.getElementById('track').innerHTML = STAGES.map(function(s, i){
+    return (i ? '<span class="ar">›</span>' : '') +
+           '<span class="t" title="第 ' + esc(s.n) + ' 节">' + esc(s.name) + '</span>';
+  }).join('');
+
+  /* 课程目录：先导片 + 按阶段分组，全部内嵌 B 站官方播放器 */
+  var html = '';
+  html += '<div class="lesson on" role="button" tabindex="0" data-i="0">' +
+          '<div class="idx">▶</div>' +
+          '<div class="info"><div class="lt">' + esc(PLAYLIST[0].title) + '</div>' +
+          '<div class="ls">' + esc(PLAYLIST[0].brief) + '</div></div>' +
+          '<div class="play">▶ ' + esc(PRELUDE.dur) + '</div>' +
+          '</div>';
+  STAGES.forEach(function(st){
+    var group = LESSONS.filter(function(l){ return l.stage === st.name; });
+    if(!group.length) return;
+    html += '<div class="stage"><span class="bar"></span><b>' + esc(st.name) + '</b>' +
+            '<em>' + esc(st.n) + ' · ' + group.length + ' 节</em></div>';
+    group.forEach(function(l){
+      var i = PLAYLIST.indexOf(l);
+      html += '<div class="lesson on" role="button" tabindex="0" data-i="' + i + '">' +
+              '<div class="idx">' + l.no + '</div>' +
+              '<div class="info"><div class="lt">' + esc(l.title) + '</div>' +
+              '<div class="ls">' + esc(l.brief) + '</div></div>' +
+              '<div class="play">▶ ' + esc(l.dur) + '</div>' +
+              '</div>';
+    });
+  });
+  document.getElementById('list').innerHTML = html;
+  document.getElementById('cnt').textContent = '共 ' + LESSONS.length + ' 节 + 先导片 · 在线免费';
+
+  /* 弹窗播放器：内嵌 B 站官方外链播放器 */
+  var plMask = document.getElementById('plMask'),
+      plNo = document.getElementById('plNo'),
+      plTitle = document.getElementById('plTitle'),
+      plDesc = document.getElementById('plDesc'),
+      plStage = document.getElementById('plStage'),
+      plPrev = document.getElementById('plPrev'),
+      plNext = document.getElementById('plNext'),
+      plClose = document.getElementById('plClose');
+  var cur = -1, lastFocus = null;
+
+  function playerSrc(bv){
+    return BVPLAYER + bv + '&page=1&high_quality=1&danmaku=0&autoplay=0';
+  }
+  function show(i){
+    if(i < 0 || i >= PLAYLIST.length) return;
+    cur = i;
+    var l = PLAYLIST[i];
+    plNo.textContent = l.prelude ? '先导片' : '第 ' + l.no + ' 节';
+    plTitle.textContent = l.title;
+    plDesc.textContent = l.brief;
+    plStage.innerHTML = '<iframe src="' + playerSrc(l.bv) + '" scrolling="no" frameborder="0" ' +
+      'allowfullscreen="true" title="' + esc(l.title) + '"></iframe>';
+    plPrev.disabled = i <= 0;
+    plNext.disabled = i >= PLAYLIST.length - 1;
+    plMask.classList.add('on');
+    document.body.style.overflow = 'hidden';
+  }
+  function hide(){
+    plMask.classList.remove('on');
+    plStage.innerHTML = '';
+    document.body.style.overflow = '';
+    if(lastFocus){ try{ lastFocus.focus(); }catch(e){} lastFocus = null; }
+  }
+  function openLesson(i, trigger){
+    lastFocus = trigger || null;
+    show(i);
+  }
+
+  var list = document.getElementById('list');
+  list.addEventListener('click', function(e){
+    var card = e.target.closest('.lesson.on');
+    if(card) openLesson(+card.getAttribute('data-i'), card);
+  });
+  list.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    var card = e.target.closest('.lesson.on');
+    if(!card) return;
+    e.preventDefault();
+    openLesson(+card.getAttribute('data-i'), card);
+  });
+
+  plClose.addEventListener('click', hide);
+  plPrev.addEventListener('click', function(){ if(cur > 0) show(cur - 1); });
+  plNext.addEventListener('click', function(){ if(cur < PLAYLIST.length - 1) show(cur + 1); });
+  plMask.addEventListener('click', function(e){ if(e.target === plMask) hide(); });
+  document.addEventListener('keydown', function(e){
+    if(!plMask.classList.contains('on')) return;
+    if(e.key === 'Escape') hide();
+    else if(e.key === 'ArrowLeft'){ if(cur > 0) show(cur - 1); }
+    else if(e.key === 'ArrowRight'){ if(cur < PLAYLIST.length - 1) show(cur + 1); }
+  });
+})();
+</script>
+</body>
+</html>

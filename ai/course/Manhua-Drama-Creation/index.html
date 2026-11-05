@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2ebd85">
+<meta name="description" content="AI 漫剧创作实操课 · 12 节边学边练：从剧本、分镜、资产图到即梦与豆包双平台成片。">
+<title>AI 漫剧创作实操课 · 初阶12节边学边练</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#1fa873;--green:#2ebd85;--blue:#2f9df0;
+  --grad:linear-gradient(135deg,#35d29a 0%,#2f9df0 100%);
+  --bg:#f5f7fa;--text:#1e293b;--text2:#64748b;
+  --card:#fff;--line:#e6eef0;--shadow:0 8px 22px rgba(47,157,240,.10);--radius:16px;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;
+  background:linear-gradient(180deg,#eefaf4 0%,#eef4fb 100%);
+  color:var(--text);line-height:1.85;min-height:100vh;
+  display:flex;justify-content:center;padding:24px 16px calc(40px + env(safe-area-inset-bottom));
+}
+.container{width:100%;max-width:760px}
+
+/* ---------- 首屏标题卡（含 3D 胶片） ---------- */
+.hero{
+  position:relative;border-radius:22px;padding:28px 22px 26px;color:#fff;overflow:hidden;
+  background:var(--grad);box-shadow:0 14px 30px rgba(47,157,240,.25);
+  display:flex;align-items:center;gap:18px;
+}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.14);pointer-events:none}
+.hero::before{width:130px;height:130px;top:-46px;right:-34px}
+.hero::after{width:74px;height:74px;bottom:-26px;left:-18px}
+.hero-txt{position:relative;flex:1;min-width:0}
+.hero .tag{
+  display:inline-block;padding:3px 11px;border-radius:999px;font-size:11.5px;font-weight:700;
+  letter-spacing:.06em;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.34);
+}
+.hero h1{font-size:clamp(21px,5.6vw,26px);line-height:1.35;font-weight:800;letter-spacing:1px;margin-top:10px;text-shadow:0 2px 8px rgba(0,0,0,.12)}
+.hero .sub{font-size:13.5px;margin-top:7px;letter-spacing:.06em;opacity:.96}
+.hero .meta{font-size:12px;margin-top:4px;opacity:.86;letter-spacing:.04em}
+
+/* 3D 胶片：透视倾斜 + 齿孔 */
+.film{
+  position:relative;flex:none;width:126px;height:80px;border-radius:9px;
+  background:linear-gradient(160deg,#ffffff,#e7f6f0);
+  box-shadow:0 16px 26px rgba(15,90,120,.28),0 2px 0 rgba(255,255,255,.6) inset;
+  transform:perspective(620px) rotateY(-24deg) rotateX(9deg) rotateZ(-2deg);
+  transform-style:preserve-3d;
+}
+.film::before,.film::after{
+  content:"";position:absolute;left:6px;right:6px;height:7px;
+  background-image:radial-gradient(circle at 4px 3.5px,rgba(47,157,240,.42) 2px,transparent 2.6px);
+  background-size:13px 7px;background-repeat:repeat-x;
+}
+.film::before{top:3px}
+.film::after{bottom:3px}
+.film i{
+  position:absolute;top:14px;bottom:14px;border-radius:3px;
+  background:linear-gradient(160deg,#35d29a,#2f9df0);opacity:.85;
+}
+.film i:nth-child(1){left:8px;width:30px}
+.film i:nth-child(2){left:44px;width:30px;opacity:.62}
+.film i:nth-child(3){left:80px;width:38px;opacity:.44}
+
+/* ---------- 学习主线（单行流程链，窄屏自然折行） ---------- */
+.track{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:3px 7px;
+  margin-top:14px;padding:11px 13px;border-radius:13px;
+  background:rgba(255,255,255,.8);border:1px solid var(--line);
+  box-shadow:0 4px 12px rgba(47,157,240,.05);
+}
+.track .t{font-size:11.5px;font-weight:700;color:#4a6270;letter-spacing:.02em;white-space:nowrap}
+.track .ar{font-size:11px;color:#b9ccd5;line-height:1}
+
+/* ---------- 通用卡片 ---------- */
+.sec{background:#fff;border-radius:var(--radius);padding:18px 18px 14px;margin-top:16px;box-shadow:var(--shadow)}
+.sec-head{display:flex;align-items:center;gap:8px;padding-bottom:11px;border-bottom:2px solid #eaf4ef;margin-bottom:4px}
+.sec-head .dot{width:8px;height:8px;border-radius:50%;background:var(--grad);flex:none}
+.sec-head h2{font-size:16.5px;color:#2f6ba3;font-weight:800;letter-spacing:.02em}
+.sec-head .cnt{margin-left:auto;font-size:11.5px;color:#8aa09a;font-weight:600}
+
+/* 阶段小标题 */
+.stage{display:flex;align-items:center;gap:8px;margin:16px 2px 4px}
+.stage:first-of-type{margin-top:10px}
+.stage .bar{width:3px;height:14px;border-radius:2px;background:var(--grad);flex:none}
+.stage b{font-size:13px;color:#3d5a66;font-weight:800;letter-spacing:.02em}
+.stage em{font-style:normal;font-size:11px;color:#a3b4bd;font-weight:600}
+
+/* 课程行 */
+.lesson{
+  display:flex;align-items:center;gap:13px;padding:12px 13px;margin:8px 2px;border-radius:13px;
+  background:#f8fbfa;border:1.5px solid #e8f2ee;
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease,border-color .16s ease;
+}
+.lesson.on{cursor:pointer}
+.lesson.on:hover{background:#eefaf4;border-color:#bfe8d6;box-shadow:0 10px 20px -10px rgba(46,158,107,.5);transform:translateY(-3px)}
+.lesson.on:active{transform:translateY(-1px) scale(.997)}
+.lesson .idx{
+  flex:none;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:14.5px;font-weight:800;color:#fff;background:var(--grad);
+  box-shadow:0 5px 12px rgba(47,157,240,.28);
+}
+.lesson .info{flex:1;min-width:0}
+.lesson .lt{font-size:15px;font-weight:700;color:#26333c;line-height:1.5;text-wrap:pretty}
+.lesson .ls{font-size:11.5px;color:#8aa09a;margin-top:2px;line-height:1.6;text-wrap:pretty}
+.lesson .play{
+  flex:none;display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:999px;
+  background:#fff;color:#1fa873;border:1.5px solid var(--green);font-size:12.5px;font-weight:800;white-space:nowrap;
+}
+.lesson.on:hover .play{background:var(--grad);color:#fff;border-color:transparent}
+
+/* 未上线状态 */
+.lesson.soon{background:#fbfcfd;border-color:#edf2f5}
+.lesson.soon .idx{background:#e8eef2;color:#a8b8c2;box-shadow:none}
+.lesson.soon .lt{color:#8d9ea8}
+.lesson.soon .ls{color:#b3c0c8}
+.lesson .soon-tag{
+  flex:none;padding:5px 11px;border-radius:999px;background:#f1f5f8;color:#a8b8c2;
+  font-size:11.5px;font-weight:700;white-space:nowrap;letter-spacing:.02em;
+}
+
+/* 打卡表下载 */
+.file{
+  display:flex;align-items:center;gap:13px;padding:14px;border-radius:13px;text-decoration:none;
+  background:linear-gradient(135deg,#f2fbf7,#f1f7ff);border:1.5px dashed #bfe0d3;color:inherit;
+  transition:transform .16s,box-shadow .16s;
+}
+.file:hover{transform:translateY(-2px);box-shadow:0 10px 22px -12px rgba(47,157,240,.55)}
+.file .fi{
+  flex:none;width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  background:var(--grad);color:#fff;font-size:18px;
+}
+.file .ft{flex:1;min-width:0}
+.file .ft b{display:block;font-size:14px;color:#26333c;font-weight:800}
+.file .ft span{display:block;font-size:11.5px;color:#8aa09a;margin-top:2px}
+.file .fw{flex:none;font-size:12px;font-weight:800;color:var(--primary);white-space:nowrap}
+
+.tips{margin:12px 2px 2px;font-size:12px;color:var(--text2);line-height:1.95}
+.tips li{list-style:none;padding-left:16px;position:relative}
+.tips li::before{content:"";position:absolute;left:4px;top:10px;width:5px;height:5px;border-radius:50%;background:#bfe0d3}
+
+/* 返回 + 页脚 */
+.back-wrap{text-align:center;margin:24px 0 4px}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:11px 26px;background:#fff;color:#1fa873;
+  border:1.5px solid var(--green);border-radius:14px;font-size:14px;font-weight:800;text-decoration:none;
+  box-shadow:0 4px 12px rgba(46,158,107,.12);transition:transform .15s;
+}
+.back-btn:active{transform:scale(.97)}
+footer{text-align:center;font-size:12px;color:#a8bcb4;margin-top:24px;letter-spacing:.04em;line-height:2}
+
+/* 教练微信号提示 */
+.coach-tip{position:relative;display:inline-block;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.coach-tip .tip{
+  visibility:hidden;opacity:0;position:absolute;bottom:145%;left:50%;transform:translateX(-50%) translateY(4px);
+  background:var(--grad);color:#fff;padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:700;
+  white-space:nowrap;letter-spacing:.04em;z-index:99;pointer-events:none;
+  box-shadow:0 6px 18px rgba(47,157,240,.35);transition:opacity .2s,transform .2s,visibility .2s;
+}
+.coach-tip .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#2f9df0}
+.coach-tip:hover .tip,.coach-tip:active .tip,.coach-tip:focus .tip{visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:520px){
+  body{padding:18px 14px calc(32px + env(safe-area-inset-bottom))}
+  .hero{padding:24px 18px;gap:12px}
+  .film{width:82px;height:54px;transform:perspective(520px) rotateY(-20deg) rotateX(8deg)}
+  .film i:nth-child(1){left:6px;width:19px}
+  .film i:nth-child(2){left:29px;width:19px}
+  .film i:nth-child(3){left:52px;width:24px}
+  .film::before,.film::after{background-size:11px 6px;height:6px}
+  .lesson{padding:11px 12px;gap:11px}
+  .lesson .lt{font-size:14px}
+  .lesson .idx{width:33px;height:33px;font-size:13.5px}
+  .track{padding:10px 11px;gap:2px 6px}
+  .track .t{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){
+  .lesson,.file{transition:none}
+  .lesson.on:hover,.file:hover{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <div class="hero-txt">
+      <span class="tag">AI视频创作 · 初阶12节</span>
+      <h1>AI漫剧创作实操课</h1>
+      <p class="sub">从一句故事，到一版成片</p>
+      <p class="meta">即梦 AI × 豆包 AI 双平台实测</p>
+    </div>
+    <div class="film" aria-hidden="true"><i></i><i></i><i></i></div>
+  </header>
+
+  <div class="track" id="track"></div>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>课程目录</h2>
+      <span class="cnt" id="cnt"></span>
+    </div>
+    <div id="list"></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>学习打卡表</h2>
+    </div>
+    <a class="file" href="../../resources/Manhua-Drama-Creation/document/AI漫剧创作实操课程学习打卡表.xlsx" download>
+      <span class="fi">▤</span>
+      <span class="ft">
+        <b>AI漫剧创作实操课程学习打卡表</b>
+        <span>初阶12 节 · 完成状态 / 完成日期 / 复盘备注</span>
+      </span>
+      <span class="fw">下载 ↓</span>
+    </a>
+    <ul class="tips">
+      <li>建议看一节练一节，不要一次性看完所有课再动手</li>
+      <li>每完成一课记录日期，并在备注写下失败原因与优化方向</li>
+      <li>整套学完可产出：一套剧本分镜 + 一套人物/场景资产 + 一版 AI 成片</li>
+    </ul>
+  </section>
+
+  <div class="back-wrap">
+    <a href="../../learn_ai.html" class="back-btn">🏠 返回课程中心</a>
+  </div>
+
+  <footer>
+    © 2026 <span class="coach-tip" tabindex="0">两英豆豆教练<span class="tip">微信号 ddtt0754</span></span>
+  </footer>
+</div>
+
+<script>
+/* ===== 课程数据：新增视频时只需把 ready 改 true 并填 page ===== */
+var STAGES = [
+  { name:'基础认知', n:'01' },
+  { name:'前期内容创作', n:'02-05' },
+  { name:'资产设计', n:'06-08' },
+  { name:'提示词核心', n:'09' },
+  { name:'工具实操', n:'10-12' }
+];
+
+var LESSONS = [
+  { no:1, title:'课前须知 + 导演思维', stage:'基础认知', brief:'搞清课程目标与工具，建立镜头叙事思维',
+    page:'video1.html', ready:true },
+  { no:2, title:'剧本生成的方法', stage:'前期内容创作', brief:'用 AI 生成结构化剧本，掌握起承转合',
+    page:'video2.html', ready:true },
+  { no:3, title:'剧本转分镜', stage:'前期内容创作', brief:'把剧本拆成可执行的镜头分镜',
+    page:'video3.html', ready:true },
+  { no:4, title:'从分镜中提取人物', stage:'前期内容创作', brief:'提炼角色设定，统一人物特征',
+    page:'video4.html', ready:true },
+  { no:5, title:'从分镜脚本提取场景、道具', stage:'前期内容创作', brief:'整理场景与道具清单',
+    page:'video5.html', ready:true },
+  { no:6, title:'设计人物资产图', stage:'资产设计', brief:'用资产图固定长相，解决 AI 变脸',
+    page:'video6.html', ready:true },
+  { no:7, title:'设计场景、道具、妖兽', stage:'资产设计', brief:'为世界观设计场景、道具与妖兽资产',
+    page:'video7.html', ready:true },
+  { no:8, title:'参考资产图出分镜', stage:'资产设计', brief:'带着资产图重做分镜，保证画面统一',
+    page:'video8.html', ready:true },
+  { no:9, title:'视频生成提示词公式', stage:'提示词核心', brief:'掌握提示词公式，不再靠瞎试关键词',
+    page:'video9.html', ready:true },
+  { no:10, title:'生视频实操①+②（即梦）', stage:'工具实操', brief:'在即梦完成第一批镜头与整片成片',
+    page:'video10.html', ready:true },
+  { no:11, title:'打斗视频生成（即梦）', stage:'工具实操', brief:'专项攻克打斗与动作镜头',
+    page:'video11.html', ready:true },
+  { no:12, title:'生视频实操（豆包）', stage:'工具实操', brief:'同组分镜换豆包生成，对比两平台',
+    page:'video12.html', ready:true }
+];
+
+(function(){
+  var esc = function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+
+  /* 学习主线：一行流程链 */
+  document.getElementById('track').innerHTML = STAGES.map(function(s, i){
+    return (i ? '<span class="ar">›</span>' : '') +
+           '<span class="t" title="第 ' + esc(s.n) + ' 节">' + esc(s.name) + '</span>';
+  }).join('');
+
+  /* 课程目录：按阶段分组 */
+  var html = '', readyCount = 0;
+  STAGES.forEach(function(st, si){
+    var group = LESSONS.filter(function(l){ return l.stage === st.name; });
+    if(!group.length) return;
+    html += '<div class="stage"><span class="bar"></span><b>' + esc(st.name) + '</b>' +
+            '<em>' + esc(st.n) + ' · ' + group.length + ' 节</em></div>';
+    group.forEach(function(l){
+      if(l.ready) readyCount++;
+      var on = l.ready && l.page;
+      html += '<div class="lesson' + (on ? ' on' : ' soon') + '"' +
+              (on ? ' role="button" tabindex="0" data-page="' + esc(l.page) + '" data-no="' + l.no + '"' : '') + '>' +
+              '<div class="idx">' + l.no + '</div>' +
+              '<div class="info"><div class="lt">' + esc(l.title) + '</div>' +
+              '<div class="ls">' + esc(l.brief) + '</div></div>' +
+              (on ? '<div class="play">▶ 播放</div>' : '<div class="soon-tag">待上线</div>') +
+              '</div>';
+    });
+  });
+  document.getElementById('list').innerHTML = html;
+  document.getElementById('cnt').textContent = '共 ' + LESSONS.length + ' 节 · 已上线 ' + readyCount + ' 节';
+
+  /* 弹窗播放（同一窗口名，避免重复开窗） */
+  function openLesson(page, no){
+    var w = Math.min(1040, Math.floor(screen.availWidth * 0.92));
+    var h = Math.min(680, Math.floor(screen.availHeight * 0.88));
+    var left = Math.floor((screen.availWidth - w) / 2);
+    var top = Math.floor((screen.availHeight - h) / 2);
+    var win = window.open(page, 'manhuaVideo' + no,
+      'width=' + w + ',height=' + h + ',left=' + left + ',top=' + top +
+      ',resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,status=no');
+    if(!win) location.href = page;
+  }
+
+  var list = document.getElementById('list');
+  list.addEventListener('click', function(e){
+    var card = e.target.closest('.lesson.on');
+    if(card) openLesson(card.getAttribute('data-page'), card.getAttribute('data-no'));
+  });
+  list.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    var card = e.target.closest('.lesson.on');
+    if(!card) return;
+    e.preventDefault();
+    openLesson(card.getAttribute('data-page'), card.getAttribute('data-no'));
+  });
+})();
+</script>
+</body>
+</html>
