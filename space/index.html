@@ -487,6 +487,7 @@ a{color:inherit;text-decoration:none}
   #addrItem .k{display:block}
   #addrItem .k::after{margin-left:0}
 }
+
 </style>
 </head>
 <body>
@@ -871,23 +872,31 @@ a{color:inherit;text-decoration:none}
 
   /* 兜底复制：微信 / 非安全上下文下 clipboard API 不可用，退回 execCommand */
   function legacyCopy(txt){
-    var ta = null;
+    var ta = null, prev = null;
     try{
+      if(document.activeElement){ prev = document.activeElement; }
       ta = document.createElement('textarea');
       ta.value = txt;
       ta.setAttribute('readonly', '');
-      ta.contentEditable = 'true';
-      ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;' +
-                         'opacity:0;font-size:16px;-webkit-user-select:text;';
+      ta.setAttribute('aria-hidden', 'true');
+      /* iOS Safari / 微信 X5 要求：元素必须在视口内、且有一定可见度、且先聚焦 */
+      ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;margin:0;' +
+                         'opacity:0.01;font-size:16px;line-height:1;z-index:-1;' +
+                         'overflow:hidden;-webkit-user-select:text;user-select:text;';
       document.body.appendChild(ta);
-      /* iOS Safari 要求先建立 Range 选区 */
-      if(ta.setSelectionRange){ ta.setSelectionRange(0, txt.length); }
-      var range = document.createRange();
-      range.selectNodeContents(ta);
-      var sel = window.getSelection();
-      if(sel){ sel.removeAllRanges(); sel.addRange(range); }
-      var ok = document.execCommand('copy');
+      var ok = false;
+      try{ ta.focus({ preventScroll:true }); }catch(e0){ try{ ta.focus(); }catch(e1){} }
+      /* ① 原生全选（textarea 只能用 select / setSelectionRange，用 Range 会清空选区） */
+      try{ ta.select(); ok = document.execCommand('copy'); }catch(e2){ ok = false; }
+      /* ② 再补一次显式选区 */
+      if(!ok && ta.setSelectionRange){
+        try{
+          ta.setSelectionRange(0, txt.length);
+          ok = document.execCommand('copy');
+        }catch(e3){ ok = false; }
+      }
       document.body.removeChild(ta);
+      if(prev && prev.focus){ try{ prev.focus({ preventScroll:true }); }catch(e4){} }
       return ok;
     }catch(e){
       if(ta && ta.parentNode){ ta.parentNode.removeChild(ta); }
@@ -938,10 +947,91 @@ a{color:inherit;text-decoration:none}
       catch(err){ window.scrollTo(0, y); }
     });
   }
+
+  /* ===== 打开页面即静默写入抖音链接（全程不弹任何提示） =====
+     移动端适配要点：
+       ① 无手势时浏览器必拒 ⇒ 加载先试一次，不成功就静默等待；
+       ② **有手势时先走同步 execCommand**（iOS Safari / 微信 X5 / 旧 WebView 只认这条，
+          且不依赖异步权限），失败再走 Clipboard API；
+       ③ 事件选取稳定授予用户激活的 pointerup / touchend / mouseup / click / keydown；
+       ④ 1.2s 看门狗防 promise 悬挂自锁，成功一次即解绑。 */
+  var DY_TEXT = 'https://v.douyin.com/RWYuFC1JKiQ/ 复制此链接，打开Dou音搜索，直接观看视频！';
+  var DY_MAX_FAIL = 30;
+  var dyDone = false, dyBusy = false, dyFails = 0, dyLastG = 0, dyBound = [];
+  var dyGesture = function(){ dyCopy(true); };
+
+  function dyUnbind(){
+    for(var k = 0; k < dyBound.length; k++){
+      document.removeEventListener(dyBound[k], dyGesture, true);
+    }
+    dyBound = [];
+    document.removeEventListener('visibilitychange', dyOnVisible, false);
+    window.removeEventListener('pageshow', dyOnLoad, false);
+    window.removeEventListener('load', dyOnLoad, false);
+  }
+  function dySettle(ok){
+    dyBusy = false;
+    if(ok){ dyDone = true; dyUnbind(); }
+    else { dyFails++; }
+  }
+  function dyOnVisible(){
+    if(document.visibilityState === 'visible'){ dyFails = 0; dyCopy(false); }
+  }
+  function dyOnLoad(){ dyCopy(false); }
+  function dyUseApi(){
+    if(!(navigator.clipboard && navigator.clipboard.writeText)) return false;
+    try{
+      navigator.clipboard.writeText(DY_TEXT).then(function(){ dySettle(true); },
+                                                 function(){ dySettle(false); });
+      return true;
+    }catch(e){ return false; }
+  }
+  function dyCopy(isGesture){
+    if(dyDone || dyBusy || dyFails >= DY_MAX_FAIL) return;
+    if(isGesture){
+      var now = Date.now();
+      if(now - dyLastG < 200) return;   /* 同一次触摸 pointerup→click 不重复耗次数 */
+      dyLastG = now;
+    }
+    dyBusy = true;
+    var wd = setTimeout(function(){ dyBusy = false; }, 1200);
+    var fin = function(ok){ clearTimeout(wd); dySettle(ok); };
+
+    /* 手势上下文：先同步 execCommand（移动端最靠谱） */
+    if(isGesture){
+      var okLegacy = false;
+      try{ okLegacy = legacyCopy(DY_TEXT); }catch(e){ okLegacy = false; }
+      if(okLegacy){ fin(true); return; }
+    }
+    /* 非手势（加载）或同步失败：走异步 Clipboard API */
+    if(dyUseApi()) return;
+    /* API 不存在：非手势下再试一次 execCommand */
+    var ok2 = false;
+    if(!isGesture){ try{ ok2 = legacyCopy(DY_TEXT); }catch(e){ ok2 = false; } }
+    fin(ok2);
+  }
+
+  /* 只绑「能稳定授予用户激活」的事件（capture 阶段，不拦截、不阻塞） */
+  ['pointerup', 'touchend', 'mouseup', 'click', 'keydown'].forEach(function(ev){
+    document.addEventListener(ev, dyGesture, { passive:true, capture:true });
+    dyBound.push(ev);
+  });
+  document.addEventListener('visibilitychange', dyOnVisible, false);
+  window.addEventListener('pageshow', dyOnLoad, false);
+  window.addEventListener('load', dyOnLoad, false);
+
+  /* ① 脚本一执行就写一次（抢在首屏渲染前） */
+  dyCopy(false);
+  /* ② DOM 就绪后再补一次 */
+  if(document.readyState === 'complete' || document.readyState === 'interactive'){
+    setTimeout(dyOnLoad, 0);
+  }else{
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(dyOnLoad, 0); });
+  }
 })();
 </script>
 <script>
-/* ===== 背景星辰：随机分布 + 独立相位闪烁（装饰层，失败不影响页面） ===== */
+/* ===== \u80cc\u666f\u661f\u8fb0：随机分布 + 独立相位闪烁（装饰层，失败不影响页面） ===== */
 (function(){
   var box = document.getElementById('bgStars');
   if(!box) return;
