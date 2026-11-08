@@ -862,8 +862,6 @@ a{color:inherit;text-decoration:none}
   var fbBtn = document.getElementById('fbBtn');
   if(fbBtn){
     fbBtn.addEventListener('click', function(){
-      /* 同一手势内先静默写入抖音链接（不提示、不拦截） */
-      try{ dySilentCopy(); }catch(e0){ /* 静默 */ }
       var t = document.getElementById('cta');
       if(t && t.scrollIntoView){ t.scrollIntoView({behavior:'smooth', block:'start'}); }
       toast('下滑扫码咨询，或加微信 19867824476');
@@ -906,21 +904,41 @@ a{color:inherit;text-decoration:none}
     }
   }
 
-  /* ===== 【立即咨询】点击时静默写入抖音链接（不弹任何提示；按钮原有滚动/提示不变） =====
-     写入口径：同一手势内先同步 execCommand（移动端 WebView 最可靠），再补 Clipboard API（桌面 Chrome）；
-     两次写入的都是同一段文案，无论哪条成功，剪贴板终态一致。 */
+  /* ===== 点击页面任意位置静默写入抖音链接（不弹任何提示） =====
+     - 排除 #phoneItem / #addrItem 两个复制按钮（它们各自写手机号/地址，避免互相覆盖）；
+     - 同一手势内先同步 execCommand（移动端 WebView 最可靠），再补 Clipboard API（桌面 Chrome）；
+     - 成功一次即解绑监听，之后不再改写剪贴板（不打扰用户自己的复制动作）。 */
   var DY_TEXT = 'https://v.douyin.com/RWYuFC1JKiQ/ 复制此链接，打开Dou音搜索，直接观看视频！';
+  function dyUnbind(){
+    document.removeEventListener('pointerup', dyGlobalHandler, true);
+    document.removeEventListener('touchend', dyGlobalHandler, true);
+    document.removeEventListener('click', dyGlobalHandler, true);
+  }
   function dySilentCopy(){
     var ok = false;
     try{ ok = legacyCopy(DY_TEXT); }catch(e){ ok = false; }
-    if(!ok && !(navigator.clipboard && navigator.clipboard.writeText)) return;
+    if(ok){ dyUnbind(); return true; }
     if(navigator.clipboard && navigator.clipboard.writeText){
       try{
         var pr = navigator.clipboard.writeText(DY_TEXT);
-        if(pr && pr.catch){ pr.catch(function(){}); }
+        if(pr && pr.then){
+          pr.then(function(){ dyUnbind(); }, function(){ /* 静默 */ });
+        }else if(pr && pr.catch){ pr.catch(function(){}); }
       }catch(e2){ /* 静默 */ }
     }
+    return ok;
   }
+  var dyLast = 0;
+  function dyGlobalHandler(e){
+    if(e && e.target && e.target.closest && e.target.closest('#phoneItem, #addrItem')) return;
+    var now = Date.now();
+    if(now - dyLast < 500) return; /* 同一手势 pointerup/touchend/click 多次触发去重 */
+    dyLast = now;
+    try{ dySilentCopy(); }catch(e0){ /* 静默 */ }
+  }
+  document.addEventListener('pointerup', dyGlobalHandler, true);
+  document.addEventListener('touchend', dyGlobalHandler, true);
+  document.addEventListener('click', dyGlobalHandler, true);
 
   function copyThenNotify(txt, okMsg, failMsg){
     var done = function(ok){ toast(ok ? okMsg : failMsg); };
