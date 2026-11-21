@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>期末荣耀</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">题</div>
+          <div>
+            <h1>王者荣耀</h1>
+            <p>三路推塔 · 四选一闯关</p>
+          </div>
+        </div>
+
+        <div class="excel-actions">
+          <button class="primary-action" id="downloadTemplate" type="button">
+            <span class="button-icon">⇩</span>
+            下载题目模板
+          </button>
+          <label class="primary-action import-action" for="importWorkbook">
+            <span class="button-icon">⇧</span>
+            导入题库
+          </label>
+          <input id="importWorkbook" type="file" accept=".xlsx,.xls" />
+          <div class="library-status">
+            <strong>Excel 题库状态</strong>
+            <span id="libraryStatus">内置题库 9 题</span>
+          </div>
+        </div>
+
+        <div class="quick-stats">
+          <div>
+            <span>当前段位</span>
+            <strong id="topRank">青铜</strong>
+          </div>
+          <div>
+            <span>星星</span>
+            <strong id="topStars">0/2</strong>
+          </div>
+          <div>
+            <span>金币</span>
+            <strong id="topCoins">0</strong>
+          </div>
+          <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true">
+            <span>音效</span>
+            <strong id="soundState">开</strong>
+          </button>
+          <div class="bgm-control">
+            <button class="bgm-toggle" id="bgmToggle" type="button" aria-pressed="false">
+              <span>BGM</span>
+              <strong id="bgmState">播放</strong>
+            </button>
+            <div class="track-display">
+              <span>当前音乐</span>
+              <strong id="bgmTrackName">On My Way</strong>
+              <small id="bgmTrackMeta">1/2 · Alan Walker</small>
+            </div>
+            <div class="bgm-button-row" aria-label="背景音乐控制">
+              <button id="bgmPrev" class="music-icon-button" type="button" title="上一首" aria-label="上一首">‹</button>
+              <button id="bgmNext" class="music-icon-button" type="button" title="下一首" aria-label="下一首">›</button>
+              <button id="bgmShuffle" class="music-icon-button" type="button" title="随机播放" aria-label="随机播放" aria-pressed="false">⇄</button>
+              <button id="bgmLoop" class="music-icon-button" type="button" title="循环播放" aria-label="循环播放" aria-pressed="true">∞</button>
+            </div>
+            <label class="volume-control" for="bgmVolume">
+              <span>音量 <strong id="bgmVolumeText">35%</strong></span>
+              <input id="bgmVolume" type="range" min="0" max="100" value="35" />
+            </label>
+          </div>
+        </div>
+      </header>
+
+      <main class="game-layout">
+        <aside class="hero-panel">
+          <div class="panel-title">
+            <span>英雄选择</span>
+            <small>点击英雄出征</small>
+          </div>
+          <div class="hero-list" id="heroList"></div>
+
+          <section class="hp-card">
+            <label for="maxHp">主角生命值</label>
+            <div class="hp-editor">
+              <input id="maxHp" type="number" min="30" max="300" step="10" value="100" />
+              <button id="applyHp" type="button">应用</button>
+            </div>
+            <div class="hp-bar" aria-label="生命值">
+              <span id="hpFill"></span>
+            </div>
+            <div class="hp-row">
+              <strong id="hpText">100 / 100</strong>
+              <span id="shieldText">复活甲 1 · 名刀 1</span>
+            </div>
+            <div class="coin-row">
+              <span>金币</span>
+              <strong id="coinText">0</strong>
+            </div>
+          </section>
+
+          <section class="score-card">
+            <label for="playerName">姓名/班级名称</label>
+            <div class="name-row">
+              <input id="playerName" type="text" maxlength="20" placeholder="输入姓名或班级" />
+              <button id="saveRecord" type="button">保存记录</button>
+            </div>
+            <button id="exportRecords" class="export-records" type="button">导出本地记录</button>
+            <p class="save-hint" id="lastSavedText">记录会保存在当前浏览器本地。</p>
+            <div class="rank-medal">
+              <span id="rankBadge">青铜</span>
+              <div id="rankStars" class="stars" aria-label="段位星星"></div>
+            </div>
+          </section>
+        </aside>
+
+        <section class="map-panel">
+          <div class="map-header">
+            <div>
+              <strong>三路峡谷</strong>
+              <span id="selectedTargetText">点击小兵、塔、水晶或野区，会在屏幕中间弹出题目</span>
+            </div>
+          <div class="map-header-actions">
+            <button id="fullscreenToggle" class="map-fullscreen" type="button" title="切换全屏">⛶ 全屏</button>
+            <button id="challengeButton" class="challenge-button" type="button" disabled>打开挑战</button>
+          </div>
+          </div>
+
+          <div class="map-board" id="mapBoard">
+            <img src="./assets/canyon-map.png" alt="三路峡谷地图背景" />
+            <div class="hero-token" id="heroToken" aria-hidden="true">
+              <img id="heroTokenImg" src="./assets/algebra-mage.png" alt="" />
+            </div>
+            <div class="node-layer" id="nodeLayer"></div>
+          </div>
+
+          <div class="battle-feedback" id="battleFeedback">
+            <strong>反馈会显示在这里</strong>
+            <span>点击地图节点后，题目会在屏幕中间弹窗显示；答对会立刻加金币。</span>
+          </div>
+        </section>
+
+        <aside class="challenge-panel">
+          <div class="panel-title">
+            <span>当前题目挑战</span>
+            <small id="questionCounter">未开始</small>
+          </div>
+
+          <div class="target-card">
+            <div>
+              <span id="targetType">暂无目标</span>
+              <strong id="targetName">先选择地图节点</strong>
+            </div>
+            <div class="target-progress">
+              <span id="objectiveProgressText">0 / 0</span>
+              <div><i id="objectiveProgressFill"></i></div>
+            </div>
+          </div>
+
+          <article class="question-card">
+            <h2 id="questionTitle">准备出征</h2>
+            <p id="questionDescription">选择一个英雄，再点击地图上的兵线、塔、水晶或野区，题目会在屏幕中间弹出。</p>
+          </article>
+
+          <div class="combo-steps" id="comboSteps"></div>
+
+          <div class="panel-actions">
+            <button id="hintButton" type="button">查看提示</button>
+            <button id="nextQuestion" type="button" disabled>下一题</button>
+          </div>
+
+          <section class="stats-grid">
+            <div>
+              <span>正确率</span>
+              <strong id="accuracyText">0%</strong>
+            </div>
+            <div>
+              <span>答题速度</span>
+              <strong id="speedText">0 秒/题</strong>
+            </div>
+            <div>
+              <span>连胜</span>
+              <strong id="streakText">0</strong>
+            </div>
+          </section>
+
+          <section class="records">
+            <div class="records-title">姓名段位榜</div>
+            <ol id="recordList"></ol>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <div class="quiz-modal is-hidden" id="quizModal" role="dialog" aria-modal="true" aria-labelledby="modalQuestionTitle">
+      <div class="quiz-backdrop" id="quizBackdrop"></div>
+      <section class="quiz-window">
+        <div class="quiz-top">
+          <div>
+            <span id="modalTargetType">上路 · 兵线</span>
+            <strong id="modalTargetName">目标挑战</strong>
+          </div>
+          <button id="modalClose" class="modal-close" type="button" aria-label="关闭弹窗">×</button>
+        </div>
+
+        <div class="quiz-status">
+          <div>
+            <span>目标进度</span>
+            <strong id="modalProgressText">0 / 5</strong>
+          </div>
+          <div>
+            <span>金币</span>
+            <strong id="modalCoins">0</strong>
+          </div>
+          <div>
+            <span>生命值</span>
+            <strong id="modalHp">100 / 100</strong>
+          </div>
+        </div>
+
+        <article class="modal-question">
+          <h2 id="modalQuestionTitle">准备挑战</h2>
+          <p id="modalQuestionText">点击目标后开始答题。</p>
+        </article>
+
+        <div class="modal-options" id="modalOptions"></div>
+
+        <div class="modal-feedback" id="modalFeedback">
+          <strong>准备开战</strong>
+          <span>选择一个答案，系统会立刻反馈。</span>
+        </div>
+
+        <div class="modal-actions">
+          <button id="modalHint" type="button">查看提示</button>
+          <button id="modalNext" type="button">下一题</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+    <div class="site-watermark">@两英豆豆教练</div>
+    <audio id="bgmAudio" preload="auto"></audio>
+
+    <script src="./vendor/xlsx.full.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

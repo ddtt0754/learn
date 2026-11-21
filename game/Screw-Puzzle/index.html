@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>趣味螺丝钉挑战 - 两英豆豆教练</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ffaa00;
+            --secondary-color: #4CAF50;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            margin: 0; padding: 0; overflow: hidden; background: #333;
+            font-family: 'ZCOOL KuaiLe', 'Segoe UI', cursive, sans-serif;
+            touch-action: none; user-select: none; -webkit-user-select: none;
+        }
+
+        #bg-canvas { position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; }
+
+        #game-container {
+            position: relative; width: 100vw; height: 100vh;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+
+        canvas#world {
+            position: relative; z-index: 1; border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
+            pointer-events: none; display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        .top-bar {
+            padding: 15px; display: flex; justify-content: center; align-items: center;
+            flex-direction: column; pointer-events: auto;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            min-height: 100px; /* 预留高度防止抖动 */
+        }
+
+        /* 打字机标题样式 */
+        h1 { 
+            margin: 0; font-size: 2.2rem; color: #fff; 
+            text-shadow: 0 0 10px #ffcc00; text-align: center;
+            min-height: 1.2em; /* 防止高度坍塌 */
+            display: flex; justify-content: center; align-items: center;
+        }
+        .cursor {
+            display: inline-block; width: 3px; height: 1em; background-color: #fff;
+            margin-left: 5px; animation: blink 1s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .subtitle {
+            font-size: 1.2rem; color: #ffeb3b; margin-top: 5px; background: rgba(0,0,0,0.3);
+            padding: 4px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .level-indicator {
+            position: absolute; right: 20px; top: 20px; font-size: 1.8rem; color: white;
+            background: var(--glass-bg); padding: 8px 15px; border-radius: 15px;
+            backdrop-filter: blur(5px); border: 1px solid var(--glass-border);
+        }
+
+        #fullscreen-btn {
+            position: absolute; left: 20px; top: 20px; z-index: 200;
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 15px; font-family: inherit; font-size: 1.1rem; font-weight: bold;
+            color: white; background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 15px; backdrop-filter: blur(5px); cursor: pointer;
+        }
+        #fullscreen-btn:active { transform: translateY(2px); }
+
+        .controls { pointer-events: auto; display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+
+        .btn {
+            background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+            border: none; padding: 8px 20px; color: white; font-size: 1.1rem;
+            border-radius: 50px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-family: inherit; display: flex; align-items: center; gap: 5px; white-space: nowrap;
+            transition: transform 0.1s;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn.music-btn { background: linear-gradient(180deg, #a18cd1 0%, #fbc2eb 100%); }
+        .btn.restart-btn { background: linear-gradient(180deg, #ff9a9e 0%, #fecfef 100%); }
+        .btn.edit-btn { background: linear-gradient(180deg, #43e97b 0%, #38f9d7 100%); color: #333; font-weight: bold; }
+
+        .overlay-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; transition: opacity 0.3s;
+        }
+        .overlay-content {
+            background: rgba(255, 255, 255, 0.95); padding: 40px 60px; border-radius: 30px;
+            border: 4px solid #fff; text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            max-width: 80%; color: #333;
+        }
+        .big-play-btn {
+            font-size: 2.5rem; padding: 15px 60px; margin-top: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #f06595); border: none; color: white;
+            border-radius: 60px; cursor: pointer; animation: bounce 2s infinite; font-family: inherit;
+        }
+
+        #math-modal {
+            display: none; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            padding: 30px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            text-align: center; z-index: 50; min-width: 350px; border: 8px solid #ffaa00;
+            opacity: 0; transition: all 0.3s;
+        }
+        #math-modal.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        #math-question { font-size: 3rem; font-weight: bold; color: #333; margin: 20px 0; font-family: monospace; word-wrap: break-word;}
+        /* 修改了输入框的样式，变宽变小以便输入文字 */
+        #math-input { font-size: 2.2rem; padding: 10px; width: 280px; text-align: center; border: 3px solid #ccc; border-radius: 15px; }
+        #math-input:focus { outline: none; border-color: #ffaa00; }
+
+        #editor-modal {
+            display: none; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); background: #fff; padding: 25px;
+            width: 85%; max-width: 550px; border-radius: 15px; z-index: 150;
+            box-shadow: 0 0 40px rgba(0,0,0,0.6); border: 5px solid #43e97b;
+            color: #333; text-align: left;
+        }
+        #editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        #editor-modal h2 { margin: 0; color: #2c3e50; }
+        .editor-select {
+            padding: 8px 12px; font-size: 16px; border-radius: 8px; border: 2px solid #ccc;
+            font-family: inherit; outline: none; background: #f8f9fa; cursor: pointer;
+        }
+        .editor-select:focus { border-color: #43e97b; }
+        textarea {
+            width: 100%; height: 250px; font-size: 18px; padding: 15px;
+            border: 2px solid #eee; border-radius: 10px; margin-bottom: 10px;
+            font-family: monospace; box-sizing: border-box; resize: none; background: #fafafa;
+        }
+        textarea:focus { border-color: #43e97b; background: #fff; outline: none; }
+        .editor-hint { font-size: 13px; color: #666; margin-bottom: 15px; background: #f1f3f5; padding: 10px; border-radius: 8px; }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);}
+        }
+        .hidden { display: none !important; }
+        #particles { position: absolute; top:0; left:0; pointer-events:none; z-index:20; }
+    </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div id="game-container">
+    <div id="canvas-wrapper"></div>
+    <div id="particles"></div>
+
+    <div id="ui-layer">
+        <div class="top-bar">
+            <h1><span id="title-text"></span><span class="cursor">|</span></h1>
+            <div class="subtitle">@两英豆豆教练</div>
+            <div class="controls">
+                <button class="btn music-btn" onclick="soundManager.toggleBGM()">🎵 音乐: 开</button>
+                <button class="btn restart-btn" onclick="game.restartLevel()">🔄 重来</button>
+                <button class="btn" onclick="game.nextLevel()" style="background: linear-gradient(180deg, #ffaa00 0%, #ffcc33 100%);">⏭ 跳关</button>
+                <button class="btn edit-btn" onclick="questionBank.openEditor()">📝 编辑题目</button>
+            </div>
+        </div>
+        <div class="level-indicator" id="level-display">第 1 关</div>
+    </div>
+
+    <button id="fullscreen-btn" type="button" title="切换全屏" onclick="toggleFullscreen()">⛶ 全屏</button>
+
+    <!-- 开始 & 胜利 弹窗 -->
+    <div id="start-screen" class="overlay-screen">
+        <div class="overlay-content">
+            <h1 style="color:#333; text-shadow:none; display:block;">准备好挑战了吗？</h1>
+            <p style="color:#555; font-size:1.5rem; font-weight:bold;">拖动螺丝 -> 答题 -> 拆板子</p>
+            <button class="big-play-btn" onclick="game.start()">开始挑战</button>
+        </div>
+    </div>
+    <div id="win-screen" class="overlay-screen hidden">
+        <div class="overlay-content">
+            <h1 style="color:#4CAF50; text-shadow:none; display:block;">你真棒！</h1>
+            <p style="color:#555; font-size:1.5rem; font-weight:bold; margin: 20px 0;">豆豆教练偷偷夸了一下你，<br>赶紧挑战下一关吧！</p>
+            <button class="big-play-btn" onclick="game.nextLevel()">下一关</button>
+        </div>
+    </div>
+
+    <!-- 答题弹窗 -->
+    <div id="math-modal">
+        <h3 style="margin:0; color:#888; font-size:1.5rem;">门禁时间</h3>
+        <div id="math-question">?</div>
+        <!-- 重点修改：移除了 type="number" 和 pattern，允许所有文字输入 -->
+        <input type="text" id="math-input" placeholder="请输入答案">
+        <div style="margin-top:20px;">
+            <button class="btn" style="width:100%; justify-content:center; font-size:1.5rem;" onclick="game.checkAnswer()">确定</button>
+        </div>
+    </div>
+
+    <!-- 编辑器 -->
+    <div id="editor-modal">
+        <div id="editor-header">
+            <h2>📝 题目编辑器</h2>
+            <select id="level-select" class="editor-select" onchange="questionBank.onLevelSelectChange()">
+                <option value="default">🌐 全局/默认题库</option>
+                <option value="1">第 1 关</option>
+                <option value="2">第 2 关</option>
+                <option value="3">第 3 关</option>
+                <option value="4">第 4 关</option>
+                <option value="5">第 5 关</option>
+                <option value="6">第 6 关</option>
+                <option value="7">第 7 关</option>
+                <option value="8">第 8 关</option>
+                <option value="9">第 9 关</option>
+                <option value="10">第 10 关</option>
+            </select>
+        </div>
+        <div class="editor-hint">
+            格式：<b>题目|答案</b> (一行一个)<br>
+            示例：<br>
+            2+3=?|5<br>
+            苹果的英文是什么？|apple<br>
+            如果当前关卡为空，将使用全局题库；如果全局也为空，将自动生成口诀题。
+        </div>
+        <textarea id="question-text"></textarea>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <button class="btn" style="background:#ccc; color:#333;" onclick="questionBank.closeEditor()">取消</button>
+            <button class="btn edit-btn" onclick="questionBank.saveAndClose()">💾 保存修改</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /**
+     * 标题打字机特效
+     */
+    const typeWriter = {
+        texts: ["别笑，你试你也过不了第二关🤦‍♂️", "记得关注两英豆豆教练"],
+        speed: 100, // 打字速度
+        deleteSpeed: 50, // 删除速度
+        wait: 2000, // 停顿时间
+        el: null,
+        textIdx: 0,
+        charIdx: 0,
+        isDeleting: false,
+        
+        init: function() {
+            this.el = document.getElementById('title-text');
+            this.tick();
+        },
+        
+        tick: function() {
+            const currentFullText = this.texts[this.textIdx % this.texts.length];
+            
+            if (this.isDeleting) {
+                this.charIdx--;
+            } else {
+                this.charIdx++;
+            }
+            
+            this.el.innerText = currentFullText.substring(0, this.charIdx);
+            
+            let delta = this.isDeleting ? this.deleteSpeed : this.speed;
+            
+            if (!this.isDeleting && this.charIdx === currentFullText.length) {
+                delta = this.wait;
+                this.isDeleting = true;
+            } else if (this.isDeleting && this.charIdx === 0) {
+                this.isDeleting = false;
+                this.textIdx++;
+                delta = 500;
+            }
+            
+            setTimeout(() => this.tick(), delta);
+        }
+    };
+
+    /**
+     * 题库管理器
+     */
+    const questionBank = {
+        data: { "default": [] },
+        currentEditingScope: "default",
+
+        init: function() {
+            const saved = localStorage.getItem('screw_puzzle_data_v3'); // 更新了缓存版本防止和旧版本数字题冲突
+            if (saved) { try { this.data = JSON.parse(saved); } catch(e) {} }
+        },
+        parseText: function(text) {
+            const list = [];
+            if(!text) return list;
+            text.split('\n').forEach(line => {
+                const parts = line.split('|');
+                if (parts.length === 2) {
+                    const q = parts[0].trim();
+                    // 重点修改：移除了 parseInt，将所有答案作为字符串保留
+                    const a = parts[1].trim(); 
+                    if (q && a) list.push({q, a});
+                }
+            });
+            return list;
+        },
+        stringifyList: function(list) {
+            if(!list) return "";
+            return list.map(item => `${item.q}|${item.a}`).join('\n');
+        },
+        openEditor: function() {
+            const currentLevelStr = game.currentLevel ? game.currentLevel.toString() : "default";
+            const select = document.getElementById('level-select');
+            if ([...select.options].some(o => o.value === currentLevelStr)) { select.value = currentLevelStr; } 
+            else { select.value = "default"; }
+            this.currentEditingScope = select.value;
+            this.loadTextToEditor();
+            document.getElementById('editor-modal').style.display = 'block';
+        },
+        onLevelSelectChange: function() {
+            const text = document.getElementById('question-text').value;
+            this.data[this.currentEditingScope] = this.parseText(text);
+            const select = document.getElementById('level-select');
+            this.currentEditingScope = select.value;
+            this.loadTextToEditor();
+        },
+        loadTextToEditor: function() {
+            const list = this.data[this.currentEditingScope] || [];
+            document.getElementById('question-text').value = this.stringifyList(list);
+        },
+        closeEditor: function() { document.getElementById('editor-modal').style.display = 'none'; },
+        saveAndClose: function() {
+            const text = document.getElementById('question-text').value;
+            this.data[this.currentEditingScope] = this.parseText(text);
+            localStorage.setItem('screw_puzzle_data_v3', JSON.stringify(this.data));
+            this.closeEditor();
+            alert("题库已保存！🎯");
+        },
+        getQuestion: function(level) {
+            const levelStr = level.toString();
+            let pool = this.data[levelStr];
+            if (!pool || pool.length === 0) pool = this.data["default"];
+            if (pool && pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
+            return this.generateDefault();
+        },
+        generateDefault: function() {
+            const isMult = Math.random() > 0.4;
+            if (isMult) {
+                const a = Math.floor(Math.random() * 8) + 2, b = Math.floor(Math.random() * 8) + 2;
+                return { q: `${a} × ${b} = ?`, a: String(a * b) }; // 统一转为字符串返回
+            } else {
+                const b = Math.floor(Math.random() * 8) + 2, ans = Math.floor(Math.random() * 8) + 2, a = b * ans;
+                return { q: `${a} ÷ ${b} = ?`, a: String(ans) };
+            }
+        }
+    };
+
+    const soundManager = {
+        ctx: null, isPlaying: false, isMuted: false,
+        init: function() { window.AudioContext = window.AudioContext || window.webkitAudioContext; this.ctx = new AudioContext(); },
+        playTone: function(freq, type, duration, vol=0.1) {
+            if (!this.ctx || this.isMuted) return;
+            const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+            gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+            osc.connect(gain); gain.connect(this.ctx.destination);
+            osc.start(); osc.stop(this.ctx.currentTime + duration);
+        },
+        playClank: function() {
+            if (!this.ctx || this.isMuted) return;
+            const buf = this.ctx.createBuffer(1, 22050, 44100);
+            const data = buf.getChannelData(0);
+            for(let i=0; i<22050; i++) data[i] = (Math.random()*2-1) * Math.exp(-i/5000);
+            const src = this.ctx.createBufferSource(); src.buffer = buf;
+            const gain = this.ctx.createGain(); gain.gain.value = 0.3;
+            src.connect(gain); gain.connect(this.ctx.destination); src.start();
+        },
+        playRatchet: function() { this.playTone(200, 'sawtooth', 0.1, 0.05); setTimeout(()=>this.playTone(250,'sawtooth',0.1,0.05), 50); },
+        playWin: function() { if(!this.ctx) return; [523,659,783,1046].forEach((f,i)=>setTimeout(()=>this.playTone(f,'sine',0.6,0.1), i*150)); },
+        toggleBGM: function() {
+            if(!this.ctx) this.init();
+            const btn = document.querySelector('.music-btn');
+            if(this.isPlaying) { this.isPlaying=false; this.isMuted=true; btn.innerText="🎵 音乐: 关"; btn.style.filter="grayscale(1)"; }
+            else { this.isPlaying=true; this.isMuted=false; btn.innerText="🎵 音乐: 开"; btn.style.filter="grayscale(0)"; this.playBGMLoop(); }
+        },
+        playBGMLoop: function() {
+            if(!this.isPlaying) return;
+            const seq = [261,329,392,523,392,329,293,349];
+            let idx = 0;
+            const loop = () => { if(!this.isPlaying) return; this.playTone(seq[idx], 'triangle', 0.5, 0.02); idx=(idx+1)%8; setTimeout(loop, 600); };
+            loop();
+        }
+    };
+
+    const particleSystem = {
+        canvas:null, ctx:null, particles:[],
+        init: function() {
+            this.canvas=document.createElement('canvas'); this.canvas.width=window.innerWidth; this.canvas.height=window.innerHeight;
+            this.canvas.style.cssText="position:absolute;top:0;left:0;pointer-events:none;z-index:20";
+            document.getElementById('particles').appendChild(this.canvas);
+            this.ctx=this.canvas.getContext('2d'); this.animate();
+        },
+        spawn: function(x,y, color='#ffaa00') { 
+            for(let i=0;i<15;i++) this.particles.push({x,y,vx:(Math.random()-0.5)*10,vy:(Math.random()-0.5)*10,life:1,color:color}); 
+        },
+        animate: function() {
+            this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+            for(let i=this.particles.length-1;i>=0;i--){
+                let p=this.particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.5; p.life-=0.03;
+                this.ctx.globalAlpha=p.life; this.ctx.fillStyle=p.color; this.ctx.beginPath(); this.ctx.arc(p.x,p.y,4,0,Math.PI*2); this.ctx.fill();
+                if(p.life<=0) this.particles.splice(i,1);
+            }
+            requestAnimationFrame(()=>this.animate());
+        }
+    };
+
+    const game = {
+        engine: null, render: null, runner: null, currentLevel: 0,
+        width: 800, height: 1000,
+        holes: [], plates: [], constraints: [],
+        drag: { active:false, screwId:-1, startPos:{x:0,y:0}, currentPos:{x:0,y:0}, targetId:-1 },
+        math: { pending:false, from:-1, to:-1, answer:"" },
+
+        init: function() {
+            questionBank.init();
+            typeWriter.init(); // 启动打字机
+            this.drawBg(); window.addEventListener('resize', ()=>{ this.drawBg(); this.resizeCanvas(); });
+
+            this.engine = Matter.Engine.create();
+            this.engine.world.gravity.y = 1.5;
+
+            this.render = Matter.Render.create({
+                element: document.getElementById('canvas-wrapper'),
+                engine: this.engine,
+                options: { width: this.width, height: this.height, wireframes: false, background: 'transparent', pixelRatio: window.devicePixelRatio }
+            });
+
+            this.resizeCanvas();
+            this.bindEvents();
+
+            Matter.Events.on(this.render, 'afterRender', () => this.drawOverlay());
+            Matter.Events.on(this.engine, 'collisionStart', (e) => {
+                e.pairs.forEach(p => { if(p.bodyA.speed>2 || p.bodyB.speed>2) soundManager.playClank(); });
+            });
+
+            this.runner = Matter.Runner.create();
+            Matter.Render.run(this.render);
+            Matter.Runner.run(this.runner, this.engine);
+            particleSystem.init();
+        },
+
+        drawBg: function() {
+            const c=document.getElementById('bg-canvas'), ctx=c.getContext('2d');
+            c.width=window.innerWidth; c.height=window.innerHeight;
+            const g=ctx.createLinearGradient(0,0,0,c.height); g.addColorStop(0,'#2c3e50'); g.addColorStop(1,'#203a43');
+            ctx.fillStyle=g; ctx.fillRect(0,0,c.width,c.height);
+        },
+        resizeCanvas: function() {
+            const c=this.render.canvas, h=window.innerHeight, w=window.innerWidth;
+            let s=h/this.height; if(this.width*s > w) s=w/this.width; s*=0.98;
+            c.style.width=`${this.width*s}px`; c.style.height=`${this.height*s}px`;
+        },
+        getScreenPos: function(wx, wy) {
+            const canvas = this.render.canvas;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = rect.width / this.width;
+            const scaleY = rect.height / this.height;
+            return {
+                x: rect.left + wx * scaleX,
+                y: rect.top + wy * scaleY
+            };
+        },
+        bindEvents: function() {
+            const c = this.render.canvas;
+            const start = e => this.inputStart(e), move = e => this.inputMove(e), end = e => this.inputEnd(e);
+            c.addEventListener('mousedown', start); window.addEventListener('mousemove', move); window.addEventListener('mouseup', end);
+            c.addEventListener('touchstart', start, {passive:false}); window.addEventListener('touchmove', move, {passive:false}); window.addEventListener('touchend', end);
+            document.getElementById('math-input').addEventListener('keydown', e=>{if(e.key==='Enter')this.checkAnswer()});
+        },
+
+        start: function() {
+            soundManager.init(); soundManager.toggleBGM();
+            document.getElementById('start-screen').classList.add('hidden');
+            this.loadLevel(1);
+        },
+        loadLevel: function(n) {
+            this.currentLevel = n;
+            document.getElementById('level-display').innerText = `第 ${n} 关`;
+            document.getElementById('win-screen').classList.add('hidden');
+            
+            Matter.Composite.clear(this.engine.world); Matter.Engine.clear(this.engine);
+            this.holes=[]; this.plates=[]; this.constraints=[];
+
+            const floorY = this.height - 20; 
+            const ground = Matter.Bodies.rectangle(this.width/2, floorY + 30, this.width, 60, { isStatic: true, render: { fillStyle: '#5d4037' } });
+            const left = Matter.Bodies.rectangle(-50, this.height/2, 100, this.height*2, { isStatic: true });
+            const right = Matter.Bodies.rectangle(this.width+50, this.height/2, 100, this.height*2, { isStatic: true });
+            Matter.Composite.add(this.engine.world, [ground, left, right]);
+
+            const builders = [
+                this.lvl1, this.lvl2, this.lvl3, this.lvl4, this.lvl5,
+                this.lvl6, this.lvl7, this.lvl8, this.lvl9, this.lvl10
+            ];
+            if(n <= builders.length) builders[n-1].call(this);
+            else { alert("通关了！"); this.loadLevel(1); }
+
+            Matter.Events.on(this.engine, 'collisionStart', (e) => {
+                 e.pairs.forEach(p => { if(p.bodyA.speed>3 || p.bodyB.speed>3) soundManager.playClank(); });
+            });
+        },
+        restartLevel: function() { this.loadLevel(this.currentLevel); },
+        nextLevel: function() { this.loadLevel(this.currentLevel+1); },
+
+        // Level Helpers
+        addPlate: function(x,y,w,h,ang,offs,col='#a8b0c0') {
+            const b = Matter.Bodies.rectangle(x,y,w,h, {
+                chamfer:{radius:8}, angle:ang*Math.PI/180,
+                render:{fillStyle:col, strokeStyle:'#555', lineWidth:2},
+                friction:0.3, restitution:0.2, density:0.01
+            });
+            Matter.Composite.add(this.engine.world, b); this.plates.push(b);
+            offs.forEach(o => {
+                const r=b.angle, wx=b.position.x+(o.x*Math.cos(r)-o.y*Math.sin(r)), wy=b.position.y+(o.x*Math.sin(r)+o.y*Math.cos(r));
+                this.addHole(wx,wy,true,b);
+            });
+        },
+        addHole: function(x,y,has,body) {
+            const id=this.holes.length; this.holes.push({id,x,y,hasScrew:has});
+            if(has && body) this.lock(body,x,y,id);
+        },
+        lock: function(body,x,y,hid) {
+            const dx=x-body.position.x, dy=y-body.position.y, a=-body.angle;
+            const px=dx*Math.cos(a)-dy*Math.sin(a), py=dx*Math.sin(a)+dy*Math.cos(a);
+            const c=Matter.Constraint.create({bodyA:body, pointB:{x,y}, pointA:{x:px,y:py}, stiffness:1, length:0, render:{visible:false}});
+            c.holeId=hid; Matter.Composite.add(this.engine.world, c); this.constraints.push(c);
+        },
+
+        // Levels Definitions
+        lvl1: function() {
+            const cx=400, cy=550;
+            this.addHole(cx+80, cy+250, false); this.addHole(cx+140, cy+220, false); this.addHole(cx+20, cy+280, false);
+            this.addPlate(cx-130, cy+50, 90, 30, -45, [{x:-30,y:0}, {x:30,y:0}]);
+            this.addPlate(cx-60, cy-60, 35, 120, -10, [{x:0,y:-40}, {x:0,y:40}]);
+            this.addPlate(cx, cy-100, 35, 140, 0, [{x:0,y:-50}, {x:0,y:0}, {x:0,y:50}]);
+            this.addPlate(cx+60, cy-80, 35, 120, 10, [{x:0,y:-40}, {x:0,y:40}]);
+            this.addPlate(cx+110, cy-40, 35, 90, 25, [{x:0,y:-30}, {x:0,y:30}]);
+            this.addPlate(cx, cy+60, 140, 35, 5, [{x:-50,y:0}, {x:50,y:0}]);
+        },
+        lvl2: function() {
+            const cx=400, cy=500;
+            this.addHole(cx-100, cy+300, false); this.addHole(cx, cy+300, false); this.addHole(cx+100, cy+300, false);
+            this.addPlate(cx-60, cy-60, 40, 160, -30, [{x:0,y:-60},{x:0,y:60}], '#ff9a9e');
+            this.addPlate(cx+60, cy-60, 40, 160, 30, [{x:0,y:-60},{x:0,y:60}], '#ff9a9e');
+            this.addPlate(cx, cy+80, 120, 40, 0, [{x:-40,y:0},{x:40,y:0}], '#a18cd1');
+            this.addPlate(cx, cy-40, 180, 30, 90, [{x:0,y:0}], '#a8b0c0');
+            this.addPlate(cx-50, cy-150, 80, 25, 45, [{x:0,y:0}], '#666');
+            this.addPlate(cx+50, cy-150, 80, 25, -45, [{x:0,y:0}], '#666');
+            this.addPlate(cx, cy+150, 100, 25, 0, [{x:-30,y:0}, {x:30,y:0}], '#666');
+            this.addPlate(cx-80, cy+20, 80, 20, 90, [{x:0,y:0}], '#666');
+            this.addPlate(cx+80, cy+20, 80, 20, 90, [{x:0,y:0}], '#666');
+        },
+        lvl3: function() {
+            const cx=400, cy=500;
+            this.addHole(cx-60, cy+350, false); this.addHole(cx+60, cy+350, false);
+            this.addHole(cx-140, cy+300, false); this.addHole(cx+140, cy+300, false);
+            this.addPlate(cx-50, cy, 30, 300, 0, [{x:0,y:-100},{x:0,y:0},{x:0,y:100}]);
+            this.addPlate(cx+50, cy, 30, 300, 0, [{x:0,y:-100},{x:0,y:0},{x:0,y:100}]);
+            this.addPlate(cx, cy-80, 250, 30, 0, [{x:-50,y:0},{x:50,y:0}]);
+            this.addPlate(cx, cy+80, 250, 30, 0, [{x:-50,y:0},{x:50,y:0}]);
+        },
+        lvl4: function() {
+            const cx=400, cy=500;
+            this.addHole(cx, cy+300, false); this.addHole(cx-80, cy+300, false); this.addHole(cx+80, cy+300, false);
+            this.addPlate(cx, cy+100, 300, 30, 0, [{x:-100,y:0},{x:0,y:0},{x:100,y:0}], '#6a11cb');
+            this.addPlate(cx-70, cy, 200, 30, -60, [{x:0,y:-50},{x:0,y:50}], '#2575fc');
+            this.addPlate(cx+70, cy, 200, 30, 60, [{x:0,y:-50},{x:0,y:50}], '#2575fc');
+            this.addPlate(cx, cy-100, 100, 30, 0, [{x:-30,y:0},{x:30,y:0}], '#ff9a9e');
+            this.addPlate(cx, cy+20, 150, 30, 0, [{x:0,y:0}], '#a8b0c0');
+        },
+        lvl5: function() {
+            const cx=400, cy=500;
+            this.addHole(cx-50, cy+350, false); this.addHole(cx+50, cy+350, false);
+            this.addPlate(cx, cy, 50, 50, 0, [{x:0,y:0}], '#f9d423');
+            this.addPlate(cx, cy-100, 30, 150, 0, [{x:0,y:-50},{x:0,y:50}]);
+            this.addPlate(cx, cy+100, 30, 150, 0, [{x:0,y:-50},{x:0,y:50}]);
+            this.addPlate(cx-100, cy, 150, 30, 0, [{x:-50,y:0},{x:50,y:0}]);
+            this.addPlate(cx+100, cy, 150, 30, 0, [{x:-50,y:0},{x:50,y:0}]);
+            this.addPlate(cx-120, cy, 30, 240, 0, [{x:0,y:0}], '#ff0844');
+            this.addPlate(cx+120, cy, 30, 240, 0, [{x:0,y:0}], '#ff0844');
+        },
+        lvl6: function() {
+            const cx=400, cy=500;
+            this.addHole(cx-100, cy+350, false); this.addHole(cx+100, cy+350, false);
+            this.addPlate(cx-100, cy, 40, 300, 0, [{x:0,y:-100},{x:0,y:0},{x:0,y:100}], '#333');
+            this.addPlate(cx+100, cy, 40, 300, 0, [{x:0,y:-100},{x:0,y:0},{x:0,y:100}], '#333');
+            this.addPlate(cx, cy-100, 240, 30, 0, [{x:-80,y:0},{x:80,y:0}], '#ddd');
+            this.addPlate(cx, cy+100, 240, 30, 0, [{x:-80,y:0},{x:80,y:0}], '#ddd');
+            this.addPlate(cx, cy, 300, 30, 45, [{x:0,y:0}], '#f00');
+        },
+        lvl7: function() {
+            const cx=400, cy=500;
+            this.addHole(cx-120, cy+350, false); this.addHole(cx+120, cy+350, false); this.addHole(cx, cy+350, false);
+            this.addPlate(cx, cy, 100, 100, 0, [{x:-30,y:-30},{x:30,y:-30},{x:-30,y:30},{x:30,y:30}], '#222');
+            this.addPlate(cx-100, cy-80, 150, 25, -30, [{x:40,y:0}], '#444');
+            this.addPlate(cx+100, cy-80, 150, 25, 30, [{x:-40,y:0}], '#444');
+            this.addPlate(cx-100, cy+80, 150, 25, 30, [{x:40,y:0}], '#444');
+            this.addPlate(cx+100, cy+80, 150, 25, -30, [{x:-40,y:0}], '#444');
+        },
+        lvl8: function() {
+            const cx=400, cy=500;
+            this.addHole(cx-60, cy+380, false); this.addHole(cx+60, cy+380, false);
+            this.addPlate(cx, cy-150, 300, 30, 0, [{x:-120,y:0},{x:120,y:0}], '#555');
+            this.addPlate(cx, cy+150, 300, 30, 0, [{x:-120,y:0},{x:120,y:0}], '#555');
+            this.addPlate(cx-150, cy, 30, 300, 0, [{x:0,y:-120},{x:0,y:120}], '#555');
+            this.addPlate(cx+150, cy, 30, 300, 0, [{x:0,y:-120},{x:0,y:120}], '#555');
+            this.addPlate(cx, cy, 200, 30, 0, [{x:0,y:0},{x:-80,y:0},{x:80,y:0}], '#f90');
+            this.addPlate(cx, cy, 30, 200, 0, [{x:0,y:0},{x:0,y:-80},{x:0,y:80}], '#f90');
+        },
+        lvl9: function() {
+            const cx=400, cy=500;
+            this.addHole(cx-100, cy+350, false); this.addHole(cx, cy+350, false); this.addHole(cx+100, cy+350, false);
+            for(let i=0; i<6; i++) {
+                let xOff = (i%3 - 1) * 80;
+                let yOff = Math.floor(i/3) * 120 - 100;
+                this.addPlate(cx+xOff, cy+yOff, 20, 100, 0, [{x:0,y:-30}, {x:0,y:30}], '#0ff');
+            }
+            this.addPlate(cx, cy-50, 300, 20, 0, [{x:-80,y:0},{x:80,y:0}], '#fff');
+            this.addPlate(cx, cy+50, 300, 20, 0, [{x:-80,y:0},{x:80,y:0}], '#fff');
+        },
+        lvl10: function() {
+            const cx=400, cy=500;
+            this.addHole(cx-80, cy+380, false); this.addHole(cx+80, cy+380, false);
+            this.addPlate(cx, cy, 400, 40, 45, [{x:-150,y:0},{x:0,y:0},{x:150,y:0}], '#000');
+            this.addPlate(cx, cy, 400, 40, -45, [{x:-150,y:0},{x:0,y:0},{x:150,y:0}], '#000');
+            this.addPlate(cx, cy-180, 200, 30, 0, [{x:0,y:0}], '#f00');
+            this.addPlate(cx, cy+180, 200, 30, 0, [{x:0,y:0}], '#f00');
+            this.addPlate(cx-180, cy, 30, 200, 0, [{x:0,y:0}], '#f00');
+            this.addPlate(cx+180, cy, 30, 200, 0, [{x:0,y:0}], '#f00');
+            this.addPlate(cx, cy, 100, 100, 0, [{x:0,y:0}], '#ffd700');
+        },
+
+        // Interaction
+        getPos: function(e) {
+            const r=this.render.canvas.getBoundingClientRect();
+            const cx=e.touches?e.touches[0].clientX:e.clientX, cy=e.touches?e.touches[0].clientY:e.clientY;
+            return {x:(cx-r.left)*(this.width/r.width), y:(cy-r.top)*(this.height/r.height)};
+        },
+        inputStart: function(e) {
+            if(this.math.pending) return;
+            const p=this.getPos(e); let t=null, min=40;
+            this.holes.forEach(h=>{const d=Math.hypot(p.x-h.x,p.y-h.y);if(d<min&&h.hasScrew){min=d;t=h;}});
+            if(t) { this.drag={active:true, screwId:t.id, startPos:{x:t.x,y:t.y}, currentPos:p, targetId:-1}; soundManager.playRatchet(); }
+        },
+        inputMove: function(e) {
+            if(!this.drag.active) return; if(e.type!=='mousemove'&&e.type!=='mouseup')e.preventDefault();
+            const p=this.getPos(e); this.drag.currentPos=p; this.drag.targetId=-1; let min=40;
+            this.holes.forEach(h=>{if(!h.hasScrew&&h.id!==this.drag.screwId){const d=Math.hypot(p.x-h.x,p.y-h.y);if(d<min)this.drag.targetId=h.id;}});
+        },
+        inputEnd: function(e) {
+            if(!this.drag.active) return;
+            if(this.drag.targetId!==-1) this.promptMath(this.drag.screwId, this.drag.targetId);
+            this.drag.active=false;
+        },
+
+        // Math & Logic
+        promptMath: function(fid, tid) {
+            this.math.pending=true; this.math.from=fid; this.math.to=tid;
+            const qa = questionBank.getQuestion(this.currentLevel); 
+            this.math.answer = qa.a;
+            document.getElementById('math-question').innerText = qa.q;
+            document.getElementById('math-input').value = "";
+            const m = document.getElementById('math-modal'); m.style.display='block'; setTimeout(()=>m.classList.add('show'),10);
+            document.getElementById('math-input').focus();
+        },
+        checkAnswer: function() {
+            if(!this.math.pending) return;
+            const i=document.getElementById('math-input');
+            
+            // 重点修改：统一将用户输入和题库答案转为字符串，并忽略前后空格和大小写，增加容错性
+            const userInput = i.value.trim().toLowerCase();
+            const correctAns = String(this.math.answer).trim().toLowerCase();
+            
+            if(userInput === correctAns) {
+                soundManager.playTone(600,'sine',0.1); this.moveScrew(this.math.from, this.math.to);
+                const m=document.getElementById('math-modal'); m.classList.remove('show');
+                setTimeout(()=>{m.style.display='none';this.math.pending=false;},300);
+            } else {
+                soundManager.playTone(150,'sawtooth',0.3); i.style.borderColor='red'; setTimeout(()=>i.style.borderColor='#ccc',500);
+            }
+        },
+        moveScrew: function(fid, tid) {
+            const idx = this.constraints.findIndex(c=>c.holeId===fid);
+            if(idx!==-1) { 
+                const body = this.constraints[idx].bodyA; 
+                Matter.Composite.remove(this.engine.world, this.constraints[idx]); 
+                this.constraints.splice(idx,1); 
+                Matter.Sleeping.set(body, false);
+            }
+            
+            const fromHole = this.holes[fid];
+            const toHole = this.holes[tid];
+            const fromPos = this.getScreenPos(fromHole.x, fromHole.y);
+            const toPos = this.getScreenPos(toHole.x, toHole.y);
+            
+            this.holes[fid].hasScrew=false; this.holes[tid].hasScrew=true;
+            
+            particleSystem.spawn(fromPos.x, fromPos.y, '#aaaaaa'); 
+            particleSystem.spawn(toPos.x, toPos.y, '#ffaa00');
+            
+            soundManager.playRatchet();
+            const th=this.holes[tid], bs=Matter.Query.point(this.plates, {x:th.x, y:th.y});
+            if(bs.length>0) this.lock(bs[0], th.x, th.y, tid);
+            this.checkWin();
+        },
+        checkWin: function() {
+            setTimeout(()=>{
+                if(this.constraints.length === 0) { 
+                    soundManager.playWin(); 
+                    document.getElementById('win-screen').classList.remove('hidden'); 
+                }
+            }, 1000); 
+        },
+
+        // Rendering
+        drawOverlay: function() {
+            const ctx = this.render.context;
+            ctx.save(); ctx.fillStyle = "#4e342e"; ctx.fillRect(0, this.height - 20, this.width, 20); ctx.restore();
+
+            if(this.currentLevel===1) this.drawHand(ctx);
+            if(this.currentLevel===2) this.drawHeart(ctx);
+            this.holes.forEach(h=>{
+                ctx.beginPath(); ctx.arc(h.x,h.y,10,0,Math.PI*2); ctx.fillStyle='#111'; ctx.fill();
+                ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1; ctx.stroke();
+                if(h.hasScrew && (!this.drag.active || this.drag.screwId!==h.id)) this.drawScrew(ctx,h.x,h.y);
+                if(this.drag.active && this.drag.targetId===h.id) {
+                    ctx.beginPath(); ctx.arc(h.x,h.y,18,0,Math.PI*2); ctx.strokeStyle='#4CAF50'; ctx.lineWidth=4; ctx.stroke();
+                }
+            });
+            if(this.drag.active) this.drawScrew(ctx, this.drag.currentPos.x, this.drag.currentPos.y, true);
+        },
+        drawScrew: function(ctx,x,y,drag=false) {
+            const r=drag?18:14; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+            const g=ctx.createRadialGradient(x-5,y-5,2,x,y,r); g.addColorStop(0,'#fff'); g.addColorStop(0.5,'#ffd700'); g.addColorStop(1,'#b8860b');
+            ctx.fillStyle=g; ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=drag?15:2; ctx.fill(); ctx.shadowBlur=0;
+            ctx.beginPath(); ctx.strokeStyle='#5c4000'; ctx.lineWidth=3; ctx.lineCap='round';
+            const o=r*0.4; ctx.moveTo(x-o,y-o); ctx.lineTo(x+o,y+o); ctx.moveTo(x+o,y-o); ctx.lineTo(x-o,y+o); ctx.stroke();
+        },
+        drawHand: function(ctx) {
+            ctx.save(); ctx.globalCompositeOperation='destination-over'; ctx.translate(400, 600);
+            ctx.strokeStyle="rgba(255,255,255,0.1)"; ctx.lineWidth=5; ctx.setLineDash([10,10]);
+            ctx.beginPath(); ctx.moveTo(-70,250); ctx.lineTo(-70,100); ctx.lineTo(-150,20); ctx.lineTo(-90,-30);
+            ctx.lineTo(-70,0); ctx.lineTo(-70,-120); ctx.lineTo(-30,-120); ctx.lineTo(-30,-50);
+            ctx.lineTo(0,-150); ctx.lineTo(40,-150); ctx.lineTo(40,-50); ctx.lineTo(70,-130);
+            ctx.lineTo(100,-130); ctx.lineTo(100,-30); ctx.lineTo(140,-60); ctx.lineTo(160,-30);
+            ctx.lineTo(120,100); ctx.lineTo(120,250); ctx.stroke(); ctx.restore();
+        },
+        drawHeart: function(ctx) {
+            ctx.save(); ctx.globalCompositeOperation='destination-over'; ctx.translate(400, 500);
+            ctx.strokeStyle="rgba(255,192,203,0.2)"; ctx.lineWidth=10; ctx.beginPath();
+            ctx.moveTo(0,80); ctx.bezierCurveTo(70,150,180,50,100,-50);
+            ctx.bezierCurveTo(40,-100,0,-20,0,-20); ctx.bezierCurveTo(0,-20,-40,-100,-100,-50);
+            ctx.bezierCurveTo(-180,50,-70,150,0,80); ctx.stroke(); ctx.restore();
+        }
+    };
+
+    // --- 全屏切换（行为与「学习拔河」一致） ---
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            const root = document.documentElement;
+            const req = root.requestFullscreen || root.webkitRequestFullscreen;
+            if (req) req.call(root);
+        } else {
+            const exit = document.exitFullscreen || document.webkitExitFullscreen;
+            if (exit) exit.call(document);
+        }
+    }
+
+    window.onload = function() { game.init(); };
+</script>
+</body>
+</html>

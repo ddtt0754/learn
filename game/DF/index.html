@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>学习三角洲 - 森林行动</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: 'Microsoft YaHei', sans-serif; touch-action: none; user-select: none; }
+        
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 30px; height: 30px; transform: translate(-50%, -50%); pointer-events: none; z-index: 100; }
+        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: #00FF00; box-shadow: 0 0 5px #000; }
+        #crosshair::before { top: 13px; left: 0; width: 30px; height: 4px; }
+        #crosshair::after { top: 0; left: 13px; width: 4px; height: 30px; }
+
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 200; background: rgba(34, 139, 34, 0.9); }
+        .title { font-size: 80px; color: #FFD700; text-shadow: 4px 4px 0 #8B4513, 8px 8px 0 #000; margin-bottom: 10px; font-weight: 900; letter-spacing: 5px; text-align: center; }
+        .subtitle { font-size: 28px; color: #FFF; margin-bottom: 30px; font-weight: bold; text-shadow: 2px 2px 4px #000; text-align: center; }
+        
+        .btn { background: #FF4500; color: #fff; border: 4px solid #8B0000; padding: 15px 30px; margin: 10px; font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 15px; box-shadow: 0 5px 0 #8B0000; transition: 0.1s; }
+        .btn:active { transform: translateY(5px); box-shadow: 0 0 0 #8B0000; }
+        .btn-blue { background: #1E90FF; border-color: #00008B; box-shadow: 0 5px 0 #00008B; }
+        .btn-green { background: #32CD32; border-color: #006400; box-shadow: 0 5px 0 #006400; }
+
+        #hud { position: absolute; top: 10px; left: 10px; color: #fff; font-size: 22px; font-weight: bold; text-shadow: 2px 2px 0 #000; z-index: 150; pointer-events: none; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 10px; border: 2px solid #FFF; }
+        .hp-heart { color: #FF0000; text-shadow: 1px 1px 0 #FFF; }
+        
+        #instructions-text { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: #FFD700; font-size: 22px; font-weight: bold; text-shadow: 2px 2px 0 #000; z-index: 150; pointer-events: none; background: rgba(0,0,0,0.7); padding: 10px 30px; border-radius: 10px; border: 2px solid #FFF; text-align: center; white-space: nowrap; }
+        
+        #message { position: absolute; top: 30%; width: 100%; text-align: center; color: #FF0000; font-size: 60px; font-weight: 900; text-shadow: 3px 3px 0 #FFF, 6px 6px 0 #000; pointer-events: none; display: none; z-index: 150; }
+
+        #rabbit-quiz { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); border: 5px solid #FFD700; border-radius: 20px; padding: 40px; z-index: 300; text-align: center; color: #FFF; box-shadow: 0 0 50px #000; }
+        #rabbit-quiz h2 { color: #FF69B4; margin-top: 0; font-size: 36px; }
+        #rabbit-q-text { font-size: 40px; margin: 20px 0; font-weight: bold; letter-spacing: 2px; }
+        #rabbit-input { font-size: 28px; padding: 10px; width: 80%; border-radius: 10px; border: none; text-align: center; margin-bottom: 20px; outline: none; }
+
+        #leaderboard-panel { background: rgba(0,0,0,0.8); border-radius: 15px; padding: 20px; color: white; margin-top: 20px; width: 80%; max-width: 500px; max-height: 200px; overflow-y: auto; }
+        .lb-row { display: flex; justify-content: space-between; border-bottom: 1px solid #555; padding: 5px 0; font-size: 18px; }
+        .lb-row.header { font-weight: bold; color: #FFD700; }
+
+        #control-panel { display: none; position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 95%; height: 160px; background: rgba(0,0,0,0.3); border-radius: 20px; z-index: 180; justify-content: space-between; align-items: center; padding: 0 20px; box-sizing: border-box; }
+        .dpad, .action-pad { display: grid; gap: 10px; }
+        .dpad { grid-template-columns: 60px 60px 60px; grid-template-rows: 60px 60px; }
+        .action-pad { grid-template-columns: 80px 80px; }
+        .ctrl-btn { background: rgba(255,255,255,0.7); border: 3px solid #333; border-radius: 10px; font-size: 20px; font-weight: bold; color: #000; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0 #333; }
+        .ctrl-btn:active, .ctrl-btn.active { background: #FFD700; transform: translateY(4px); box-shadow: 0 0 0 #333; }
+        #btn-shoot { background: #FF4500; color: #FFF; border-color: #8B0000; box-shadow: 0 4px 0 #8B0000; font-size: 24px; grid-column: span 2; height: 80px; border-radius: 20px; }
+
+        #watermark-ui { position: absolute; bottom: 180px; right: 20px; color: rgba(255, 255, 255, 0.7); font-size: 16px; font-weight: bold; z-index: 9999; pointer-events: none; text-shadow: 1px 1px 2px #000; }
+        #watermark-bg { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><text x='50' y='200' transform='rotate(-30 200 200)' fill='black' font-size='26' font-weight='bold' font-family='Arial' opacity='0.03'>制作:抖音@李翔在湘西</text></svg>"); pointer-events: none; z-index: 9998; }
+
+        #fullscreen-btn { position: absolute; top: 12px; right: 12px; z-index: 10001; display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-family: inherit; font-size: 16px; font-weight: bold; color: #FFF; background: rgba(0, 0, 0, 0.55); border: 2px solid #FFF; border-radius: 10px; cursor: pointer; pointer-events: auto; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35); }
+        #fullscreen-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+    </style>
+    <script src="vendor/three.min.js"></script>
+    <script src="vendor/PointerLockControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div id="crosshair"></div>
+    <div id="hud">
+        <div style="margin-bottom: 5px;">关卡进度: <span id="level-display" style="color:#FFD700;">1-1</span></div>
+        <div style="margin-bottom: 5px;">战术装甲: <span id="hp-display" class="hp-heart">❤️❤️❤️❤️❤️</span></div>
+        <div>行动耗时: <span id="time-display" style="color:#00FF00;">00:00</span></div>
+    </div>
+    <div id="instructions-text">任务加载中...</div>
+    <div id="message"></div>
+    <div id="watermark-ui">@两英豆豆教练</div>
+    <div id="watermark-bg"></div>
+    <button id="fullscreen-btn" type="button" title="切换全屏">⛶ 全屏</button>
+
+    <div id="control-panel">
+        <div class="dpad">
+            <div style="visibility: hidden;"></div><div class="ctrl-btn" id="btn-w">W</div><div style="visibility: hidden;"></div>
+            <div class="ctrl-btn" id="btn-a">A</div><div class="ctrl-btn" id="btn-s">S</div><div class="ctrl-btn" id="btn-d">D</div>
+        </div>
+        <div class="action-pad" style="grid-template-columns: 70px 70px;">
+            <div class="ctrl-btn" id="btn-turn-l">左转</div><div class="ctrl-btn" id="btn-turn-r">右转</div>
+        </div>
+        <div class="action-pad">
+            <div class="ctrl-btn" id="btn-jump" style="grid-column: span 2; height: 50px;">跳跃</div>
+            <div class="ctrl-btn" id="btn-shoot">💥 开火</div>
+        </div>
+    </div>
+
+    <div id="rabbit-quiz">
+        <h2>⚠️ 遭遇野生测验！</h2>
+        <div id="rabbit-q-text">这里是题目</div>
+        <input type="text" id="rabbit-input" placeholder="输入答案后点击提交或按回车" autocomplete="off">
+        <br>
+        <button class="btn btn-green" onclick="submitRabbitQuiz()">确认提交</button>
+    </div>
+
+    <div id="settlement" class="overlay" style="display:none; z-index: 400;">
+        <h1 class="title" style="font-size: 80px;" id="end-title">行动代号：胜利</h1>
+        <p class="subtitle" id="end-subtitle" style="font-size: 30px;">最终耗时：00:00 | 剩余装甲：5</p>
+        <div style="margin: 20px 0; text-align: center;">
+            <input type="text" id="player-name" placeholder="输入特种兵代号(姓名)" style="font-size: 24px; padding: 10px; border-radius: 10px; text-align: center;">
+            <button class="btn btn-blue" onclick="saveScore()">记录战绩</button>
+        </div>
+        <button class="btn" onclick="location.reload()">重新部署</button>
+    </div>
+
+    <div id="blocker" class="overlay">
+        <div class="title">学习三角洲</div>
+        <div class="subtitle">四则运算 | @两英豆豆教练</div>
+        
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 800px;">
+            <button class="btn" onclick="startGame(false)">💻 开始特训 (PC键鼠)</button>
+            <button class="btn btn-blue" onclick="startGame(true)">📺 开启大屏白板模式</button>
+        </div>
+        
+        <div style="margin-top: 30px; display: flex; gap: 15px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px;">
+            <button class="btn btn-green" style="font-size: 16px; padding: 10px 20px;" onclick="downloadTemplate()">1. 下载题库模板</button>
+            <button class="btn btn-blue" style="font-size: 16px; padding: 10px 20px;" onclick="document.getElementById('excel-upload').click();">2. 导入自定义题库</button>
+            <input type="file" id="excel-upload" style="display: none;" accept=".xlsx, .xls" onchange="importQuestions(event)">
+        </div>
+
+        <div id="leaderboard-panel">
+            <div class="lb-row header"><span>特种兵代号</span><span>耗时</span><span>剩余生命</span></div>
+            <div id="lb-content">无记录</div>
+        </div>
+    </div>
+
+    <script>
+        console.log("©两英豆豆教练 - 学习三角洲");
+
+        // --- 全屏切换（行为与「学习拔河」一致） ---
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                const root = document.documentElement;
+                const req = root.requestFullscreen || root.webkitRequestFullscreen;
+                if (req) req.call(root);
+            } else {
+                const exit = document.exitFullscreen || document.webkitExitFullscreen;
+                if (exit) exit.call(document);
+            }
+        }
+        (function bindFullscreenButton() {
+            const btn = document.getElementById('fullscreen-btn');
+            if (!btn) return;
+            // 阻断冒泡：document 上的 mousedown 会触发开火，按钮自身点击不应算作射击
+            ['mousedown', 'pointerdown', 'touchstart'].forEach(function (type) {
+                btn.addEventListener(type, function (e) { e.stopPropagation(); });
+            });
+            btn.addEventListener('click', function (e) { e.stopPropagation(); toggleFullscreen(); });
+        })();
+
+        // --- 核心题库数据 (四年级大纲加强版) ---
+        let gameData = {
+            level1: [ 
+                // 只保留 3-4 个靶子，避免画面拥挤，且严格遵守除数不能为0才是Trap
+                [ {text: "0 ÷ 45 = 0", isTrap: false}, {text: "128 ÷ 0 = 0", isTrap: true}, {text: "0 × 99 = 0", isTrap: false} ],
+                [ {text: "35 + 0 = 35", isTrap: false}, {text: "0 ÷ 0 = 0", isTrap: true}, {text: "0 ÷ 256 = 0", isTrap: false} ],
+                [ {text: "100 - 0 = 100", isTrap: false}, {text: "34 ÷ (7-7) = 0", isTrap: true}, {text: "0 × 1000 = 0", isTrap: false} ]
+            ],
+            level2: [ 
+                // 多位数混合运算，顺序考点
+                { expr: "125 - 25 × 4", ops: ['-', '×'], order: ['×', '-'], step: 0 },
+                { expr: "360 ÷ 40 + 15", ops: ['+', '÷'], order: ['÷', '+'], step: 0 },
+                { expr: "24 + 160 ÷ 4 × 2", ops: ['×', '+', '÷'], order: ['÷', '×', '+'], step: 0 } // 同级从左到右
+            ],
+            level3: [ 
+                // 带括号的计算匹配
+                { expr: "( 125 - 25 ) × 4 = ?", targets: [ {text:"100", right:false}, {text:"400", right:true}, {text:"25", right:false} ] },
+                { expr: "360 ÷ ( 40 + 50 ) = ?", targets: [ {text:"9", right:false}, {text:"4", right:true}, {text:"45", right:false} ] },
+                { expr: "25 × ( 14 + 6 ) = ?", targets: [ {text:"500", right:true}, {text:"350", right:false}, {text:"400", right:false} ] }
+            ],
+            rabbits: [ 
+                // 四年级四则运算测验
+                { q: "125 × 8 = ?", a: "1000" }, { q: "360 ÷ 60 = ?", a: "6" }, { q: "25 × 4 = ?", a: "100" },
+                { q: "180 ÷ 30 = ?", a: "6" }, { q: "45 + 55 = ?", a: "100" }, { q: "300 - 125 = ?", a: "175" },
+                { q: "15 × 6 = ?", a: "90" }, { q: "400 ÷ 8 = ?", a: "50" }, { q: "24 × 5 = ?", a: "120" }, { q: "1000 - 250 = ?", a: "750" }
+            ]
+        };
+
+        let hp = 5, timeSeconds = 0, timerInterval = null, gameState = 'MENU'; 
+        let isWhiteboardMode = false, currentRabbitQ = null;
+        let camera, scene, renderer, controls, raycaster;
+        let moveForward=false, moveBackward=false, moveLeft=false, moveRight=false, turnLeft=false, turnRight=false;
+        let canJump = true; let prevTime = performance.now();
+        const velocity = new THREE.Vector3(), direction = new THREE.Vector3();
+        let targets = [], particles = [], bullets = [], animals = [];
+        let gunGroup, nextLevelCube = null, recoilTime = 0;
+        let mainLvl = 1, subLvl = 1;
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator(), gainNode = audioCtx.createGain();
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+            if (type === 'shoot') { osc.type='square'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(0.01, now+0.1); gainNode.gain.setValueAtTime(0.3, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now+0.1); osc.start(now); osc.stop(now+0.1); } 
+            else if (type === 'hit') { osc.type='sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.linearRampToValueAtTime(1200, now+0.1); gainNode.gain.setValueAtTime(0.5, now); gainNode.gain.linearRampToValueAtTime(0.01, now+0.2); osc.start(now); osc.stop(now+0.2); } 
+            else if (type === 'error') { osc.type='sawtooth'; osc.frequency.setValueAtTime(100, now); osc.frequency.linearRampToValueAtTime(80, now+0.3); gainNode.gain.setValueAtTime(0.5, now); gainNode.gain.linearRampToValueAtTime(0.01, now+0.3); osc.start(now); osc.stop(now+0.3); } 
+            else if (type === 'hurt') { osc.type='square'; osc.frequency.setValueAtTime(50, now); osc.frequency.exponentialRampToValueAtTime(10, now+0.4); gainNode.gain.setValueAtTime(0.8, now); gainNode.gain.linearRampToValueAtTime(0.01, now+0.4); osc.start(now); osc.stop(now+0.4); } 
+            else if (type === 'win') { osc.type='triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(600, now+0.15); osc.frequency.setValueAtTime(800, now+0.3); gainNode.gain.setValueAtTime(0.5, now); gainNode.gain.linearRampToValueAtTime(0.01, now+0.6); osc.start(now); osc.stop(now+0.6); }
+        }
+
+        init(); animate(); loadLeaderboard();
+
+        function init() {
+            scene = new THREE.Scene(); scene.background = new THREE.Color(0x87CEEB); scene.fog = new THREE.Fog(0x87CEEB, 30, 180); 
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000); camera.position.set(0, 15, 80);
+            scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 0.8));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8); dirLight.position.set(50, 100, -50); scene.add(dirLight);
+
+            buildEnvironment(); buildGun();
+
+            renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(window.devicePixelRatio); renderer.setSize(window.innerWidth, window.innerHeight); document.body.appendChild(renderer.domElement);
+            raycaster = new THREE.Raycaster();
+
+            controls = new THREE.PointerLockControls(camera, document.body); scene.add(controls.getObject());
+            document.addEventListener('keydown', onKeyDown); document.addEventListener('keyup', onKeyUp);
+            document.addEventListener('mousedown', () => { if (controls.isLocked && gameState === 'PLAYING') shoot(); });
+            controls.addEventListener('unlock', () => { if(gameState === 'PLAYING' && !isWhiteboardMode) document.getElementById('blocker').style.display = 'flex'; });
+
+            window.addEventListener('resize', onWindowResize);
+            setInterval(spawnAnimal, 12000); bindVirtualButtons();
+
+            document.getElementById('rabbit-input').addEventListener('keypress', function(e) { if (e.key === 'Enter') submitRabbitQuiz(); });
+        }
+
+        function buildEnvironment() {
+            const floorGeo = new THREE.PlaneGeometry(500, 500, 20, 20); const pos = floorGeo.attributes.position;
+            for(let i=0; i<pos.count; i++) pos.setZ(i, Math.random() * 2); floorGeo.computeVertexNormals();
+            const floor = new THREE.Mesh(floorGeo, new THREE.MeshLambertMaterial({ color: 0x228B22 })); floor.rotation.x = -Math.PI / 2; scene.add(floor);
+            
+            const house = new THREE.Group(); const walls = new THREE.Mesh(new THREE.BoxGeometry(30, 20, 20), new THREE.MeshLambertMaterial({color: 0xDEB887})); walls.position.y = 10; house.add(walls);
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(22, 15, 4), new THREE.MeshLambertMaterial({color: 0x8B0000})); roof.position.y = 27.5; roof.rotation.y = Math.PI/4; house.add(roof);
+            house.position.set(-60, 0, -100); house.rotation.y = Math.PI/6; scene.add(house);
+
+            const trunkMat = new THREE.MeshLambertMaterial({ color: 0x8B4513 }), leavesMat = new THREE.MeshLambertMaterial({ color: 0x006400 });
+            for (let i=0; i<80; i++) {
+                const x = (Math.random()-0.5)*400, z = (Math.random()-0.5)*400; if (Math.abs(x)<50 && Math.abs(z)<100) continue; 
+                const sY = 0.5 + Math.random()*1.5, trunk = new THREE.Mesh(new THREE.CylinderGeometry(2,2,20), trunkMat); trunk.scale.y = sY; trunk.position.set(x, 10*sY, z); scene.add(trunk);
+                const leaves = new THREE.Mesh(new THREE.ConeGeometry(12, 30, 8), leavesMat); leaves.scale.set(1+Math.random(), sY, 1+Math.random()); leaves.position.set(x, 20*sY+10, z); scene.add(leaves);
+            }
+        }
+
+        function spawnAnimal() {
+            if(gameState !== 'PLAYING' || animals.length >= 2) return;
+            const rGroup = new THREE.Group(); const mat = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+            const body = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 5), mat); body.position.y = 1.5;
+            const head = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 3), mat); head.position.set(0, 4, -3);
+            const earL = new THREE.Mesh(new THREE.BoxGeometry(0.8, 3, 0.5), mat); earL.position.set(-1, 6, -3);
+            const earR = new THREE.Mesh(new THREE.BoxGeometry(0.8, 3, 0.5), mat); earR.position.set(1, 6, -3);
+            const tail = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({color: 0xCCCCCC})); tail.position.set(0, 2, 2.5);
+            rGroup.add(body, head, earL, earR, tail);
+
+            const isLeft = Math.random() > 0.5; rGroup.position.set(isLeft ? -80 : 80, 0, -20 - Math.random() * 40); rGroup.lookAt(isLeft ? 80 : -80, 0, rGroup.position.z);
+            rGroup.userData = { type: 'rabbit', speed: (Math.random() * 0.3 + 0.2) * (isLeft ? 1 : -1) };
+            
+            const hitbox = new THREE.Mesh(new THREE.BoxGeometry(8, 10, 8), new THREE.MeshBasicMaterial({visible: false}));
+            hitbox.position.y = 4; hitbox.userData = rGroup.userData; hitbox.parentGroup = rGroup; rGroup.add(hitbox);
+            scene.add(rGroup); animals.push(rGroup);
+        }
+
+        function buildGun() {
+            gunGroup = new THREE.Group();
+            const barrel = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 5), new THREE.MeshLambertMaterial({ color: 0x333333 })); barrel.position.set(0, 0, -2.5);
+            const handle = new THREE.Mesh(new THREE.BoxGeometry(1, 2.5, 1.2), new THREE.MeshLambertMaterial({ color: 0x8B4513 })); handle.position.set(0, -1.2, 0); handle.rotation.x = Math.PI / 10;
+            gunGroup.add(barrel); gunGroup.add(handle); gunGroup.position.set(1.5, -1.5, -3); camera.add(gunGroup); scene.add(camera);
+        }
+
+        function createTextTexture(text, bgColor, textColor, size=55, emphasize=false) {
+            const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 256; const ctx = canvas.getContext('2d');
+            ctx.fillStyle = bgColor; ctx.roundRect ? ctx.roundRect(10, 10, 492, 236, 30) : ctx.fillRect(10, 10, 492, 236); ctx.fill();
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 10; ctx.stroke();
+            const fontOf = s => `${emphasize ? '900' : 'bold'} ${s}px "Microsoft YaHei", "PingFang SC", Arial, sans-serif`;
+            const maxW = 430; let fs = size;
+            ctx.font = fontOf(fs); let tw = ctx.measureText(text).width;
+            if (tw > maxW) { fs = Math.max(18, Math.floor(fs * maxW / tw)); ctx.font = fontOf(fs); }
+            ctx.fillStyle = textColor; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            if (emphasize) { ctx.strokeStyle = textColor; ctx.lineJoin = 'round'; ctx.miterLimit = 2; ctx.lineWidth = Math.max(2.5, fs * 0.06); ctx.strokeText(text, 256, 128); }
+            ctx.fillText(text, 256, 128);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function updateHUD() {
+            document.getElementById('hp-display').innerText = '❤️'.repeat(hp) || '阵亡';
+            const mins = Math.floor(timeSeconds / 60).toString().padStart(2, '0'), secs = (timeSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('time-display').innerText = `${mins}:${secs}`;
+        }
+
+        function takeDamage() {
+            hp--; updateHUD(); playSound('hurt');
+            document.body.style.backgroundColor = "red"; setTimeout(() => document.body.style.backgroundColor = "#87CEEB", 150);
+            if (hp <= 0) {
+                gameState = 'END'; clearInterval(timerInterval);
+                document.getElementById('end-title').innerText = "任务失败"; document.getElementById('end-title').style.color = "#FF0000";
+                document.getElementById('end-subtitle').innerText = "战术装甲已耗尽，请重新挑战！"; document.getElementById('settlement').style.display = 'flex';
+                if(!isWhiteboardMode) controls.unlock();
+            }
+        }
+
+        function loadLevel() {
+            document.getElementById('level-display').innerText = `${mainLvl}-${subLvl}`;
+            targets.forEach(t => scene.remove(t)); targets = [];
+            if(nextLevelCube) { scene.remove(nextLevelCube); nextLevelCube = null; }
+            
+            if(isWhiteboardMode){ camera.position.set(0, 15, 80); camera.rotation.set(0,0,0); } 
+            else { controls.getObject().position.set(0, 15, 80); }
+
+            const inst = document.getElementById('instructions-text');
+            if (mainLvl === 1) {
+                inst.innerText = "任务1：击碎所有运算正确的靶子，绝不能打除数为0的陷阱！";
+                const levelData = gameData.level1[subLvl - 1];
+                const totalWidth = 60; 
+                const startX = -totalWidth / 2;
+                const spacing = totalWidth / (levelData.length - 1);
+
+                const fitSize = (function (texts, want, maxW) {
+                    const mc = document.createElement('canvas').getContext('2d');
+                    mc.font = `900 ${want}px "Microsoft YaHei", "PingFang SC", Arial, sans-serif`;
+                    let widest = 0; texts.forEach(t => { widest = Math.max(widest, mc.measureText(t).width); });
+                    return widest > maxW ? Math.max(18, Math.floor(want * maxW / widest)) : want;
+                })(levelData.map(q => q.text), 74, 430);
+                levelData.forEach((q, idx) => {
+                    const tex = createTextTexture(q.text, '#FF69B4', '#FFF', fitSize, true); // 加粗加大 + 按实测宽度自动收缩，保证不出粉框
+                    const mesh = new THREE.Mesh(new THREE.BoxGeometry(16, 8, 2), new THREE.MeshBasicMaterial({map: tex})); 
+                    mesh.position.set(startX + idx * spacing, 15, -20);
+                    mesh.userData = { type: 'zero', isTrap: q.isTrap }; 
+                    scene.add(mesh); targets.push(mesh);
+                });
+            } else if (mainLvl === 2) {
+                const data = gameData.level2[subLvl - 1]; data.step = 0; 
+                inst.innerText = `任务2：[ ${data.expr} ] 按正确逻辑顺序射击！`;
+                data.ops.forEach((op, idx) => {
+                    const tex = createTextTexture(op, '#1E90FF', '#FFF', 80);
+                    const mesh = new THREE.Mesh(new THREE.BoxGeometry(12, 12, 2), new THREE.MeshBasicMaterial({map: tex})); 
+                    mesh.position.set(-20 + idx * 20, 15, -10); mesh.userData = { type: 'order', op: op, ref: data }; scene.add(mesh); targets.push(mesh);
+                });
+            } else if (mainLvl === 3) {
+                const data = gameData.level3[subLvl - 1];
+                inst.innerText = `任务3：[ ${data.expr} ] 射击正确的答案结果！`;
+                data.targets.forEach((q, idx) => {
+                    const tex = createTextTexture(q.text, '#FFD700', '#000', 80);
+                    const mesh = new THREE.Mesh(new THREE.BoxGeometry(14, 10, 2), new THREE.MeshBasicMaterial({map: tex})); 
+                    mesh.position.set(-20 + idx * 20, 15, -10); mesh.userData = { type: 'calc', right: q.right }; scene.add(mesh); targets.push(mesh);
+                });
+            }
+        }
+
+        function shoot() {
+            playSound('shoot'); recoilTime = 10; 
+            const bullet = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 4), new THREE.MeshBasicMaterial({color: 0xFFFF00}));
+            bullet.position.copy(camera.position); bullet.quaternion.copy(camera.quaternion); scene.add(bullet); bullets.push(bullet);
+
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+            let hitObjects = targets.slice();
+            if(nextLevelCube) hitObjects.push(nextLevelCube);
+            animals.forEach(a => hitObjects.push(a.children[a.children.length-1]));
+
+            const intersects = raycaster.intersectObjects(hitObjects);
+            if (intersects.length > 0) {
+                const hit = intersects[0].object;
+                setTimeout(() => {
+                    if(gameState !== 'PLAYING') return;
+                    if(hit.userData.type === 'rabbit') { triggerRabbitQuiz(hit.parentGroup); return; }
+
+                    createParticles(hit.position || hit.parentGroup.position);
+                    if(hit.userData.type === 'nextLevel') { playSound('win'); startNextLevel(); return; }
+
+                    if (mainLvl === 1 && hit.userData.type === 'zero') {
+                        if (hit.userData.isTrap) { showMsg("除数不能为0！装甲受损！", "#FF0000"); takeDamage(); } 
+                        else { showMsg("完全正确！", "#32CD32"); playSound('hit'); removeTarget(hit); if(targets.filter(t => !t.userData.isTrap).length === 0) spawnNextLevelBlock(); }
+                    } else if (mainLvl === 2 && hit.userData.type === 'order') {
+                        const data = hit.userData.ref;
+                        if (hit.userData.op === data.order[data.step]) {
+                            showMsg("运算顺序正确！", "#32CD32"); playSound('hit'); removeTarget(hit); data.step++; if (data.step >= data.order.length) spawnNextLevelBlock();
+                        } else { showMsg("算错啦，先乘除后加减！", "#FF0000"); takeDamage(); }
+                    } else if (mainLvl === 3 && hit.userData.type === 'calc') {
+                        if (hit.userData.right) { showMsg("计算准确！", "#32CD32"); playSound('hit'); removeTarget(hit); spawnNextLevelBlock(); } 
+                        else { showMsg("答案错误！受损！", "#FF0000"); takeDamage(); }
+                    }
+                }, 100); 
+            }
+        }
+
+        function triggerRabbitQuiz(rabbitModel) {
+            playSound('hit'); createParticles(rabbitModel.position);
+            scene.remove(rabbitModel); animals = animals.filter(a => a !== rabbitModel);
+            gameState = 'RABBIT_QUIZ'; if(!isWhiteboardMode) controls.unlock();
+            
+            const q = gameData.rabbits[Math.floor(Math.random() * gameData.rabbits.length)]; currentRabbitQ = q;
+            document.getElementById('rabbit-q-text').innerText = q.q; document.getElementById('rabbit-input').value = '';
+            document.getElementById('rabbit-quiz').style.display = 'block'; setTimeout(() => document.getElementById('rabbit-input').focus(), 100);
+        }
+
+        function submitRabbitQuiz() {
+            const ans = document.getElementById('rabbit-input').value.trim(); if(!ans) return;
+            document.getElementById('rabbit-quiz').style.display = 'none';
+            if(ans === currentRabbitQ.a) { showMsg("回答正确！装甲未受损", "#00FF00"); playSound('win'); } 
+            else { showMsg(`回答错误！正确答案是 ${currentRabbitQ.a}`, "#FF0000"); takeDamage(); }
+            if(hp > 0) { gameState = 'PLAYING'; if(!isWhiteboardMode) controls.lock(); }
+        }
+
+        function removeTarget(mesh) { scene.remove(mesh); targets = targets.filter(t => t !== mesh); }
+        function createParticles(pos) { const mat = new THREE.MeshBasicMaterial({color: 0xFFFF00}); for(let i=0; i<15; i++) { const p = new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,1.5), mat); p.position.copy(pos); p.velocity = new THREE.Vector3((Math.random()-0.5)*3, (Math.random()-0.5)*3, (Math.random()-0.5)*3); scene.add(p); particles.push(p); } }
+        function spawnNextLevelBlock() { playSound('win'); showMsg("目标达成！射击金块进入下一关", "#FFD700"); nextLevelCube = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshBasicMaterial({map: createTextTexture("击碎进入下一关", "#FF4500", "#FFF", 50)})); nextLevelCube.position.set(0, 30, -10); nextLevelCube.userData = { type: 'nextLevel' }; scene.add(nextLevelCube); }
+
+        function startNextLevel() {
+            subLvl++; if (subLvl > 3) { subLvl = 1; mainLvl++; }
+            if (mainLvl > 3) {
+                gameState = 'END'; clearInterval(timerInterval); playSound('win');
+                document.getElementById('end-title').innerText = "战役胜利！"; document.getElementById('end-title').style.color = "#FFD700";
+                const mins = Math.floor(timeSeconds / 60).toString().padStart(2, '0'), secs = (timeSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('end-subtitle').innerText = `最终耗时：${mins}:${secs} | 剩余装甲：${hp}`;
+                document.getElementById('settlement').style.display = 'flex'; if (!isWhiteboardMode) controls.unlock(); return;
+            }
+            loadLevel();
+        }
+
+        function startGame(isWhiteboard) {
+            audioCtx.resume(); isWhiteboardMode = isWhiteboard; document.getElementById('blocker').style.display = 'none';
+            if (isWhiteboard) document.getElementById('control-panel').style.display = 'flex'; else { document.getElementById('control-panel').style.display = 'none'; controls.lock(); }
+            hp = 5; timeSeconds = 0; updateHUD(); mainLvl = 1; subLvl = 1; gameState = 'PLAYING';
+            clearInterval(timerInterval); timerInterval = setInterval(() => { if(gameState==='PLAYING'){ timeSeconds++; updateHUD(); } }, 1000);
+            loadLevel();
+        }
+
+        function showMsg(txt, color) { const m = document.getElementById('message'); m.innerText = txt; m.style.color = color; m.style.display = 'block'; setTimeout(() => { m.style.display = 'none'; }, 2000); }
+
+        function bindVirtualButtons() {
+            const bindBtn = (id, onStart, onEnd) => {
+                const btn = document.getElementById(id);
+                const startEvt = (e) => { e.preventDefault(); if(gameState==='PLAYING') { btn.classList.add('active'); onStart(); } };
+                const endEvt = (e) => { e.preventDefault(); btn.classList.remove('active'); onEnd(); };
+                btn.addEventListener('mousedown', startEvt); btn.addEventListener('touchstart', startEvt);
+                btn.addEventListener('mouseup', endEvt); btn.addEventListener('mouseleave', endEvt); btn.addEventListener('touchend', endEvt);
+            };
+            bindBtn('btn-w', () => moveForward=true, () => moveForward=false); bindBtn('btn-s', () => moveBackward=true, () => moveBackward=false);
+            bindBtn('btn-a', () => moveLeft=true, () => moveLeft=false); bindBtn('btn-d', () => moveRight=true, () => moveRight=false);
+            bindBtn('btn-turn-l', () => turnLeft=true, () => turnLeft=false); bindBtn('btn-turn-r', () => turnRight=true, () => turnRight=false);
+            bindBtn('btn-jump', () => { if(canJump){ velocity.y += 250; canJump = false; playSound('jump'); } }, () => {});
+            bindBtn('btn-shoot', () => shoot(), () => {});
+        }
+        function onKeyDown(event) { if(isWhiteboardMode || gameState!=='PLAYING') return; switch (event.code) { case 'ArrowUp': case 'KeyW': moveForward=true; break; case 'ArrowLeft': case 'KeyA': moveLeft=true; break; case 'ArrowDown': case 'KeyS': moveBackward=true; break; case 'ArrowRight': case 'KeyD': moveRight=true; break; case 'Space': if(canJump) { velocity.y+=250; canJump=false; playSound('jump'); } break; } }
+        function onKeyUp(event) { if(isWhiteboardMode) return; switch (event.code) { case 'ArrowUp': case 'KeyW': moveForward=false; break; case 'ArrowLeft': case 'KeyA': moveLeft=false; break; case 'ArrowDown': case 'KeyS': moveBackward=false; break; case 'ArrowRight': case 'KeyD': moveRight=false; break; } }
+        function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
+
+        function animate() {
+            requestAnimationFrame(animate); const time = performance.now(); const delta = Math.min((time - prevTime) / 1000, 0.1); prevTime = time;
+
+            if (gameState === 'PLAYING') {
+                velocity.x -= velocity.x * 10.0 * delta; velocity.z -= velocity.z * 10.0 * delta; velocity.y -= 9.8 * 80.0 * delta; 
+                direction.z = Number(moveForward) - Number(moveBackward); direction.x = Number(moveRight) - Number(moveLeft); direction.normalize(); 
+                if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
+                if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;
+
+                if (!isWhiteboardMode) {
+                    controls.moveRight(-velocity.x * delta); controls.moveForward(-velocity.z * delta); controls.getObject().position.y += (velocity.y * delta);
+                    if (controls.getObject().position.y < 15) { velocity.y = 0; controls.getObject().position.y = 15; canJump = true; }
+                } else {
+                    camera.translateX(-velocity.x * delta); camera.translateZ(velocity.z * delta); camera.position.y += (velocity.y * delta);
+                    if(turnLeft) camera.rotation.y += 2.0 * delta; if(turnRight) camera.rotation.y -= 2.0 * delta;
+                    if (camera.position.y < 15) { velocity.y = 0; camera.position.y = 15; canJump = true; }
+                }
+
+                // 取消了乱跑设定，只保留轻微的上下浮动，确保白板上稳如泰山
+                targets.forEach((t, i) => { 
+                    t.position.y = 15 + Math.sin(time*0.003 + i)*2; 
+                });
+
+                if(nextLevelCube) { if(nextLevelCube.position.y > 15) nextLevelCube.position.y -= 30 * delta; nextLevelCube.rotation.y += 0.02; nextLevelCube.rotation.x += 0.01; }
+                for(let i=bullets.length-1; i>=0; i--) { let b = bullets[i]; b.translateZ(-300 * delta); if(b.position.distanceTo(camera.position) > 200) { scene.remove(b); bullets.splice(i,1); } }
+                
+                for(let i=animals.length-1; i>=0; i--){ let a = animals[i]; a.position.x += a.userData.speed; a.position.y = 0 + Math.abs(Math.sin(time * 0.01)) * 4; if(Math.abs(a.position.x) > 150) { scene.remove(a); animals.splice(i,1); } }
+                if (recoilTime > 0) { gunGroup.position.z = -1.5; gunGroup.rotation.x = Math.PI / 12; recoilTime--; } else { gunGroup.position.z += (-2.5 - gunGroup.position.z) * 0.1; gunGroup.rotation.x += (0 - gunGroup.rotation.x) * 0.1; }
+            }
+
+            for(let i=particles.length-1; i>=0; i--){ let p = particles[i]; p.position.add(p.velocity); p.scale.multiplyScalar(0.9); if(p.scale.x < 0.1) { scene.remove(p); particles.splice(i,1); } }
+            renderer.render(scene, camera);
+        }
+
+        function loadLeaderboard() {
+            const lb = JSON.parse(localStorage.getItem('mathDeltaLB') || '[]'); const content = document.getElementById('lb-content');
+            if(lb.length === 0) { content.innerHTML = "<div style='text-align:center; padding:10px;'>暂无记录，快来创造历史！</div>"; return; }
+            content.innerHTML = '';
+            lb.sort((a,b) => b.hp - a.hp || a.time - b.time).slice(0, 5).forEach(r => {
+                const mins = Math.floor(r.time / 60).toString().padStart(2, '0'), secs = (r.time % 60).toString().padStart(2, '0');
+                content.innerHTML += `<div class='lb-row'><span>${r.name}</span><span>${mins}:${secs}</span><span>${'❤️'.repeat(r.hp)}</span></div>`;
+            });
+        }
+        function saveScore() {
+            const name = document.getElementById('player-name').value.trim() || '神秘特种兵';
+            const lb = JSON.parse(localStorage.getItem('mathDeltaLB') || '[]'); lb.push({name, time: timeSeconds, hp});
+            localStorage.setItem('mathDeltaLB', JSON.stringify(lb)); location.reload();
+        }
+        function downloadTemplate() {
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["关卡号", "选项文字", "是否陷阱(TRUE/FALSE)"], ["1", "0 ÷ 45 = 0", "FALSE"], ["1", "128 ÷ 0 = 0", "TRUE"], ["1", "0 × 99 = 0", "FALSE"], ["2", "35 + 0 = 35", "FALSE"], ["2", "0 ÷ 0 = 0", "TRUE"], ["2", "0 ÷ 256 = 0", "FALSE"], ["3", "100 - 0 = 100", "FALSE"], ["3", "34 ÷ (7-7) = 0", "TRUE"], ["3", "0 × 1000 = 0", "FALSE"]]), "Level1_选择");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["关卡号", "屏幕显示题干", "射击目标1", "射击目标2", "射击目标3"], ["1", "125 - 25 × 4", "×", "-", ""], ["2", "360 ÷ 40 + 15", "÷", "+", ""], ["3", "24 + 160 ÷ 4 × 2", "÷", "×", "+"]]), "Level2_顺序");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["关卡号", "屏幕显示题干", "正确答案", "干扰项1", "干扰项2"], ["1", "( 125 - 25 ) × 4 = ?", "400", "100", "25"], ["2", "360 ÷ ( 40 + 50 ) = ?", "4", "9", "45"], ["3", "25 × ( 14 + 6 ) = ?", "500", "350", "400"]]), "Level3_匹配");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["弹出问题", "输入框正确答案"], ["125 × 8 = ?", "1000"], ["360 ÷ 60 = ?", "6"], ["25 × 4 = ?", "100"]]), "Rabbits_填空");
+            XLSX.writeFile(wb, "学习三角洲_题库模板.xlsx");
+        }
+        function importQuestions(event) {
+            const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const wb = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                    const sheet1 = XLSX.utils.sheet_to_json(wb.Sheets["Level1_选择"] || wb.Sheets[wb.SheetNames[0]]); let l1 = [[], [], []];
+                    sheet1.forEach(row => { const lvl = parseInt(row['关卡号'])-1; if(lvl>=0 && lvl<3) l1[lvl].push({text: row['选项文字'], isTrap: String(row['是否陷阱(TRUE/FALSE)']).toUpperCase() === 'TRUE'}); }); gameData.level1 = l1;
+                    const sheet2 = XLSX.utils.sheet_to_json(wb.Sheets["Level2_顺序"] || wb.Sheets[wb.SheetNames[1]]); let l2 = [];
+                    sheet2.forEach(row => { let ops = []; if(row['射击目标1']) ops.push(row['射击目标1']); if(row['射击目标2']) ops.push(row['射击目标2']); if(row['射击目标3']) ops.push(row['射击目标3']); let shuffledOps = [...ops].sort(() => Math.random() - 0.5); l2.push({ expr: row['屏幕显示题干'], ops: shuffledOps, order: ops, step: 0 }); }); gameData.level2 = l2;
+                    const sheet3 = XLSX.utils.sheet_to_json(wb.Sheets["Level3_匹配"] || wb.Sheets[wb.SheetNames[2]]); let l3 = [];
+                    sheet3.forEach(row => { let targets = [ {text: String(row['正确答案']), right: true}, {text: String(row['干扰项1']), right: false}, {text: String(row['干扰项2']), right: false} ]; targets.sort(() => Math.random() - 0.5); l3.push({ expr: row['屏幕显示题干'], targets: targets }); }); gameData.level3 = l3;
+                    const sheet4 = XLSX.utils.sheet_to_json(wb.Sheets["Rabbits_填空"] || wb.Sheets[wb.SheetNames[3]]); let rabbits = [];
+                    sheet4.forEach(row => { rabbits.push({q: row['弹出问题'], a: String(row['输入框正确答案']) }); }); gameData.rabbits = rabbits;
+                    alert("题库导入成功！排位记录不受影响。");
+                } catch(err) { alert("导入失败，请确保使用下载的模板格式！"); }
+            }; reader.readAsArrayBuffer(file);
+        }
+    </script>
+</body>
+</html>

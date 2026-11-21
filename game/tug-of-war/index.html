@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>学习拔河</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <audio id="bgmAudio" src="./assets/audio/bgm.mp3" loop preload="none"></audio>
+    <audio id="correctSound" src="./assets/audio/correct.wav" preload="auto"></audio>
+    <audio id="wrongSound" src="./assets/audio/wrong.wav" preload="auto"></audio>
+    <audio id="pullSound" src="./assets/audio/pull.wav" preload="auto"></audio>
+    <audio id="winSound" src="./assets/audio/win.wav" preload="auto"></audio>
+    <audio id="clickSound" src="./assets/audio/click.wav" preload="auto"></audio>
+
+    <header class="topbar">
+      <button id="fullscreenBtn" class="utility-btn" type="button">全屏</button>
+      <div class="title-block">
+        <p>@两英豆豆教练</p>
+        <h1>学习拔河</h1>
+      </div>
+      <div class="top-actions">
+        <label class="target-select">
+          <span>胜利拉力</span>
+          <select id="winLimitSelect">
+            <option value="4">4 格</option>
+            <option value="5">5 格</option>
+            <option value="6" selected>6 格</option>
+            <option value="8">8 格</option>
+          </select>
+        </label>
+        <button id="audioBtn" class="utility-btn" type="button">音乐</button>
+        <button id="bankBtn" class="utility-btn" type="button">题库</button>
+        <button id="resetBtn" class="utility-btn strong" type="button">重新开始</button>
+      </div>
+    </header>
+
+    <main class="game-layout">
+      <section class="team-panel team-blue" aria-label="蓝队答题区">
+        <div class="team-head">
+          <div>
+            <p>Team 1</p>
+            <h2>蓝队</h2>
+          </div>
+          <strong id="leftCorrect">0</strong>
+        </div>
+        <div class="question-box">
+          <p id="leftMode" class="mode-label">通用学习题库</p>
+          <div id="leftPrompt" class="prompt">准备出题</div>
+        </div>
+        <div id="leftOptions" class="options-grid"></div>
+        <p id="leftFeedback" class="feedback">点中正确答案就向左拉</p>
+      </section>
+
+      <section class="arena-panel" aria-label="拔河比赛区">
+        <div class="match-strip">
+          <div>
+            <span>蓝队</span>
+            <strong id="blueScore">0</strong>
+          </div>
+          <div class="clock">
+            <span>用时</span>
+            <strong id="timer">00:00</strong>
+          </div>
+          <div>
+            <span>红队</span>
+            <strong id="redScore">0</strong>
+          </div>
+        </div>
+
+        <div id="arena" class="arena">
+          <div class="center-line"></div>
+          <div class="ground-shadow"></div>
+          <div class="pull-ruler">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+
+          <div id="tugScene" class="tug-scene">
+            <div id="ropeLayer" class="rope-layer">
+              <img src="./assets/images/rope.png" alt="" draggable="false" />
+              <span class="rope-knot"></span>
+              <span class="flag"></span>
+            </div>
+            <div id="blueTeam" class="team-sprite-wrap blue-sprite-wrap">
+              <img class="team-sprite" src="./assets/images/blue-team.png" alt="蓝队拔河小人" draggable="false" />
+            </div>
+            <div id="redTeam" class="team-sprite-wrap red-sprite-wrap">
+              <img class="team-sprite" src="./assets/images/red-team.png" alt="红队拔河小人" draggable="false" />
+            </div>
+          </div>
+
+          <div id="resultBanner" class="result-banner" hidden>
+            <p id="resultText">蓝队获胜</p>
+            <button id="playAgainBtn" type="button">再来一局</button>
+          </div>
+        </div>
+
+        <div class="delta-panel">
+          <span>拉力差</span>
+          <div class="delta-track">
+            <i id="deltaMarker"></i>
+          </div>
+          <strong id="deltaText">0 / 6</strong>
+        </div>
+      </section>
+
+      <section class="team-panel team-red" aria-label="红队答题区">
+        <div class="team-head">
+          <div>
+            <p>Team 2</p>
+            <h2>红队</h2>
+          </div>
+          <strong id="rightCorrect">0</strong>
+        </div>
+        <div class="question-box">
+          <p id="rightMode" class="mode-label">通用学习题库</p>
+          <div id="rightPrompt" class="prompt">准备出题</div>
+        </div>
+        <div id="rightOptions" class="options-grid"></div>
+        <p id="rightFeedback" class="feedback">错了只闪红光，题目不变</p>
+      </section>
+    </main>
+
+    <section id="bankModal" class="modal-backdrop" hidden aria-label="题库管理">
+      <div class="bank-modal">
+        <div class="modal-head">
+          <div>
+            <p>教师题库工具</p>
+            <h2>Excel 题库导入</h2>
+          </div>
+          <button id="closeBankBtn" class="icon-close" type="button">×</button>
+        </div>
+        <div class="bank-actions two-actions">
+          <button id="templateXlsxBtn" type="button">下载题目模板</button>
+          <button id="importBankBtn" class="primary-bank-btn" type="button">导入题库</button>
+          <input id="importBankInput" type="file" accept=".xlsx,.xls" hidden />
+        </div>
+        <div class="bank-note">
+          <strong id="bankCount">0 道题</strong>
+          <span>模板列：题目、正确答案、错误选项1、错误选项2、错误选项3。左右两边会尽量抽不同题，减少互抄。</span>
+        </div>
+        <textarea id="bankPreview" spellcheck="false" readonly></textarea>
+      </div>
+    </section>
+  </div>
+
+  <script src="./assets/vendor/xlsx.full.min.js"></script>
+  <script src="./game.js"></script>
+</body>
+</html>
